@@ -1,5 +1,5 @@
 /* ====================================== sessionStorage 本地存储  ====================================== */
-import $fn from './fn'
+import $fn from '@com/fn'
 export default {
 	// ====================================== 设置存储
 	set(key,value){

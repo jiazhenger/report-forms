@@ -1,5 +1,5 @@
 /* ====================================== sessionStorage 本地存储  ====================================== */
-import F from './methods'
+import $fn from '@com/fn'
 export default {
 	// 设置 cookie
 	setCookie(name, value, days){
@@ -27,7 +27,7 @@ export default {
             }
         }
         
-        if(F.isValid(res)){
+        if($fn.isValid(res)){
         	return JSON.parse(unescape(res));
         }
         

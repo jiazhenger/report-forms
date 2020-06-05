@@ -35,20 +35,36 @@ const config = (opt)=>{
 	}
 }
 
+// 序列化参数 {a:1,b:2} to ?a=1&b=2
+const serializeParam = (body,isPost) => {
+	if(!$fn.hasObject(body)) return '';
+	let param = body;
+	let str='';
+	for(var i in param){
+		if($fn.isValid(param[i])){ str += i + '=' + param[i] + '&' }
+	}
+	if (str.charAt(str.length - 1) === '&'){ str = str.slice(0, str.length - 1) }
+	str = isPost ? str : '?' + str
+	return encodeURI(str);	// encodeURI 不对 [:, /, ;,?] 进行编码
+}
+
+// 序列化公参及自定义传参
+//const combineParam = (body) => { return serializeParam(LS.get('login')) + serializeParam(body) }
+
 // 将 body 以函数形式处理
 const manageBody = body => $fn.isFunction(body) ? body() : body
 // 给空数据加类型
 const setType = (_this,dataName) => {
-	if(!_this) return;
-	let stack = _this.state[dataName];
+	if(!_this) return
+	let stack = _this[dataName]
 	if($fn.isArray(stack)){
-		stack = [];
+		stack = []
 	}else if($fn.isObject(stack)){
 		stack = {}
 	}else{
-		stack = '';
+		stack = ''
 	}
-	if($fn.isValid(dataName)){_this.setState({ [dataName] :  stack }) };
+	if($fn.isValid(dataName)){ _this[dataName] =  stack  }
 	return stack;
 }
 // http 核心封装
@@ -60,79 +76,8 @@ const setType = (_this,dataName) => {
  * 		error:()=>{}				// 接口请求不通时调用
  * 		closeToast:true				// 数据请求成功但不符合规则时，屏蔽默认提示，可在 then 中自定义提示
  * }
- * 
+ *
  * */
-const coreRequest = (url, param, action, defined) => {
-	let UD = defined || {}
-	let api = url.indexOf('http') !== -1 ? url : Config.api
-	let body = manageBody(param);				// 处理自定义参数的不同形式 {} function
-	let sParam = serializeParam(body);	// 序列化参数
-		body = UD.type === 1 ? serializeParam(body,true) : body
-	let promise;
-	let configs = config({
-		type	: UD.type,
-		noToken	: UD.noToken,
-		api		: api
-	})
-	
-	$fn.isFunction(UD.onStart) && UD.onStart()		// 一开始就调用
-	
-	if(action === 'get'){
-		promise = axios.get(url + sParam, configs);
-		logMsg('%c' + action + ' === ' + api + url + sParam, 'color:blue')		// 输出 api
-	}else{
-		promise = axios.post(url, body, configs);
-		logMsg('%c' + action + ' === ' + api + url + JSON.stringify(body), 'color:blue')	
-	}
-	
-	// 加载效果
-	return new Promise((resolve, reject) => {
-		promise.then(res => {	// 接口正确接收数据处理
-			let data = res.data;
-			let code = data.status;
-			
-			if(code === 1){	// 数据请求成功
-				resolve(data.data);
-				logMsg(url + '===', data.data);
-			} else if(code === 501){	// 登录信息已过期，请重新登录!
-				$fn.toast(data['msg'])
-				$fn.remove()
-				$fn.loginTo()
-				// 跳转不同登录页
-				setTimeout(()=>$fn.go('/'))
-			}else{ // 数据请求成功但不符合规则
-				reject(data);
-					
-				$fn.isFunction(UD.onError) && UD.onError(data)	// 只要出错就调用
-				$fn.isFunction(UD.onFail) && UD.onFail(data)	// 数据处理不满足条件时调用
-				
-				if(UD.onMsg){
-					$fn.isFunction(UD.onMsg) && UD.onMsg(data)		// 自定义提示
-				}else{
-					$fn.toast(data['msg'],UD.onError)			// 默认开启出错提示
-				}
-				
-				logMsg(url + '===', data);
-			}
-			
-			$fn.isFunction(UD.onEnd)		&& UD.onEnd(data)  		// 只要调用接口就调用
-			$fn.isFunction(UD.onSuccess)	&& UD.onSuccess(data) 	// 只要调用接口成功就调用
-			
-		}, (err) => { 					// 接口错误处理
-			if(!UD.noError){ $fn.toast('服务器或网络出错')}
-			$fn.isFunction(UD.onNet) 	&& UD.onNet()				// 服务器出错或无网络调用
-			$fn.isFunction(UD.onError) 	&& UD.onError()				// 只要出错就调用
-			$fn.isFunction(UD.onEnd)	&& UD.onEnd()  				// 只要调用接口就调用
-			//error(err, api + url)
-		})
-	})
-}
-// ===================================================== pull 请求组件
-// post 请求
-const post = (url,body,defined) => coreRequest(url,body,'post',defined)
-// get 请求
-const get = (url,body,defined) => coreRequest(url,body,'get',defined)
-// ===================================================== pull 提交
 const coreRequest = (url, param, action, defined) => {
 	let UD = defined || {}
 	let api = url.indexOf('http') !== -1 ? url : Config.api
