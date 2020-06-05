@@ -11,7 +11,8 @@ import ReactDOM from 'react-dom'
 // ======================================================== 注册服务器
 //import * as serviceWorker from './serviceWorker'
 // ======================================================== 入口文件
-import App from './App'
+// import App from './App'
+import App from '@pages'
 // ======================================================== 启动 react
 //ReactDOM.render( <React.StrictMode><App/></React.StrictMode>, document.querySelector('#app-root') )
 ReactDOM.render( <App/>, document.querySelector('#app-root') )

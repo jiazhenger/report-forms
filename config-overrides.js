@@ -14,15 +14,12 @@ module.exports = override(
         ['@antd'] 	: resolve('src/components/antd'),
         ['@mu'] 	: resolve('src/components/material-ui'),
         ['@es'] 	: resolve('src/components/echarts'),
-        
 	  	['@cpx'] 	: resolve('src/components-x'),
-	  	
 	  	['@assets'] : resolve('src/assets'),
 	  	['@css'] 	: resolve('src/assets/css'),
-	  	['@img'] : resolve('src/assets/images'),
+	  	['@img'] 	: resolve('src/assets/images'),
 	  	['@js'] 	: resolve('src/assets/js'),
 	  	['@pages'] 	: resolve('src/pages'),
-	  	
 		['@redux'] 	: resolve('src/redux')
 	}),
 	// 异步引入 antd 配置
