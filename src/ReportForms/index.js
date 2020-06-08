@@ -1,20 +1,19 @@
 import React from 'react'
 // ===================================================================== private component
 import Content from './cpt/content'
-import Drag from './cpt/js/core'
+import Core from './js/core'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Collapse } from 'antd'
 import { Tabs } from 'antd'
 // ===================================================================== image
-import QuitImage from '@img/icon/quit.png'
 import TableImage from '@img/icon/table.png'
 import ImgImage from '@img/icon/img.png'
 import TextImage from '@img/icon/text.png'
 // ===================================================================== declare
 const Panel = Collapse.Panel
 const { TabPane } = Tabs
-const { $fn } = window
+// const { $fn } = window
 const rightWidth = '350px'
 const leftWidth = '200px'
 // ===================================================================== template
@@ -35,10 +34,10 @@ const IconButton2 = ({ icon, label, onDragStart}) => (
 // ===================================================================== component
 export default class extends React.Component {	
 	componentDidMount(){
-		Drag.GlobalListener(this)
+		Core.GlobalListener(this)
 	}
 	onDragStart = e => {
-		Drag.DragStart(e,this)
+		Core.DragStart(e,this)
 	}
 	onDrop(e){
 		
@@ -54,7 +53,7 @@ export default class extends React.Component {
 					<h5 className='f12 b ml5 c0'>报表编辑器</h5>
 					<div className='ex h'>
 						<ul className='fxmc h'>
-							<IconButton icon={QuitImage} label='退出' />
+							<IconButton label='退出' />
 						</ul>
 					</div>
 				</header>
