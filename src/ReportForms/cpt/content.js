@@ -25,29 +25,30 @@ const axes = (dom,width,height,space,isY) => {
 // ===================================================================== component
 export default ({ onDrop, onDragOver }) => {
 	const paper = React.useRef()
-	const box = React.useRef()
+	const $axes = React.useRef()
 	React.useEffect(()=>{
-		const dom = box.current
-		const paperDom = paper.current
+		const { current } = $axes
 		const resize = () => {
-			const width = dom.clientWidth
-			const height = dom.clientHeight
-			const space = 15
+			const width = current.clientWidth
+			const height = current.clientHeight
+			const space = 20
 			// 创建坐标系
-			axes(dom,width,height,space)
-			axes(dom,width,height,space,true)
+			axes(current,width,height,space)
+			axes(current,width,height,space,true)
 		}
 		resize()
 		window.addEventListener('resize',e=>{
-			dom.querySelector('.axesX').remove()
-			dom.querySelector('.axesY').remove()
+			current.querySelector('.axesX').remove()
+			current.querySelector('.axesY').remove()
 			resize()
 		})
 	},[ ])
 	return (
-		<div className='bcf' ref={paper} onDrop={onDrop} onDragOver={onDragOver} style={{padding:'20px',width:'800px',height:'1000px',margin:'0 auto',boxShadow:'0 0 8px #ccc'}}>
-			<div className='rel bor1 wh' ref={box}>
-				
+		<div id='dragWraper' className='bcf' ref={paper}  style={{padding:'20px',width:'800px',height:'1000px',margin:'0 auto',boxShadow:'0 0 8px #ccc'}}>
+			<div className='rel bor1 wh' ref={$axes} onDrop={onDrop} onDragOver={onDragOver}>
+				<section className='abs_lt wh i10 oh' id='dragContent'>
+					
+				</section>
 			</div>
 		</div>
 	)
