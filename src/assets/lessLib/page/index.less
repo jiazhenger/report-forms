@@ -1,3 +1,24 @@
 /* ================================ *** 个性化模块 *** ================================ */
 .drag-list li{.w(31.2%);.m(0 3% 10px 0);}
 .drag-list li:nth-child(3n){.mr;}
+
+.move{.bor(@main-color)}
+.hide{
+	>div:extend(.rel){.index(2)}
+}
+
+.point-mark:extend(.abs_lt,.wh){.bor(@main-color);.dn;
+	@w:6;
+	@f:-@w/2;
+	p:extend(.abs,.r100px){.ww(@w);.bc(@main-color);.p(2);
+		&:nth-child(1){.l_t(@f);.cd(se-resize);}
+		&:nth-child(2){.r_t(@f);.cd(sw-resize);}
+		&:nth-child(3){.r_b(@f);.cd(se-resize);}
+		&:nth-child(4){.l_b(@f);.cd(sw-resize);}
+		
+		&:nth-child(5){.l_t(50%,@f);.ml(-@w/2);.cd(n-resize);}
+		&:nth-child(6){.r_t(@f,50%);.mt(-@w/2);.cd(w-resize);}
+		&:nth-child(7){.l_b(50%,@f);.ml(-@w/2);.cd(n-resize);}
+		&:nth-child(8){.l_t(@f,50%);.mt(-@w/2);.cd(w-resize);}
+	}
+}

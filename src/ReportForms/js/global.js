@@ -2,7 +2,6 @@ import Drag from './drag'
 import Axes from './axes'
 import Html from './html'
 import { differ, axeSspace  } from './config'
-const { $fn } = window
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -49,7 +48,6 @@ const dragRange = (e,_this, opt) => {
 			opt.onDrag && opt.onDrag({$drag,dragInfo,$scroll,scrollInfo})
 		}else{
 			opt.onFail && opt.onFail({$drag,dragInfo,$scroll,scrollInfo})
-			
 		}
 	})
 }
@@ -98,6 +96,7 @@ export default {
 					_this.node.style.top = top + 'px'
 					
 					$drag.appendChild(_this.node)
+					_this.node.querySelector('.point-mark').style.display = 'block'
 				},
 				onFail:()=>{
 					removeHtml()
@@ -115,8 +114,23 @@ export default {
 		}else{
 			const node = document.createElement('div')
 			node.className = 'move'
-			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;border:1px solid ${$fn.c0};background:#fff`
+			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;background:#fff`
 			node.innerHTML = Html[type]
+			
+			// 拖动标点
+			const point = document.createElement('span')
+			point.className = 'point-mark'
+			point.innerHTML = `
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+				<p class='dir lt'><s></s></p>
+			`
+			node.appendChild(point)
 			_this.node = node
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)

@@ -21,8 +21,8 @@ export default space => {
 		const width = el.clientWidth
 		const height = el.clientHeight
 		// 创建坐标系
-		createAxes(el,width,height,space)
 		createAxes(el,width,height,space,true)
+		createAxes(el,width,height,space)
 	}
 	resize()
 	window.addEventListener('resize',e=>{

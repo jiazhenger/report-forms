@@ -3,6 +3,7 @@ import React from 'react'
 import Content from './cpt/content'
 import Global from './js/global'
 import Part from './js/part'
+// import Size from './js/size'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Collapse } from 'antd'
@@ -41,6 +42,7 @@ export default class extends React.Component {
 		this.$axes = document.querySelector('#axes')				// x 轴
 		Global.init(this)
 		Part.init(this)
+		// Size(this)
 	}
 	onDragStart = (e,type) => {
 		Global.DragStart(e,this,type)
@@ -67,7 +69,7 @@ export default class extends React.Component {
 					{/*  左侧操作 */}
 					<nav className='bcf rel' style={{width:leftWidth}}>
 						<div className='abs_full scroll'>
-							<ul className='fxw plr5 pt10 drag-list'>
+							<ul className='fxw plr5 pt10 drag-list nosel'>
 								<IconButton2 icon={TextImage} label='文本' onDragStart={e=>this.onDragStart(e,'text')}/>
 								<IconButton2 icon={ImgImage} label='图片' />
 								<IconButton2 icon={TableImage} label='表格' />
@@ -75,7 +77,7 @@ export default class extends React.Component {
 						</div>
 					</nav>
 					{/*  中心展示 */}
-					<section className='ex rel'>
+					<section className='ex rel nosel'>
 						<div className='abs_full scrollXY' style={{padding:'15px'}} id='scrollbox'>
 							<Content onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
 						</div>
