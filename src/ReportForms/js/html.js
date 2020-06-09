@@ -3,5 +3,5 @@
  * 
  */
 export default {
-	text: `<div style='height:30px;line-height:30px;min-width:100px'></div>`
+	text: `<div style='min-height:24px;line-height:24px;min-width:97px'></div>`
 }

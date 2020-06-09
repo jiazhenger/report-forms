@@ -1,4 +1,4 @@
-const axesColor = '#eee' 	// 坐标颜色
+import { axesColor } from './config'
 // 创建坐标系
 const createAxes = (dom,width,height,space,isY) => {
 	let html = ''
@@ -15,7 +15,7 @@ const createAxes = (dom,width,height,space,isY) => {
 	dom.appendChild(node)
 }
 
-module.exports = space => {
+export default space => {
 	const el = document.querySelector('#axes')
 	const resize = () => {
 		const width = el.clientWidth

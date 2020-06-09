@@ -1,7 +1,8 @@
 import React from 'react'
 // ===================================================================== private component
 import Content from './cpt/content'
-import Core from './js/core'
+import Global from './js/global'
+import Part from './js/part'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Collapse } from 'antd'
@@ -34,10 +35,15 @@ const IconButton2 = ({ icon, label, onDragStart}) => (
 // ===================================================================== component
 export default class extends React.Component {	
 	componentDidMount(){
-		Core.GlobalListener(this)
+		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
+		this.$scroll = document.querySelector('#scrollbox') 		// 滚动区域
+		this.$paper = document.querySelector('#paper')				// 纸张区域
+		this.$axes = document.querySelector('#axes')				// x 轴
+		Global.init(this)
+		Part.init(this)
 	}
-	onDragStart = e => {
-		Core.DragStart(e,this)
+	onDragStart = (e,type) => {
+		Global.DragStart(e,this,type)
 	}
 	onDrop(e){
 		
@@ -62,7 +68,7 @@ export default class extends React.Component {
 					<nav className='bcf rel' style={{width:leftWidth}}>
 						<div className='abs_full scroll'>
 							<ul className='fxw plr5 pt10 drag-list'>
-								<IconButton2 icon={TextImage} label='文本' onDragStart={this.onDragStart}/>
+								<IconButton2 icon={TextImage} label='文本' onDragStart={e=>this.onDragStart(e,'text')}/>
 								<IconButton2 icon={ImgImage} label='图片' />
 								<IconButton2 icon={TableImage} label='表格' />
 							</ul>

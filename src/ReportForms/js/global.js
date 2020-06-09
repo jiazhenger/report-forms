@@ -1,10 +1,8 @@
 import Drag from './drag'
 import Axes from './axes'
 import Html from './html'
+import { differ, axeSspace  } from './config'
 const { $fn } = window
-// config
-const differXY = 10 		// 鼠标在拖动元素的位置
-const space = 20			// 坐标间隔
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -13,10 +11,8 @@ const removeHtml = () => {
 	}
 }
 // 查找鼠标经过的放置HTML元素的范围
-const dragRange = (e,_this) => {
-	const $drag = document.querySelector('#dragContent') 		// HTML元素放置区域
-	const $scroll = document.querySelector('#scrollbox') 		// 滚动区域
-	const $paper = document.querySelector('#paper')	// 纸张区域
+const dragRange = (e,_this, opt) => {
+	const { $drag, $scroll, $paper} = _this
 	const { x, y } = Drag.getMouse(e)
 	const scrollInfo = Drag.getInfo($scroll)
 	const scrollTop = scrollInfo.scrollTop
@@ -50,58 +46,77 @@ const dragRange = (e,_this) => {
 						))
 	return new Promise( resolve =>{
 		if(rangeXstart && rangeXend && rangeYstart && rangeYend){
-			resolve({$drag,dragInfo,$scroll,scrollInfo})
+			opt.onDrag && opt.onDrag({$drag,dragInfo,$scroll,scrollInfo})
 		}else{
-			removeHtml()
-			_this.node = null
+			opt.onFail && opt.onFail({$drag,dragInfo,$scroll,scrollInfo})
+			
 		}
 	})
 }
 // 拖动 html 元素
 export default {
 	// 默认执行
-	GlobalListener(_this){
+	init(_this){
 		/* 初始化坐标 */
-		Axes(space)
+		Axes(axeSspace)
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
 			const { x, y } = Drag.getMouse(e)
 			if(_this.node){
-				_this.node.style.left = (x - differXY ) + 'px'
-				_this.node.style.top = (y - differXY ) + 'px'
+				_this.node.style.left = (x - differ) + 'px'
+				_this.node.style.top = (y - differ) + 'px'
 			}
+			dragRange(e,_this,{
+				onDrag:({$drag,dragInfo,$scroll,scrollInfo}) => {
+					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
+					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
+					Drag.mark(_this,'.axesY', left)
+					Drag.mark(_this,'.axesX', top)
+				},
+				onFail:()=>{
+					
+				}
+			})
 		}
 		/*  鼠标松开时重新定位 html 元素位置 */
 		this.setNewPosition = e => {
 			if(!_this.node) return;
 			const { x, y } = Drag.getMouse(e)
-			dragRange(e,_this).then( ({$drag,dragInfo,$scroll,scrollInfo}) =>{
-				document.body.removeEventListener('mousemove',this.setHtmlPosition)
-				document.body.removeEventListener('mouseup',this.setNewPosition)
-				_this.node.className = 'drag'
-				
-				let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differXY
-				let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differXY
-				
-				left = left - (left % space) + 1
-				top = top - (top % space) + 1
-				
-				_this.node.style.left = left + 'px'
-				_this.node.style.top = top + 'px'
-				$drag.appendChild(_this.node)
+			dragRange(e,_this,{
+				onDrag:({$drag,dragInfo,$scroll,scrollInfo}) => {
+					document.body.removeEventListener('mousemove',this.setHtmlPosition)
+					document.body.removeEventListener('mouseup',this.setNewPosition)
+					_this.node.className = 'drag'
+					
+					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
+					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
+					
+					left = left - (left % axeSspace) + 1
+					top = top - (top % (axeSspace/2)) + 1
+					
+					_this.node.style.left = left + 'px'
+					_this.node.style.top = top + 'px'
+					
+					$drag.appendChild(_this.node)
+				},
+				onFail:()=>{
+					removeHtml()
+					_this.node = null
+				}
 			})
 		}
 	},
 	// 开始拖动
-	DragStart(e,_this){
+	DragStart(e,_this,type){
 		const { x, y } = Drag.getMouse(e)
+		if(!type) return;
 		if(document.querySelector('.move')){
 			
 		}else{
 			const node = document.createElement('div')
 			node.className = 'move'
 			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;border:1px solid ${$fn.c0};background:#fff`
-			node.innerHTML = Html.text
+			node.innerHTML = Html[type]
 			_this.node = node
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)

@@ -1,3 +1,4 @@
+import { axesColor, axesActiveColor } from './config'
 /**
  * 拖动元素
  * 
@@ -32,5 +33,15 @@ export default {
 			positionTop 	: offsetTop,			// 向上相对偏移距离
 			positionLeft 	: offsetLeft,			// 向左相对偏移距离
 		}
+	},
+	mark(_this, $axes, left) {
+		const n = parseInt(left / 20)
+		Array.prototype.slice.call(_this.$axes.querySelector($axes).children,0).forEach((v,i)=>{
+			if(n === i){
+				v.style.background = axesActiveColor
+			}else{
+				v.style.background = axesColor
+			}
+		})
 	}
 }
