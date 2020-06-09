@@ -22,8 +22,8 @@ export default {
 			offsetEle = offsetEle.offsetParent
 		}	
 		return {
-			offsetTop,								// 元素到窗口顶部边缘距离
-			offsetLeft,								// 元素到窗口左侧边缘距离
+			offsetTop,								// 元素到窗口顶部边缘距离，滚动条不影响
+			offsetLeft,								// 元素到窗口左侧边缘距离，滚动条不影响
 			width 			: el.clientWidth, 		// 元素宽度
 			height 			: el.clientHeight,		// 元素高度
 			scrollWidth 	: el.scrollWidth,		// 横向滚动宽度

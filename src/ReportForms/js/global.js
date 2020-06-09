@@ -1,7 +1,7 @@
 import Drag from './drag'
 import Axes from './axes'
 import Html from './html'
-import { differ, axeSspace  } from './config'
+import { differ, axesSpace  } from './config'
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -56,7 +56,7 @@ export default {
 	// 默认执行
 	init(_this){
 		/* 初始化坐标 */
-		Axes(axeSspace)
+		Axes(axesSpace)
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
 			const { x, y } = Drag.getMouse(e)
@@ -89,8 +89,8 @@ export default {
 					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
 					
-					left = left - (left % axeSspace) + 1
-					top = top - (top % (axeSspace/2)) + 1
+					left = left - (left % axesSpace) + 1
+					top = top - (top % (axesSpace/2)) + 1
 					
 					_this.node.style.left = left + 'px'
 					_this.node.style.top = top + 'px'
@@ -121,14 +121,14 @@ export default {
 			const point = document.createElement('span')
 			point.className = 'point-mark'
 			point.innerHTML = `
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
-				<p class='dir lt'><s></s></p>
+				<p class='dir lt-wh'><s></s></p>
+				<p class='dir rt-wh'><s></s></p>
+				<p class='dir rb-wh'><s></s></p>
+				<p class='dir lb-wh'><s></s></p>
+				<p class='dir tc-h'><s></s></p>
+				<p class='dir rc-w'><s></s></p>
+				<p class='dir bc-h'><s></s></p>
+				<p class='dir lc-w'><s></s></p>
 			`
 			node.appendChild(point)
 			_this.node = node

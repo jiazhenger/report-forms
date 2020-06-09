@@ -4,7 +4,7 @@ module.exports =  {
 	// axes 配置
 	axesColor: '#eee',
 	axesActiveColor: '#333',
-	axeSspace: 20,
+	axesSpace: 20,
 	// 拖动框配置
 	moveBorderColor:'#666',
 	stopBorderColor:'#aaa'
