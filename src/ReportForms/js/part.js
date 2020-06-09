@@ -8,9 +8,16 @@ export default {
 		const { $drag } = _this
 		let startX = 0
 		let startY = 0
+		// 拖动改变尺寸
 		const DragSizeMove = e => {
+			const { target } = e
 			const { x, y } = Drag.getMouse(e)
 			const { offsetLeft, offsetTop, width, height } = Drag.getInfo($drag)
+			let t = Dom.parents(target,'drag')
+			console.log(t)
+			if(t){
+				t.style.width = x  - offsetLeft + 'px'
+			}
 		}
 		// 打开拖动
 		const DragStart = e => {
@@ -19,8 +26,7 @@ export default {
 			const { x, y } = Drag.getMouse(e)
 			let t = Dom.parents(target,'drag')
 			const name = target.className
-			
-			if( name === 'dir'){
+			if( name.indexOf('dir') >= 0 ){
 				return $drag.addEventListener('mousemove',DragSizeMove)
 			}
 			
@@ -141,6 +147,7 @@ export default {
 			})
 			
 			$drag.removeEventListener('mousemove',DragMove)
+			$drag.removeEventListener('mousemove',DragSizeMove)
 		})
 	}
 }
