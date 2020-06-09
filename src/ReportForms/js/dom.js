@@ -4,11 +4,15 @@
 module.exports = {
 	// 判断元素是否有 className
 	hasClass(el,className){
-		const c = el.className
-		if(c){
-			return c.indexOf(className) !== -1 
+		if(el){
+			const c = el.className
+			if(c){
+				return c.indexOf(className) !== -1 
+			}else{
+				return false
+			}
 		}else{
-			return false;
+			return false
 		}
 	},
 	// 查找父级有指定样式的元素

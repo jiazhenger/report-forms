@@ -103,7 +103,6 @@ export default {
 			const { target } = e
 			const t = Dom.parents(target,'drag')
 			// 获取拖动尺寸的元素
-			const name = target.className
 			if( this.dargNode ){
 				const left = parseInt(this.dargNode.style.left)
 				const top = parseInt(this.dargNode.style.top)
@@ -182,7 +181,6 @@ export default {
 		document.body.addEventListener('mouseup',e=>{
 			const { target } = e
 			let t = Dom.parents(target,'drag')
-			
 			const name = target.className
 			if( name.indexOf('dir') >= 0 ){
 				
