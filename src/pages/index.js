@@ -1,6 +1,8 @@
 import React from 'react'
+import Async from '@com/async'
 // ===================================================================== public component
-import ReportForms from '@/ReportForms'
+import Toast from '@cpx/toast'
+const ReportForms = Async(()=>import('@/ReportForms'))
 // ===================================================================== antd
 
 // ===================================================================== image
@@ -10,6 +12,9 @@ import ReportForms from '@/ReportForms'
 // ===================================================================== component
 export default () => {
 	return (
-		<ReportForms />
+		<>
+			<ReportForms />
+			<Toast />
+		</>
 	)
 }

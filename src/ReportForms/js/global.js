@@ -101,6 +101,7 @@ export default {
 				onFail:()=>{
 					removeHtml()
 					_this.node = null
+					_this.setState({hasNode:null, node:null})
 				}
 			})
 		}
@@ -116,6 +117,8 @@ export default {
 			node.className = 'move'
 			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;background:#fff`
 			node.innerHTML = Html[type]
+			node.children[0].className = 'template'
+			node.setAttribute('type',type)
 			
 			// 拖动标点
 			const point = document.createElement('span')
@@ -132,6 +135,7 @@ export default {
 			`
 			node.appendChild(point)
 			_this.node = node
+			_this.setState({hasNode:true, node})
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)
 			document.body.addEventListener('mouseup',this.setNewPosition)

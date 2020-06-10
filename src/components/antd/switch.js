@@ -1,4 +1,4 @@
-﻿/* ====================================== toast  ====================================== */
+/* ====================================== toast  ====================================== */
 import React from 'react'
 import { Switch } from 'antd'
 // ===================================================================== Select
@@ -9,7 +9,7 @@ export default class Index extends React.Component {
 	onChange = value => {
 		const { onChange, name, bool } = this.props
 		this.setState({ value },()=>{
-			let rs = bool ? value : (this.state.value ? 0 : 1)
+			let rs = bool ? value : this.state.value
 			onChange && onChange( name ? { [name]: rs } : rs )
 		})
 	}

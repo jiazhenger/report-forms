@@ -1,4 +1,4 @@
-﻿/* ====================================== toast  ====================================== */
+/* ====================================== toast  ====================================== */
 import React from 'react'
 import { Button } from 'antd'
 //import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -12,7 +12,7 @@ export default class Btn extends React.Component{
 	static Search = Search
 	static Submit = Submit
 	render(){
-		const { type, size, children, text, width, minWidth, className, onClick, loading, htmlType, disabled, style, ghost, round } = this.props
+		const { type, size, children, label, width, minWidth, className, onClick, loading, htmlType, disabled, style, ghost, round } = this.props
 		let height = {}
 		let radius = round ? {borderRadius:'100px'} : {borderRadius: '3px'}
 		if(size === 'x'){
@@ -32,7 +32,7 @@ export default class Btn extends React.Component{
 				htmlType 	= { htmlType }
 				ghost 		= { ghost }
 			>
-				{text||children}
+				{label||children}
 			</Button>
 		)
 	}
