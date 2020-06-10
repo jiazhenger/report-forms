@@ -25,14 +25,17 @@ const dragRange = (e,_this, opt) => {
 	const scrollPadding = parseInt($scroll.style.padding)
 	const dragPadding = parseInt($paper.style.padding)
 	const padding = scrollPadding + dragPadding
-	
 	// 确定目标元素放置范围
 	const dragInfo = Drag.getInfo($drag)
 	const { offsetLeft, offsetTop, width, height } = dragInfo
+	
 	const spaceX = scrollWidth - scrollLeft - scrollClientWidth
 	const spaceY = scrollHeight - scrollTop - scrollClientHeight
+	
+	console.log(scrollWidth)
+	
 	const rangeXstart =  ( scrollLeft <= padding && x > offsetLeft - scrollLeft ) || ( scrollLeft > padding && x > scrollOffestLeft)
-	const rangeXend = 	( scrollClientWidth === scrollWidth && x < offsetLeft + width  ) || 
+	const rangeXend = 	( scrollClientWidth === scrollWidth + 2 && x < offsetLeft + width  ) || 
 						(scrollClientWidth < scrollWidth && (
 							( spaceX >= dragPadding && x < scrollOffestLeft + scrollClientWidth) || 
 							( spaceX < dragPadding && x < scrollOffestLeft + scrollClientWidth - (dragPadding - spaceX))

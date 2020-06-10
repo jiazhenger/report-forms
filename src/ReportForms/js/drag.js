@@ -12,26 +12,21 @@ export default {
 		}
 	},
 	//  获取元素各种信息
-	getInfo : function(el){	
-		let offsetTop = el.offsetTop
-		let offsetLeft = el.offsetLeft
-		let offsetEle = el.offsetParent
-		while(offsetEle){
-			offsetTop += offsetEle.offsetTop
-			offsetLeft += offsetEle.offsetLeft
-			offsetEle = offsetEle.offsetParent
-		}	
+	getInfo : function(s){	
+		const r = s.getBoundingClientRect( )
 		return {
-			offsetTop,								// 元素到窗口顶部边缘距离，滚动条不影响
-			offsetLeft,								// 元素到窗口左侧边缘距离，滚动条不影响
-			width 			: el.clientWidth, 		// 元素宽度
-			height 			: el.clientHeight,		// 元素高度
-			scrollWidth 	: el.scrollWidth,		// 横向滚动宽度
-			scrollHeight	: el.scrollHeight,		// 纵向滚动高度
-			scrollLeft 		: el.scrollLeft,		// 横向滚动距离
-			scrollTop 		: el.scrollTop,			// 纵向滚动距离
-			positionTop 	: offsetTop,			// 向上相对偏移距离
-			positionLeft 	: offsetLeft,			// 向左相对偏移距离
+			offsetTop		: r.top,
+			offsetLeft		: r.left,
+			offsetRight		: r.right,
+			offsetBottom	: r.bottom,
+			width 			: r.width,
+			height 			: r.height,
+			scrollWidth 	: s.scrollWidth,
+			scrollHeight	: s.scrollHeight,
+			scrollLeft 		: s.scrollLeft,	
+			scrollTop 		: s.scrollTop,	
+			posTop 			: s.offsetTop,	
+			posLeft 		: s.offsetLeft,	
 		}
 	},
 	mark(_this, $axes, left) {
