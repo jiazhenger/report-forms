@@ -21,12 +21,24 @@ export default {
 			offsetBottom	: r.bottom,
 			width 			: r.width,
 			height 			: r.height,
+			clientWidth 	: s.clientWidth,
+			clientHeight 	: s.clientHeight,
+			offsetWidth 	: s.offsetWidth,
+			offsetHeight 	: s.offsetHeight,
 			scrollWidth 	: s.scrollWidth,
 			scrollHeight	: s.scrollHeight,
 			scrollLeft 		: s.scrollLeft,	
 			scrollTop 		: s.scrollTop,	
 			posTop 			: s.offsetTop,	
-			posLeft 		: s.offsetLeft,	
+			posLeft 		: s.offsetLeft,
+			left			: parseInt(s.style.left),
+			top 			: parseInt(s.style.top)
+		}
+	},
+	getPos(s){
+		return {
+			left : parseInt(s.style.left),
+			top  : parseInt(s.style.top)
 		}
 	},
 	mark(_this, $axes, left) {

@@ -4,7 +4,6 @@ import List from './list'
 // ===================================================================== page component
 export default ({ parent }) => {
 	const onChange = React.useCallback( (name,value,none) => {
-		console.log(name)
 		const drag = parent.node
 		if(drag){
 			const obj = {}
@@ -12,7 +11,8 @@ export default ({ parent }) => {
 				obj.label = i
 				obj.value = name[i]
 			}
-			drag.querySelector('.template').style[obj.label] = obj.value === '' ? 0 : obj.value + 'px'
+			
+			drag.querySelector('.template').style[obj.label] = obj.value === '' ? 0 : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
 		}else{
 			window.$fn.toast('未选中目标')
 		}
@@ -27,8 +27,12 @@ export default ({ parent }) => {
 				<List.Input label='补白上' name='paddingTop' onChange={onChange}  isHalf />
 				<List.Input label='补白下' name='paddingBottom' onChange={onChange}  isHalf />
 			</div>
-			<div>
-				<List.Input label='背景' isHalf />
+			<div className='fx'>
+				<List.Input label='圆角' name='borderRadius' onChange={onChange}  isHalf />
+				<List.Input label='背景' name='backgroundColor' onChange={onChange} isHalf />
+			</div>
+			<div className='fx'>
+				<List.Input label='透明度' name='opacity' onChange={onChange} isHalf />
 			</div>
 		</>
 	)

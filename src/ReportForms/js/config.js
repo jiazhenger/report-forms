@@ -7,5 +7,7 @@ module.exports =  {
 	axesSpace: 20,
 	// 拖动框配置
 	moveBorderColor:'#999',
-	stopBorderColor:'#aaa'
+	stopBorderColor:'#aaa',
+	// 拖动滚动
+	scrollSpace:10
 }

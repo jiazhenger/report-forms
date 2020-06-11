@@ -16,7 +16,7 @@ import { Tabs } from 'antd'
 // ===================================================================== private component
 import Content from './cpt/content'
 const Text  =  Async(()=>import('./cpt/text'))
-
+const Image  =  Async(()=>import('./cpt/image'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -64,7 +64,7 @@ export default class extends React.Component {
 		
 	}
 	render( ) {
-		const { hasNode } = this.state
+		const { hasNode, type } = this.state
 		return (
 			<div className='wh fv'>
 				{/* header */}
@@ -82,7 +82,7 @@ export default class extends React.Component {
 						<div className='abs_full scroll'>
 							<ul className='fxw plr5 pt10 drag-list nosel'>
 								<IconButton2 icon={TextImage} label='文本' onDragStart={e=>this.onDragStart(e,'text')}/>
-								<IconButton2 icon={ImgImage} label='图片' />
+								<IconButton2 icon={ImgImage} label='图片'  onDragStart={e=>this.onDragStart(e,'img')}/>
 								<IconButton2 icon={TableImage} label='表格' />
 							</ul>
 						</div>
@@ -97,7 +97,8 @@ export default class extends React.Component {
 					<div className='bcf' style={{width:rightWidth}} id='control'>
 						<Tabs defaultActiveKey={1}>
 							<TabPane tab='样式' key={1}>
-								<Text parent={this} />
+								{ type === 'text' &&  <Text parent={this} /> }
+								{ type === 'img' &&  <Image parent={this} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
 								

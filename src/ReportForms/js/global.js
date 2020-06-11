@@ -20,22 +20,21 @@ const dragRange = (e,_this, opt) => {
 	const scrollHeight = scrollInfo.scrollHeight
 	const scrollOffestTop = scrollInfo.offsetTop
 	const scrollOffestLeft = scrollInfo.offsetLeft
-	const scrollClientWidth = scrollInfo.width
-	const scrollClientHeight = scrollInfo.height
+	const scrollClientWidth = scrollInfo.clientWidth
+	const scrollClientHeight = scrollInfo.clientHeight
 	const scrollPadding = parseInt($scroll.style.padding)
 	const dragPadding = parseInt($paper.style.padding)
 	const padding = scrollPadding + dragPadding
 	// 确定目标元素放置范围
 	const dragInfo = Drag.getInfo($drag)
-	const { offsetLeft, offsetTop, width, height } = dragInfo
+	const { offsetLeft, offsetTop, clientWidth, height } = dragInfo
 	
 	const spaceX = scrollWidth - scrollLeft - scrollClientWidth
 	const spaceY = scrollHeight - scrollTop - scrollClientHeight
 	
-	console.log(scrollWidth)
 	
 	const rangeXstart =  ( scrollLeft <= padding && x > offsetLeft - scrollLeft ) || ( scrollLeft > padding && x > scrollOffestLeft)
-	const rangeXend = 	( scrollClientWidth === scrollWidth + 2 && x < offsetLeft + width  ) || 
+	const rangeXend = 	( scrollClientWidth === scrollWidth && x < offsetLeft + clientWidth  ) || 
 						(scrollClientWidth < scrollWidth && (
 							( spaceX >= dragPadding && x < scrollOffestLeft + scrollClientWidth) || 
 							( spaceX < dragPadding && x < scrollOffestLeft + scrollClientWidth - (dragPadding - spaceX))
@@ -118,10 +117,18 @@ export default {
 		}else{
 			const node = document.createElement('div')
 			node.className = 'move'
-			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;background:#fff`
+			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;`
 			node.innerHTML = Html[type]
 			node.children[0].className = 'template'
 			node.setAttribute('type',type)
+			
+			if(type === 'text'){
+				node.style.width = '99px'
+				node.style.height = '24px'
+			}else if(type === 'img'){
+				node.style.width = '99px'
+				node.style.height = '99px'
+			}
 			
 			// 拖动标点
 			const point = document.createElement('span')
@@ -138,7 +145,7 @@ export default {
 			`
 			node.appendChild(point)
 			_this.node = node
-			_this.setState({hasNode:true, node})
+			_this.setState({hasNode:true, node, type})
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)
 			document.body.addEventListener('mouseup',this.setNewPosition)
