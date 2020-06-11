@@ -12,7 +12,7 @@ export default ({ parent }) => {
 				obj.label = i
 				obj.value = name[i]
 			}
-			drag.querySelector('.html').style[obj.label] = obj.value === '' ? 0 : obj.value + 'px'
+			drag.querySelector('.template').style[obj.label] = obj.value === '' ? 0 : obj.value + 'px'
 		}else{
 			window.$fn.toast('未选中目标')
 		}

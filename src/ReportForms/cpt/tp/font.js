@@ -57,10 +57,10 @@ export default ({ parent }) => {
 				obj.value = name[i]
 			}
 			if({}.toString.call(obj.value) === '[object Boolean]'){
-				drag.querySelector('.html').style[obj.label] = obj.value ? value : (none ? none : 'normal')
+				drag.querySelector('.template').style[obj.label] = obj.value ? value : (none ? none : 'normal')
 			}else{
 				console.log(obj)
-				drag.querySelector('.html').style[obj.label] = obj.value === undefined ? value : obj.value
+				drag.querySelector('.template').style[obj.label] = obj.value === undefined ? value : obj.value
 			}
 		}else{
 			window.$fn.toast('未选中目标')
