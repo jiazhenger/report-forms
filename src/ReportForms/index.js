@@ -40,7 +40,11 @@ const IconButton2 = ({ icon, label, onDragStart}) => (
 // ===================================================================== component
 export default class extends React.Component {
 	state = {
-		
+		node:null,
+		type:null,
+		dragStyle:{},
+		tempStyle:{},
+		tempAttr:{}
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -64,7 +68,7 @@ export default class extends React.Component {
 		
 	}
 	render( ) {
-		const { hasNode, type } = this.state
+		const { hasNode, type, dragStyle, tempStyle } = this.state
 		return (
 			<div className='wh fv'>
 				{/* header */}
@@ -97,8 +101,8 @@ export default class extends React.Component {
 					<div className='bcf' style={{width:rightWidth}} id='control'>
 						<Tabs defaultActiveKey={1}>
 							<TabPane tab='样式' key={1}>
-								{ type === 'text' &&  <Text parent={this} /> }
-								{ type === 'img' &&  <Image parent={this} /> }
+								{ type === 'text' &&  <Text parent={this} dragStyle={dragStyle} tempStyle={tempStyle} /> }
+								{ type === 'img' &&  <Image parent={this} dragStyle={dragStyle} tempStyle={tempStyle} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
 								

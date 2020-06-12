@@ -3,6 +3,6 @@
  * 
  */
 export default {
-	text: `<p style='line-height:24px;word-wrap:break-word;'></p>`,
+	text: `<p style='line-height:1.5;word-wrap:break-word;'></p>`,
 	img: `<figure></figure>`
 }

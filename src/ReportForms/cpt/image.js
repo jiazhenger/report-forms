@@ -18,7 +18,7 @@ export default class extends React.Component {
 	}
 	
 	render(){
-		const { parent } = this.props
+		const { parent, dragStyle, tempStyle } = this.props
 		return (
 			<div className='abs_lt wh scroll'>
 				<h5 className='control-title'>图片</h5>
@@ -28,8 +28,8 @@ export default class extends React.Component {
 						<List.Input label='数据' />
 					</Panel>
 					<Panel header='图片配置'><Img parent={parent} /></Panel>
-					<Panel header='位置 && 大小'><Position parent={parent} /></Panel>
-					<Panel header='页面布局'><Layout parent={parent} /></Panel>
+					<Panel header='位置 && 大小'><Position parent={parent} dragStyle={dragStyle} /></Panel>
+					<Panel header='页面布局'><Layout parent={parent}  tempStyle={tempStyle}/></Panel>
 				</Collapse>
 			</div>
 		)

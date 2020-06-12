@@ -15,7 +15,7 @@ module.exports = {
 			return false
 		}
 	},
-	// 查找父级有指定样式的元素
+	// 查找有指定样式的父级元素
 	parents(el,className){
 		var parent = el.parentNode;
 		while ( !this.hasClass(parent,className) && parent !== document.body) {

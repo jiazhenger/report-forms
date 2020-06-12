@@ -130,4 +130,10 @@ export default {
 			this.local('loginToPage',encodeURIComponent(window.location.hash))
 		}
 	},
+	toNum(v){
+		return v ? parseInt(v) : ''
+	},
+	toBool(p,v){
+		return p === v
+	}
 }

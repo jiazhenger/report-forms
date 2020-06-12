@@ -147,7 +147,7 @@ export default {
 				})
 				t.querySelector('.point-mark').style.display = 'block'
 				t.style.borderColor = '#fff' 
-				_this.setState({type})
+				_this.setState({ type, node:t})
 			}
 		})
 		// 双击
@@ -195,6 +195,24 @@ export default {
 						v.querySelector('.point-mark').style.display = 'none'
 					})
 				}
+			}
+			let m = Dom.parents(target,'move')
+			if(t || m){
+				const d = t || m
+				const $temp = d.querySelector('.template')
+				_this.setState({
+					dragStyle:d.style,
+					tempStyle:$temp.style,
+					tempAttr:{}
+				},()=>{
+					console.log($temp.style)
+				})
+			}else{
+				_this.setState({
+					dragStyle:{},
+					tempStyle:{},
+					tempAttr:{}
+				})
 			}
 			
 			Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {

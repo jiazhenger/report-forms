@@ -1,8 +1,10 @@
 import React from 'react'
 // ===================================================================== template
 import List from './list'
+const { $fn } = window
 // ===================================================================== page component
-export default ({ parent }) => {
+export default ({ parent, tempStyle }) => {
+	const style = tempStyle || {}
 	const onChange = React.useCallback( (name,value,none) => {
 		const drag = parent.node
 		if(drag){
@@ -20,7 +22,7 @@ export default ({ parent }) => {
 	return (
 		<>
 			<div className='fx'>
-				<List.Input label='补白左' name='paddingLeft' onChange={onChange}  isHalf />
+				<List.Input label='补白左' value={$fn.toNum(style.paddingLeft)} name='paddingLeft' onChange={onChange}  isHalf />
 				<List.Input label='补白右' name='paddingRight' onChange={onChange}  isHalf />
 			</div>
 			<div className='fx'>
@@ -28,7 +30,7 @@ export default ({ parent }) => {
 				<List.Input label='补白下' name='paddingBottom' onChange={onChange}  isHalf />
 			</div>
 			<div className='fx'>
-				<List.Input label='圆角' name='borderRadius' onChange={onChange}  isHalf />
+				<List.Input label='圆角' value={$fn.toNum(style.borderRadius)} name='borderRadius' onChange={onChange}  isHalf />
 				<List.Input label='背景' name='backgroundColor' onChange={onChange} isHalf />
 			</div>
 			<div className='fx'>
