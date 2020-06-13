@@ -3,38 +3,42 @@ import React from 'react'
 import List from './list'
 const { $fn } = window
 // ===================================================================== page component
-export default ({ parent, tempStyle }) => {
-	const style = tempStyle || {}
-	const onChange = React.useCallback( (name,value,none) => {
-		const drag = parent.node
-		if(drag){
+export default ({ node, tempStyle }) => {
+	const padding = React.useRef()
+	const borderRadius = React.useRef()
+	const backgroundColor = React.useRef()
+	const opacity = React.useRef()
+	
+	React.useEffect(()=>{
+		const style = tempStyle || {}
+		padding.current.setValue($fn.toNum(style.padding))
+		borderRadius.current.setValue($fn.toNum(style.borderRadius))
+		backgroundColor.current.setValue(style.backgroundColor)
+		opacity.current.setValue($fn.toNum(style.opacity))
+	},[ tempStyle ])
+	
+	const onChange = React.useCallback( (name, def) => {
+		if(node){
 			const obj = {}
 			for(var i in name){
 				obj.label = i
 				obj.value = name[i]
 			}
-			
-			drag.querySelector('.template').style[obj.label] = obj.value === '' ? 0 : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
+			console.log(obj)
+			node.querySelector('.template').style[obj.label] = obj.value === '' ? (def ? def : 0) : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
 		}else{
 			window.$fn.toast('未选中目标')
 		}
-	}, [ parent ])
+	}, [ node ])
 	return (
 		<>
 			<div className='fx'>
-				<List.Input label='补白左' value={$fn.toNum(style.paddingLeft)} name='paddingLeft' onChange={onChange}  isHalf />
-				<List.Input label='补白右' name='paddingRight' onChange={onChange}  isHalf />
+				<List.Input ref={padding} label='补白' name='padding' onChange={onChange}  isHalf />
+				<List.Input ref={opacity} label='透明度' name='opacity' onChange={onChange} isHalf />
 			</div>
 			<div className='fx'>
-				<List.Input label='补白上' name='paddingTop' onChange={onChange}  isHalf />
-				<List.Input label='补白下' name='paddingBottom' onChange={onChange}  isHalf />
-			</div>
-			<div className='fx'>
-				<List.Input label='圆角' value={$fn.toNum(style.borderRadius)} name='borderRadius' onChange={onChange}  isHalf />
-				<List.Input label='背景' name='backgroundColor' onChange={onChange} isHalf />
-			</div>
-			<div className='fx'>
-				<List.Input label='透明度' name='opacity' onChange={onChange} isHalf />
+				<List.Input ref={borderRadius} label='圆角' name='borderRadius' onChange={onChange}  isHalf />
+				<List.Input ref={backgroundColor} label='背景' name='backgroundColor' onChange={v=>onChange(v,'transparent')} isHalf />
 			</div>
 		</>
 	)

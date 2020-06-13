@@ -40,51 +40,72 @@ const LetterSpacing = [
 	{ label:'5px', value:'5px'},
 ]
 const FontFamily = [
-	{ label:'微软雅黑', value:'Microsoft YaHei'},
-	{ label:'宋体', value:'Sim Sun'},
-	{ label:'黑体', value:'Sim Hei'},
-	{ label:'楷体', value:'GB_2312'},
+	{ label:'微软雅黑', value:'微软雅黑'},
+	{ label:'宋体', value:'宋体'},
+	{ label:'黑体', value:'黑体'},
+	{ label:'楷体', value:'楷体'},
 	{ label:'Arial', value:'Arial'},
 ]
-const { $fn } = window
 // ===================================================================== page component
-export default ({ parent,  tempStyle }) => {
-	const style = tempStyle || {}
+export default ({ node,  tempStyle }) => {
+	// select
+	const fontFamily = React.useRef()
+	const fontSize = React.useRef()
+	const lineHeight = React.useRef()
+	const letterSpacing = React.useRef()
+	// switch
+	const fontWeight = React.useRef()
+	const fontStyle = React.useRef()
+	const textDecoration = React.useRef()
+	const textIndent = React.useRef()
+	
+	React.useEffect(()=>{
+		const style = tempStyle || {}
+		// select
+		fontFamily.current.setValue(style.fontFamily)
+		fontSize.current.setValue(style.fontSize)
+		lineHeight.current.setValue(style.lineHeight)
+		letterSpacing.current.setValue(style.letterSpacing)
+		// switch
+		fontWeight.current.setValue(style.fontWeight === 'bold')
+		fontStyle.current.setValue(style.fontStyle === 'italic')
+		textDecoration.current.setValue(style.textDecoration === 'underline')
+		textIndent.current.setValue(style.textIndent === '2em')
+	},[ tempStyle ])
 	const onChange = React.useCallback( (name,value,none) => {
-		const drag = parent.node
-		if(drag){
+		if(node){
 			const obj = {}
 			for(var i in name){
 				obj.label = i
 				obj.value = name[i]
 			}
 			if({}.toString.call(obj.value) === '[object Boolean]'){
-				drag.querySelector('.template').style[obj.label] = obj.value ? value : (none ? none : 'normal')
+				node.querySelector('.template').style[obj.label] = obj.value ? value : (none ? none : 'normal')
 			}else{
-				drag.querySelector('.template').style[obj.label] = obj.value === undefined ? value : obj.value
+				node.querySelector('.template').style[obj.label] = obj.value === undefined ? value : obj.value
 			}
 		}else{
 			window.$fn.toast('未选中目标')
 		}
-	}, [ parent ])
+	}, [ node ])
 	
 	return (
 		<>
 			<div className='fx'>
-				<List.Select label='字体' data={FontFamily} p='选择字体' isHalf name='fontFamily' onChange={onChange} />
-				<List.Select label='尺寸' value={style.fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={v=>onChange(v,'100%')}/>
+				<List.Select label='字体'  ref={fontFamily} data={FontFamily} p='选择字体' isHalf name='fontFamily' onChange={onChange} />
+				<List.Select label='尺寸'  ref={fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={v=>onChange(v,'100%')}/>
 			</div>
 			<div className='fx'>
-				<List.Select label='行高' value={style.lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
-				<List.Select label='间距' data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
+				<List.Select label='行高'  ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
+				<List.Select label='间距'  ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
 			</div>
 			<div className='fxj'>
-				<List.Switch label='加粗' value={$fn.toBool(style.fontWeight,'bold')} name='fontWeight' onChange={v=>onChange(v,'bold')}/>
-				<List.Switch label='倾斜' value={$fn.toBool(style.fontStyle,'italic')}  name='fontStyle' onChange={v=>onChange(v,'italic')}/>
-				<List.Switch label='下划线' value={$fn.toBool(style.textDecoration,'underline')}  name='textDecoration' onChange={v=>onChange(v,'underline','none')}/>
+				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={v=>onChange(v,'bold')}/>
+				<List.Switch label='倾斜' ref={fontStyle}  name='fontStyle' onChange={v=>onChange(v,'italic')}/>
+				<List.Switch label='下划线' ref={textDecoration}  name='textDecoration' onChange={v=>onChange(v,'underline','none')}/>
 			</div>
 			<div className='fxj'>
-				<List.Switch label='缩进'  name='textIndent' onChange={v=>onChange(v,'2em','0')}/>
+				<List.Switch label='缩进' ref={textIndent}  name='textIndent' onChange={v=>onChange(v,'2em','0')}/>
 			</div>
 		</>
 	)

@@ -131,7 +131,7 @@ export default {
 		}
 	},
 	toNum(v){
-		return v ? parseInt(v) : ''
+		return v ? parseInt(v) : 0
 	},
 	toBool(p,v){
 		return p === v

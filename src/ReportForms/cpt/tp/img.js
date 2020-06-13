@@ -44,12 +44,18 @@ const Upload = async e => {
 	}
 }
 // ===================================================================== page component
-export default ({ parent }) => {
+export default ({ node, tempAttr }) => {
 	const file = React.useRef()
+	const link = React.useRef()
+	
+	React.useEffect(()=>{
+		const attr = tempAttr || {}
+		link.current.setValue(attr.src)
+	},[ tempAttr ])
+	
 	const onChange = React.useCallback( (name,value,none) => {
-		const drag = parent.node
-		if(drag){
-			const $img = drag.querySelector('.template').querySelector('img')
+		if(node){
+			const $img = node.querySelector('.template').querySelector('img')
 			const obj = {}
 			for(var i in name){
 				obj.label = i
@@ -66,20 +72,19 @@ export default ({ parent }) => {
 				imgNode.setAttribute(obj.label,obj.value)
 				imgNode.style.cssText = 'width:100%;height:100%'
 				imgNode.draggable = false
-				drag.querySelector('.template').appendChild(imgNode)
+				node.querySelector('.template').appendChild(imgNode)
 			}
 		}else{
 			window.$fn.toast('未选中目标')
 		}
-	}, [ parent ])
+	}, [ node ])
 	// 打开文件选择目录
 	const openUpload = React.useCallback( e => {
-		const drag = parent.node
-		if(drag){
+		if(node){
 			file.current.click()
 			file.current.onchange = e => {
 				Upload(e).then(base64=>{
-					const $img = drag.querySelector('.template').querySelector('img')
+					const $img = node.querySelector('.template').querySelector('img')
 					
 					if($img){
 						$img.setAttribute('src',base64)
@@ -88,18 +93,18 @@ export default ({ parent }) => {
 						imgNode.setAttribute('src',base64)
 						imgNode.style.cssText = 'width:100%;height:100%'
 						imgNode.draggable = false
-						drag.querySelector('.template').appendChild(imgNode)
+						node.querySelector('.template').appendChild(imgNode)
 					}
 				})
 			}
 		}else{
 			window.$fn.toast('未选中目标')
 		}
-	}, [ parent ])
+	}, [ node ])
 	return (
 		<>
 			<div>
-				<List.Input label='外链' name='src' onChange={onChange} />
+				<List.Input label='外链' ref={link} name='src' onChange={onChange} />
 				<List.Button label='上传' name='src' text='图片上传' onClick={openUpload} />
 			</div>
 			<input type='file' ref={file}/>

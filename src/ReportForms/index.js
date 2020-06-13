@@ -44,7 +44,8 @@ export default class extends React.Component {
 		type:null,
 		dragStyle:{},
 		tempStyle:{},
-		tempAttr:{}
+		tempAttr:{},
+		index:0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -68,7 +69,7 @@ export default class extends React.Component {
 		
 	}
 	render( ) {
-		const { hasNode, type, dragStyle, tempStyle } = this.state
+		const { hasNode, type, dragStyle, tempStyle, tempAttr, index, node } = this.state
 		return (
 			<div className='wh fv'>
 				{/* header */}
@@ -101,8 +102,8 @@ export default class extends React.Component {
 					<div className='bcf' style={{width:rightWidth}} id='control'>
 						<Tabs defaultActiveKey={1}>
 							<TabPane tab='样式' key={1}>
-								{ type === 'text' &&  <Text parent={this} dragStyle={dragStyle} tempStyle={tempStyle} /> }
-								{ type === 'img' &&  <Image parent={this} dragStyle={dragStyle} tempStyle={tempStyle} /> }
+								{ type === 'text' &&  <Text parent={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
+								{ type === 'img' &&  <Image parent={this} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
 								
@@ -113,11 +114,6 @@ export default class extends React.Component {
 						</Tabs>
 					</div>
 				</section>
-				
-				{/* template */}
-				<div className='vh'>
-					<div className='abs red h40' id='text'>45646</div>
-				</div>
 			</div>
 		)
 	}

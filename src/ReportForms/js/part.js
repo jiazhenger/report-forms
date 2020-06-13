@@ -2,6 +2,8 @@ import Drag from './drag'
 import Dom from './dom'
 import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from './config'
 
+let clear
+
 export default {
 	// 默认执行
 	init(_this){
@@ -200,19 +202,28 @@ export default {
 			if(t || m){
 				const d = t || m
 				const $temp = d.querySelector('.template')
-				_this.setState({
-					dragStyle:d.style,
-					tempStyle:$temp.style,
-					tempAttr:{}
-				},()=>{
-					console.log($temp.style)
-				})
+				const $img = $temp.querySelector('img')
+				clearTimeout(clear)
+				clear = setTimeout(()=>{
+					_this.setState({
+						index: _this.state.index + 1,
+						dragStyle:d.style,
+						tempStyle:$temp.style,
+						tempAttr:{
+							src: $img ? $img.src : ''
+						}
+					})
+				},200)
 			}else{
-				_this.setState({
-					dragStyle:{},
-					tempStyle:{},
-					tempAttr:{}
-				})
+				clearTimeout(clear)
+				clear = setTimeout(()=>{
+					_this.setState({
+						dragStyle:{},
+						tempStyle:{},
+						tempAttr:{},
+						node:null
+					})
+				},200)
 			}
 			
 			Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
