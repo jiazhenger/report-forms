@@ -102,8 +102,8 @@ export default class extends React.Component {
 					<div className='bcf' style={{width:rightWidth}} id='control'>
 						<Tabs defaultActiveKey={1}>
 							<TabPane tab='样式' key={1}>
-								{ type === 'text' &&  <Text parent={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
-								{ type === 'img' &&  <Image parent={this} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
+								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
+								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
 								

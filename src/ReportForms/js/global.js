@@ -117,7 +117,7 @@ export default {
 		}else{
 			const node = document.createElement('div')
 			node.className = 'move'
-			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:100;`
+			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:0;`
 			node.innerHTML = Html[type]
 			node.children[0].className = 'template'
 			node.setAttribute('type',type)

@@ -221,7 +221,8 @@ export default {
 						dragStyle:{},
 						tempStyle:{},
 						tempAttr:{},
-						node:null
+						node:null,
+						type:null
 					})
 				},200)
 			}
