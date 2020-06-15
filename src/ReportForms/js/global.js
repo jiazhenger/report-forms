@@ -98,6 +98,14 @@ export default {
 					_this.node.style.top = top + 'px'
 					
 					$drag.appendChild(_this.node)
+					
+					const type = _this.node.getAttribute('type')
+					
+					if(type === 'table'){
+						_this.node.style.left = 0
+						_this.node.style.width = '100%'
+					}
+							
 					_this.node.querySelector('.point-mark').style.display = 'block'
 				},
 				onFail:()=>{
@@ -128,6 +136,8 @@ export default {
 			}else if(type === 'img'){
 				node.style.width = '99px'
 				node.style.height = '99px'
+			}else if(type === 'table'){
+				node.style.width = '99px'
 			}
 			
 			// 拖动标点
@@ -145,6 +155,7 @@ export default {
 			`
 			node.appendChild(point)
 			_this.node = node
+			
 			_this.setState({hasNode:true, node, type})
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)

@@ -29,7 +29,7 @@ export default ({ node, dragStyle }) => {
 				obj.value = name[i]
 			}
 			
-			node.style[obj.label] = obj.value === '' ? 0 : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + unit)
+			node.style[obj.label] = obj.value === '' ? '' : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + unit)
 		}else{
 			window.$fn.toast('未选中目标')
 		}

@@ -202,13 +202,13 @@ export default {
 			if(t || m){
 				const d = t || m
 				const $temp = d.querySelector('.template')
-				const $img = $temp.querySelector('img')
+				const $img = $temp ? $temp.querySelector('img') : null
 				clearTimeout(clear)
 				clear = setTimeout(()=>{
 					_this.setState({
 						index: _this.state.index + 1,
 						dragStyle:d.style,
-						tempStyle:$temp.style,
+						tempStyle: $temp ? $temp.style : {},
 						tempAttr:{
 							src: $img ? $img.src : ''
 						}

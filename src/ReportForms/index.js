@@ -17,6 +17,7 @@ import { Tabs } from 'antd'
 import Content from './cpt/content'
 const Text  =  Async(()=>import('./cpt/text'))
 const Image  =  Async(()=>import('./cpt/image'))
+const Table = Async(()=>import('./cpt/table'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -87,8 +88,8 @@ export default class extends React.Component {
 						<div className='abs_full scroll'>
 							<ul className='fxw plr5 pt10 drag-list nosel'>
 								<IconButton2 icon={TextImage} label='文本' onDragStart={e=>this.onDragStart(e,'text')}/>
-								<IconButton2 icon={ImgImage} label='图片'  onDragStart={e=>this.onDragStart(e,'img')}/>
-								<IconButton2 icon={TableImage} label='表格' />
+								<IconButton2 icon={ImgImage} label='图片' onDragStart={e=>this.onDragStart(e,'img')}/>
+								<IconButton2 icon={TableImage} label='表格' onDragStart={e=>this.onDragStart(e,'table')}/>
 							</ul>
 						</div>
 					</nav>
@@ -104,6 +105,7 @@ export default class extends React.Component {
 							<TabPane tab='样式' key={1}>
 								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
 								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
+								{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
 								
