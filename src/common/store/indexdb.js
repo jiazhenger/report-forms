@@ -47,7 +47,7 @@ export default {
 	// ====================================== 获取数据
 	get(key){
 		return new Promise((resolve, reject) => {
-			DB().then( (store:any) => {
+			DB().then( store => {
 				let req = store.get(key);
 				req.onsuccess = (e) => {
 					resolve(e.target.result);
@@ -59,8 +59,8 @@ export default {
 		});
 	},
 	// ====================================== 删除数据
-	delete(key){
-		DB().then( (store:any) => {
+	remove(key){
+		DB().then( store => {
 			let req = store.delete(key)
 			req.onsuccess = (e) => {
 				console.log('删除 indexdb 数据成功');
