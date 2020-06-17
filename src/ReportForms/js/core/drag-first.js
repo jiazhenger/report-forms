@@ -31,7 +31,6 @@ const dragRange = (e,_this, opt) => {
 	const spaceX = scrollWidth - scrollLeft - scrollClientWidth
 	const spaceY = scrollHeight - scrollTop - scrollClientHeight
 	
-	
 	const rangeXstart =  ( scrollLeft <= padding && x > offsetLeft - scrollLeft ) || ( scrollLeft > padding && x > scrollOffestLeft)
 	const rangeXend = 	( scrollClientWidth === scrollWidth && x < offsetLeft + clientWidth  ) || 
 						(scrollClientWidth < scrollWidth && (

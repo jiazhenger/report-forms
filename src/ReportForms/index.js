@@ -24,7 +24,7 @@ const rightWidth = '350px'
 const leftWidth = '200px'
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode}) => (
-	<li id={id} className={`tap cp h fxmc ${hasNode?'':'activeNode'}`} style={{width:'50px'}}>
+	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`}>
 		<div>
 			{/*<div className='fxc f15'><img style={{width:'18px',height:'18px'}} src={icon} alt=''/></div>*/}
 			<h3 className='f12 tc'>{label}</h3>
@@ -68,6 +68,7 @@ export default class extends React.Component {
 					<div className='ex h'>
 						<ul className='fxmc h'>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
+							<IconButton label='删除全部' id='delAll' hasNode={hasNode} />
 						</ul>
 					</div>
 				</header>
