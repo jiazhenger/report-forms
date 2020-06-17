@@ -1,8 +1,4 @@
 import { axesColor, axesActiveColor } from './config'
-/**
- * 拖动元素
- * 
- */
 export default {
 	// 获取鼠标信息
 	getMouse(e){

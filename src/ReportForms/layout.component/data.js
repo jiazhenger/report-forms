@@ -4,7 +4,7 @@ import Async from '@com/async'
 import { Collapse } from 'antd'
 // ===================================================================== template
 import Modal from '@antd/modal'
-import List from './tp/list'
+import List from '../public.component/list'
 // ===================================================================== declare
 const { Panel } = Collapse
 const Button  =  Async(()=>import('@antd/button'))

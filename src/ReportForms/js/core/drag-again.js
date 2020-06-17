@@ -1,6 +1,6 @@
-import Drag from './drag'
-import Dom from './dom'
-import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from './config'
+import Drag from '../public/drag'
+import Dom from '../public/dom'
+import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from '../public/config'
 
 let clear
 

@@ -3,8 +3,7 @@ import Async from '@com/async'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 // ===================================================================== template
-import List from './tp/list'
-
+import List from '../public.component/list'
 
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))

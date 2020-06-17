@@ -1,7 +1,6 @@
-import Drag from './drag'
-import Axes from './axes'
-import Html from './html'
-import { differ, axesSpace  } from './config'
+import Drag from '../public/drag'
+import Html from '../public/html'
+import { differ, axesSpace  } from '../public/config'
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -57,8 +56,6 @@ const dragRange = (e,_this, opt) => {
 export default {
 	// 默认执行
 	init(_this){
-		/* 初始化坐标 */
-		Axes(axesSpace)
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
 			const { x, y } = Drag.getMouse(e)
@@ -116,8 +113,7 @@ export default {
 			})
 		}
 	},
-	// 开始拖动
-	DragStart(e,_this,type){
+	DragStart(e, _this,type){
 		const { x, y } = Drag.getMouse(e)
 		if(!type) return;
 		if(document.querySelector('.move')){

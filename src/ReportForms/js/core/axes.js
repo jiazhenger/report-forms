@@ -1,4 +1,4 @@
-import { axesColor } from './config'
+import { axesColor, axesSpace } from '../public/config'
 // 创建坐标系
 const createAxes = (dom,width,height,space,isY) => {
 	let html = ''
@@ -15,14 +15,14 @@ const createAxes = (dom,width,height,space,isY) => {
 	dom.appendChild(node)
 }
 
-export default space => {
+export default ( ) => {
 	const el = document.querySelector('#axes')
 	const resize = () => {
 		const width = el.clientWidth
 		const height = el.clientHeight
 		// 创建坐标系
-		createAxes(el,width,height,space,true)
-		createAxes(el,width,height,space)
+		createAxes(el,width,height,axesSpace,true)
+		createAxes(el,width,height,axesSpace)
 	}
 	resize()
 	window.addEventListener('resize',e=>{

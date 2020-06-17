@@ -1,6 +1,6 @@
 import React from 'react'
 // ===================================================================== template
-import List from './list'
+import List from '../../public.component/list'
 const { $fn } = window
 // ===================================================================== page component
 export default ({ node, tempStyle }) => {

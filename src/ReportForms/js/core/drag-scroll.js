@@ -1,33 +1,33 @@
-import Dom from './dom'
-import Drag from './drag'
-import { scrollSpace } from './config'
+import Dom from '../public/dom'
+import Drag from '../public/drag'
+import { scrollSpace } from '../public/config'
+
+let prevX = 0
+let prevY = 0
+let curX = 0
+let curY = 0
+
+const getDir = (e, opt) => {
+	const { x, y } = Drag.getMouse(e)
+	prevX = curX
+	prevY = curY
+	curX = x
+	curY = y
+	if(curY > prevY){ 
+		opt.down && opt.down(y)
+	}else if(curY < prevY){
+		opt.up && opt.up(y)
+	}
+	if(curX > prevX){
+		opt.right && opt.right(x)
+	}else if(curX < prevX){
+		opt.left && opt.left(x)
+	}
+}
+
 export default {
 	// 默认执行
 	init({ $scroll }){
-		
-		let prevX = 0
-		let prevY = 0
-		let curX = 0
-		let curY = 0
-		
-		const getDir = function (e, opt) {
-			const { x, y } = Drag.getMouse(e)
-			prevX = curX
-			prevY = curY
-			curX = x
-			curY = y
-			if(curY > prevY){ 
-				opt.down && opt.down(y)
-			}else if(curY < prevY){
-				opt.up && opt.up(y)
-			}
-			if(curX > prevX){
-				opt.right && opt.right(x)
-			}else if(curX < prevX){
-				opt.left && opt.left(x)
-			}
-		}
-		
 		const mousemove = function(e){
 			const { scrollTop, scrollLeft } = Drag.getInfo($scroll)
 			getDir(e,{
@@ -55,13 +55,15 @@ export default {
 			}
 		})
 		
-		document.body.addEventListener('mouseup',function(e){
+		document.addEventListener('mouseup',function(e){
 			$scroll.style.cursor = ''
 			$scroll.removeEventListener('mousemove',mousemove)
 		})
-		document.body.addEventListener('mouseleave',function(e){
+		
+		document.addEventListener('mouseleave',function(e){
 			$scroll.style.cursor = ''
 			$scroll.removeEventListener('mousemove',mousemove)
 		})
-	}
+	},
+	
 }

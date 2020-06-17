@@ -1,6 +1,6 @@
 import React from 'react'
 // ===================================================================== template
-import List from './list'
+import List from '../../public.component/list'
 // ===================================================================== upload
 const { $fn } = window
 const imageType = ['jpg','png','jpeg','gif']
