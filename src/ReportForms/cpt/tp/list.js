@@ -40,8 +40,8 @@ class StaticInput extends React.Component{
 		this.refs.input.setValue(v)
 	}
 	render(){
-		const { label, value, name, onChange, disabled, isHalf } = this.props
-		return  <Li isHalf={isHalf} label={label}><Input ref='input' size='small' name={name} value={value} onChange={onChange}  disabled={disabled}/></Li>
+		const { label, value, name, onChange, disabled, isHalf, labelWidth, size, suffix } = this.props
+		return  <Li isHalf={isHalf} label={label} labelWidth={labelWidth} suffix={suffix}><Input ref='input' size={size||'small'} name={name} value={value} onChange={onChange}  disabled={disabled}/></Li>
 	}
 }
 

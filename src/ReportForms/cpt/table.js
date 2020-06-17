@@ -8,7 +8,7 @@ import List from './tp/list'
 
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
-const Img  =  Async(()=>import('./tp/img'))
+// const Img  =  Async(()=>import('./tp/img'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -18,7 +18,7 @@ export default class extends React.Component {
 	}
 	
 	render(){
-		const { node, dragStyle, tempStyle, tempAttr } = this.props
+		const { node, dragStyle, tempStyle } = this.props
 		return (
 			<div className='abs_lt wh scroll'>
 				<h5 className='control-title'>表格</h5>

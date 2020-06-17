@@ -5,7 +5,6 @@ import { Collapse } from 'antd'
 // ===================================================================== template
 import List from './tp/list'
 
-
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Img  =  Async(()=>import('./tp/img'))

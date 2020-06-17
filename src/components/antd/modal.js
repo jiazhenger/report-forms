@@ -1,7 +1,7 @@
-﻿/* ====================================== toast  ====================================== */
+/* ====================================== toast  ====================================== */
 import React from 'react'
 import { Modal } from 'antd'
-import Button from '@cpt/antd/antd-button'
+import Button from '@antd/button'
 // ===================================================================== 选择字典表数据
 export default class Index extends React.Component {
     state = {

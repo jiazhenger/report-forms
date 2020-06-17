@@ -15,6 +15,7 @@ import { Tabs } from 'antd'
 // const Tabs = ()=>import('@antd/tabs')
 // ===================================================================== private component
 import Content from './cpt/content'
+const Data = Async(()=>import('./cpt/data'))
 const Text  =  Async(()=>import('./cpt/text'))
 const Image  =  Async(()=>import('./cpt/image'))
 const Table = Async(()=>import('./cpt/table'))
@@ -101,14 +102,14 @@ export default class extends React.Component {
 					</section>
 					{/*  控制面版 */}
 					<div className='bcf' style={{width:rightWidth}} id='control'>
-						<Tabs defaultActiveKey={1}>
+						<Tabs defaultActiveKey='2'>
 							<TabPane tab='样式' key={1}>
 								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
 								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 								{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
-								
+								<Data />
 							</TabPane>
 							<TabPane tab='报表' key={3}>
 								
