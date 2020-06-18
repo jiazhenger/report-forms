@@ -1,5 +1,5 @@
 /* ====================================== 全局变量及方法  ====================================== */
-import Storage from './store/sessionStorage'
+import Storage from './store/localStorage'
 //import moment from 'moment'
 export default {
 	c0:'#ee7158',

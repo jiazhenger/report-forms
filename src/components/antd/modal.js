@@ -9,8 +9,7 @@ export default class Index extends React.Component {
     }
     
     onOk = () => {
-    	const { noClose, onOk } = this.props
-    	if(!noClose){ this.close() }
+    	const { onOk } = this.props
     	onOk && onOk()
     }
     
