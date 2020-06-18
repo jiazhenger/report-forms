@@ -5,20 +5,18 @@ import TableImage from '@img/icon/table.png'
 import ImgImage from '@img/icon/img.png'
 import TextImage from '@img/icon/text.png'
 // ===================================================================== dom js
-import Global from './js/global'
-import Part from './js/part'
-import Shortcut from './js/shortcut'
-import DragScroll from './js/drag-scroll'
+import MouseEvent from './js/index'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
 // const Tabs = ()=>import('@antd/tabs')
-// ===================================================================== private component
-import Content from './cpt/content'
-const Data = Async(()=>import('./cpt/data'))
-const Text  =  Async(()=>import('./cpt/text'))
-const Image  =  Async(()=>import('./cpt/image'))
-const Table = Async(()=>import('./cpt/table'))
+// ===================================================================== layout component
+import Content from './layout.component/content'
+const Data = Async(()=>import('./layout.component/data'))
+// ===================================================================== style component
+const Text  =  Async(()=>import('./style.component/text'))
+const Image  =  Async(()=>import('./style.component/image'))
+const Table = Async(()=>import('./style.component/table'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -26,7 +24,7 @@ const rightWidth = '350px'
 const leftWidth = '200px'
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode}) => (
-	<li id={id} className={`tap cp h fxmc ${hasNode?'':'activeNode'}`} style={{width:'50px'}}>
+	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`}>
 		<div>
 			{/*<div className='fxc f15'><img style={{width:'18px',height:'18px'}} src={icon} alt=''/></div>*/}
 			<h3 className='f12 tc'>{label}</h3>
@@ -55,21 +53,11 @@ export default class extends React.Component {
 		this.$paper = document.querySelector('#paper')				// 纸张区域
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
-		Global.init(this)
-		Part.init(this)
-		Shortcut.init(this)
-		DragScroll.init(this)
+		MouseEvent.init(this)
 		// Size(this)
 	}
-	onDragStart = (e,type) => {
-		Global.DragStart(e,this,type)
-	}
-	onDrop(e){
-		
-	}
-	onDragOver(e){
-		
-	}
+	// 开始拖动模板
+	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
 	render( ) {
 		const { hasNode, type, dragStyle, tempStyle, tempAttr, index, node } = this.state
 		return (
@@ -80,6 +68,7 @@ export default class extends React.Component {
 					<div className='ex h'>
 						<ul className='fxmc h'>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
+							<IconButton label='删除全部' id='delAll' hasNode={hasNode} />
 						</ul>
 					</div>
 				</header>
