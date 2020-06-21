@@ -18,8 +18,8 @@ module.exports = {
 	// 查找有指定样式的父级元素
 	parents(el,className){
 		var parent = el.parentNode;
-		while ( !this.hasClass(parent,className) && parent !== document.body) {
-			parent =  parent.parentNode
+		while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
+			parent = parent.parentNode
 		}
 		return parent === document.body ? null : parent
 	},

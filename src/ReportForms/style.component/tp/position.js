@@ -13,13 +13,15 @@ export default ({ node, dragStyle }) => {
 	
 	
 	React.useEffect(()=>{
-		const style = dragStyle || {}
-		leftRef.current.setValue($fn.toNum(style.left))
-		topRef.current.setValue($fn.toNum(style.top))
-		widthRef.current.setValue($fn.toNum(style.width))
-		heightRef.current.setValue($fn.toNum(style.height))
-		indexRef.current.setValue($fn.toNum(style.zIndex))
-	},[ dragStyle ])
+		if(node){
+			const style = dragStyle || {}
+			leftRef.current.setValue($fn.toNum(style.left))
+			topRef.current.setValue($fn.toNum(style.top))
+			widthRef.current.setValue($fn.toNum(style.width))
+			heightRef.current.setValue(node.clientHeight)
+			indexRef.current.setValue($fn.toNum(style.zIndex))
+		}
+	},[ dragStyle, node ])
 	
 	const onChange = React.useCallback( (name,unit) => {
 		if(node){

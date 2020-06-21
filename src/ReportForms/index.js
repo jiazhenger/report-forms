@@ -11,8 +11,8 @@ import MouseEvent from './js/index'
 import { Tabs } from 'antd'
 // const Tabs = ()=>import('@antd/tabs')
 // ===================================================================== layout component
-import Content from './layout.component/content'
-const Data = Async(()=>import('./layout.component/data'))
+import ContentComponent from './layout.component/content'
+const DataSourceComponent = Async(()=>import('./layout.component/dataSource'))
 // ===================================================================== style component
 const Text  =  Async(()=>import('./style.component/text'))
 const Image  =  Async(()=>import('./style.component/image'))
@@ -86,19 +86,19 @@ export default class extends React.Component {
 					{/*  中心展示 */}
 					<section className='ex rel nosel'>
 						<div className='abs_full scrollXY' style={{padding:'15px'}} id='scrollbox'>
-							<Content onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
+							<ContentComponent onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
 						</div>
 					</section>
 					{/*  控制面版 */}
 					<div className='bcf' style={{width:rightWidth}} id='control'>
-						<Tabs defaultActiveKey='2'>
+						<Tabs defaultActiveKey='1'>
 							<TabPane tab='样式' key={1}>
 								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
 								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 								{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
-								<Data />
+								<DataSourceComponent node={node} />
 							</TabPane>
 							<TabPane tab='报表' key={3}>
 								

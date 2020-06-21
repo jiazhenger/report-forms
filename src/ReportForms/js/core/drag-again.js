@@ -170,6 +170,8 @@ export default {
 						this.setAttribute('contenteditable', false)
 					})
 				}
+			}else if(t && t.getAttribute('type') === 'table'){
+				t.className = 'drag hide'
 			}
 		})
 		document.body.addEventListener('click',e=>{
@@ -191,10 +193,13 @@ export default {
 					})
 				}else{
 					_this.stop = false
-					Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
+					Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
 						v.className='drag'
 						v.style.border = '1px dashed ' + stopBorderColor
-						v.querySelector('.point-mark').style.display = 'none'
+						const $mark = v.querySelector('.point-mark')
+						if($mark){
+							v.querySelector('.point-mark').style.display = 'none'
+						}
 					})
 				}
 			}
@@ -227,7 +232,7 @@ export default {
 				},200)
 			}
 			
-			Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
+			Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
 				
 			})
 			

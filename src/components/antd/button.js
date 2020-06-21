@@ -12,7 +12,7 @@ export default class Btn extends React.Component{
 	static Search = Search
 	static Submit = Submit
 	render(){
-		const { type, size, children, label, width, minWidth, className, onClick, loading, htmlType, disabled, style, ghost, round } = this.props
+		const { type, size, icon, children, label, width, minWidth, className, onClick, loading, htmlType, disabled, style, ghost, round } = this.props
 		let height = {}
 		let radius = round ? {borderRadius:'100px'} : {borderRadius: '3px'}
 		if(size === 'x'){
@@ -31,6 +31,7 @@ export default class Btn extends React.Component{
 				onClick		= { onClick }
 				htmlType 	= { htmlType }
 				ghost 		= { ghost }
+				icon 		= { icon }
 			>
 				{label||children}
 			</Button>

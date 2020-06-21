@@ -5,6 +5,7 @@ import { Collapse } from 'antd'
 // ===================================================================== template
 import List from '../public.component/list'
 
+const Table  =  Async(()=>import('./tp/table'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 // const Img  =  Async(()=>import('./tp/img'))
@@ -26,6 +27,7 @@ export default class extends React.Component {
 						<List.Input label='名称' value='表格' />
 						<List.Input label='数据' />
 					</Panel>
+					<Panel header='生成表格'><Table node={node} /></Panel>
 					<Panel header='位置 && 大小'><Position node={node} dragStyle={dragStyle} /></Panel>
 					<Panel header='页面布局'><Layout node={node}  tempStyle={tempStyle}/></Panel>
 				</Collapse>
