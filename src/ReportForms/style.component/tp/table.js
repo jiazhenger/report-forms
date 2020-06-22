@@ -23,7 +23,7 @@ export default ({ node, dragStyle }) => {
 				const tdFragment = document.createDocumentFragment()
 				for(let j=0; j<col; j++){
 					const td = document.createElement('td')
-					td.style.cssText = 'border:1px solid #ddd;height:30px;padding:5px 5px;box-sizing:border-box;'
+					td.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;box-sizing:border-box;'
 					tdFragment.appendChild(td)
 				}
 				tr.appendChild(tdFragment)
