@@ -13,7 +13,6 @@ import List from '../public.component/list'
 // ===================================================================== declare
 const { Panel } = Collapse
 const Button  =  Async(()=>import('@antd/button'))
-const Tree  =  Async(()=>import('../public.component/tree'))
 const { $fn } = window
 
 // ===================================================================== page component
@@ -22,8 +21,7 @@ export default class extends React.Component {
 	state = {
 		model: JSON.parse(JSON.stringify(model)),
 		firstSource:{},
-		data:{},
-		treeData:[]
+		data:{}
 	}
 	componentDidMount(){
 		// 读取文件
@@ -111,50 +109,59 @@ export default class extends React.Component {
 		this.delName = null
 	}
 	/* ================================================== 选择第一层数据 ================================================== */
-	selectData(data, v){
-		if(this.state.firstField !== v){
-			const firstSource = data[v]
-			this.setState({ 
-				firstField: v, 
-				firstSource,
-			})
-			
-			let copyData = JSON.parse(JSON.stringify(data))
-			let model = {}
-			const f = (data, model, url) => {
-				let rs = data
-				if($fn.hasArray(data)){
-					rs = data[0]
-				}else if($fn.hasObject(data)){
-					rs = data
-				}
-				
-				if($fn.hasObject(rs)){
-					for(let i in rs){
-						model[i] = { name:i, value:rs[i], url: url + '/' + i }
-						if(typeof( rs[i] ) === 'object'){
-							f(rs[i], model.children, url )
-						}
-					}
-				}
-				
-				return model
+	selectData(v){
+		this.setVisitUrl((node,type) =>{
+			if(this.state.firstField !== v){
+				const firstSource = this.state.data[v]
+				this.setState({ 
+					firstField: v, 
+					firstSource: $fn.hasObject(firstSource) ? firstSource : firstSource[0],
+					secondField:null, 
+					secondData:{}
+				})
+				this.visitUrl = v
+			}else{
+				this.setState({firstField:null, firstSource:{}, secondField:null, secondData:{}})
+				this.visitUrl = ''
 			}
-			
-			const result = f(copyData,{},v)
-			console.log(result)
-			
-		}else{
-			this.setState({firstField:null, firstSource:{} })
-		}
+			if(type === 'text'){
+				node.textContent = ''
+			}else if(type === 'img'){
+				node.querySelector('img').src = window.location.origin +'/assets/images/img.png'
+			}
+		})
 	}
 	// 选择字段
 	selectField(v){
-		
+		this.setVisitUrl((node, type) =>{
+			if(this.state.secondField !== v){
+				this.setState({ secondField: v, secondData: this.state.data[v] })
+				this.visitUrl = this.state.firstField + '/' + v
+			}else{
+				this.setState({ secondField: null, secondData: null })
+				this.visitUrl = this.visitUrl.replace('/' + v, '')
+			}
+			const rs = Format.getData(this.state.data,this.visitUrl)
+			if(type === 'text'){
+				node.textContent = $fn.isString(rs) ? rs : ''
+			}else if( type === 'img'){
+				node.querySelector('img').src = $fn.isString(rs) ? rs : window.location.origin +'/assets/images/img.png'
+			}
+		})
+	}
+	// 设置访问路据路径
+	setVisitUrl = (callback) => {
+		const { node } = this.props
+		if(node){
+			callback(node.querySelector('.template'), node.getAttribute('type'))
+			node.setAttribute('data-url', this.visitUrl)
+		}else{
+			$fn.toast('未选中目标')
+		}
 	}
 	
 	render(){
-		const { model, data, firstField, firstSource } = this.state
+		const { model, data, firstField, firstSource, secondField } = this.state
 		return (
 			<>
 				<div className='abs_lt wh scroll'>
@@ -163,7 +170,7 @@ export default class extends React.Component {
 							<ul>
 								{
 									$fn.hasObject(data) && Object.keys(data).map( (v,i) =>(
-										<li key={i} className={`fxmj f12 cp ${v === firstField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectData.bind(this,data,v)}>
+										<li key={i} className={`fxmj f12 cp ${v === firstField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectData.bind(this,v)}>
 											<h6>{v}</h6>
 											<Button size='small' ghost icon={<DeleteOutlined />} onClick={ e=>this.onDel.bind(this,e,v)()} />
 										</li>
@@ -174,7 +181,13 @@ export default class extends React.Component {
 						{
 							firstField && (
 								<Panel header={firstField} key={1}>
-									<Tree data={firstSource} url={firstField} />
+									<ul>
+										{
+											$fn.hasObject(firstSource) && Object.keys(firstSource).map((v,i)=>(
+												<li className={`cp ${secondField === v ? 'c0' : ''}`} style={{padding:'2px 0'}} key={i} onClick={this.selectField.bind(this,v)}>{v}</li>
+											))
+										}
+									</ul>
 								</Panel>
 							)
 						}

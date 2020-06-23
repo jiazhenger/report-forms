@@ -63,7 +63,7 @@ export default class extends React.Component {
 		return (
 			<div className='wh fv'>
 				{/* header */}
-				<header className='fxm plr10 bcf bbor1' style={{height:'30px'}}>
+				<header className='fxm plr10 bcf bbor1 nosel' style={{height:'30px'}}>
 					<h5 className='f12 b ml5 c0'>报表编辑器</h5>
 					<div className='ex h'>
 						<ul className='fxmc h'>
@@ -90,8 +90,8 @@ export default class extends React.Component {
 						</div>
 					</section>
 					{/*  控制面版 */}
-					<div className='bcf' style={{width:rightWidth}} id='control'>
-						<Tabs defaultActiveKey='1'>
+					<div className='bcf nosel' style={{width:rightWidth}} id='control'>
+						<Tabs defaultActiveKey='2'>
 							<TabPane tab='样式' key={1}>
 								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
 								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
