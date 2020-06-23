@@ -114,13 +114,8 @@ export default class extends React.Component {
 	selectData(data, v){
 		if(this.state.firstField !== v){
 			const firstSource = data[v]
-			this.setState({ 
-				firstField: v, 
-				firstSource,
-			})
-			
+			// 递归重组数据
 			let copyData = JSON.parse(JSON.stringify(data))
-			let model = {}
 			const f = (data, model, url) => {
 				let rs = data
 				if($fn.hasArray(data)){
@@ -131,18 +126,23 @@ export default class extends React.Component {
 				
 				if($fn.hasObject(rs)){
 					for(let i in rs){
-						model[i] = { name:i, value:rs[i], url: url + '/' + i }
+						const n = $fn.hasArray(rs[i]) ? '/0' : ''
+						const urls = url + '/' + i + n
+						model[i] = { FieldName: i, FieldUrl: urls  }
 						if(typeof( rs[i] ) === 'object'){
-							f(rs[i], model.children, url )
+							f(rs[i], model[i], urls )
 						}
 					}
 				}
-				
 				return model
 			}
 			
 			const result = f(copyData,{},v)
-			console.log(result)
+			this.setState({
+				firstField: v, 
+				firstSource,
+				checkData:result
+			})
 			
 		}else{
 			this.setState({firstField:null, firstSource:{} })
@@ -154,7 +154,7 @@ export default class extends React.Component {
 	}
 	
 	render(){
-		const { model, data, firstField, firstSource } = this.state
+		const { model, data, checkData, firstField, firstSource } = this.state
 		return (
 			<>
 				<div className='abs_lt wh scroll'>
@@ -174,7 +174,7 @@ export default class extends React.Component {
 						{
 							firstField && (
 								<Panel header={firstField} key={1}>
-									<Tree data={firstSource} url={firstField} />
+									<Tree data={firstSource} url={firstField} checkData={checkData} />
 								</Panel>
 							)
 						}
