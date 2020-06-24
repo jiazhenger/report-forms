@@ -3,7 +3,7 @@ import Checkbox from '@antd/checkbox'
 
 const { $fn } = window
 // ===================================================================== page component
-const Tree = ({ data, checkData, layer, url, onSelect }) => {
+const Tree = ({ data, checkData, layer, url, onSelect, loop }) => {
 	const [ result, setResult ] = React.useState({})
 	const index = isNaN(layer) ? 0 : layer
 	React.useEffect(()=>{
@@ -40,7 +40,13 @@ const Tree = ({ data, checkData, layer, url, onSelect }) => {
 							return null
 						}
 					}
-					const disabled = $fn.hasArray(result[v]) || $fn.hasObject(result[v])
+					let disabled = false
+					// const disabled = $fn.hasArray(result[v]) || $fn.hasObject(result[v])  // 禁用数组
+					if( +loop === 1 ){
+						disabled = !$fn.hasArray(result[v]) || $fn.hasObject(result[v])
+					}else{
+						disabled = urls.indexOf('0') >= 0 || $fn.hasObject(result[v])
+					}
 					return (
 						<li key={ i } style={ index === 0 ? {} : {marginLeft:'2em'} }>
 							<div className={`fx ${disabled?'':'tap cp'}`} onClick={disabled ? null : onClick.bind(null, urls, checkData[v].checked,)}>
@@ -58,6 +64,7 @@ const Tree = ({ data, checkData, layer, url, onSelect }) => {
 										layer		= { index + 1 } 
 										url			= { urls }
 										onSelect	= { onSelect }
+										loop		= { loop }
 									/>
 								)
 							}

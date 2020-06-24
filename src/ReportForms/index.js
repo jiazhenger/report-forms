@@ -45,7 +45,8 @@ export default class extends React.Component {
 		dragStyle:{},
 		tempStyle:{},
 		tempAttr:{},
-		index:0
+		index:0,
+		key:0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -59,7 +60,7 @@ export default class extends React.Component {
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
 	render( ) {
-		const { hasNode, type, dragStyle, tempStyle, tempAttr, index, node } = this.state
+		const { hasNode, type, dragStyle, tempStyle, tempAttr, index, node, key } = this.state
 		return (
 			<div className='wh fv'>
 				{/* header */}
@@ -98,7 +99,7 @@ export default class extends React.Component {
 								{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
 							</TabPane>
 							<TabPane tab='数据' key={2}>
-								<DataSourceComponent node={node} />
+								<DataSourceComponent node={node} key={key} />
 							</TabPane>
 							<TabPane tab='报表' key={3}>
 								

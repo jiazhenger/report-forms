@@ -141,15 +141,32 @@ export default {
 		$drag.addEventListener('click',e=>{
 			const { target } = e
 			const t = Dom.parents(target,'drag')
+			const t2 = Dom.parents(target,'loopNode')
 			if(t){
 				const type = t.getAttribute('type')
+				const url = t.getAttribute('url')
 				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
 					v.querySelector('.point-mark').style.display = 'none'
 					v.style.border = '1px dashed ' + stopBorderColor
 				})
 				t.querySelector('.point-mark').style.display = 'block'
-				t.style.borderColor = '#fff' 
-				_this.setState({ type, node:t})
+				t.style.borderColor = '#fff'
+				_this.setState({ type, url, node:t, key: _this.state.key+1})
+			}
+			if(t2){
+				const url = t2.getAttribute('url')
+				for(let node of t2.parentNode.children){
+					node.style.removeProperty('background')
+				}
+				t2.style.setProperty('background','yellow','important')
+				_this.setState({ node:t2, url })
+			}else{
+				const nodes = document.querySelectorAll('.loopNode')
+				if(nodes){
+					for(let node of nodes){
+						node.style.removeProperty('background')
+					}
+				}
 			}
 		})
 		// 双击
@@ -208,8 +225,7 @@ export default {
 				const d = t || m
 				const $temp = d.querySelector('.template')
 				const $img = $temp ? $temp.querySelector('img') : null
-				clearTimeout(clear)
-				clear = setTimeout(()=>{
+				window.$fn.leak(()=>{
 					_this.setState({
 						index: _this.state.index + 1,
 						dragStyle:d.style,
@@ -218,7 +234,7 @@ export default {
 							src: $img ? $img.src : ''
 						}
 					})
-				},200)
+				})
 			}else{
 				clearTimeout(clear)
 				clear = setTimeout(()=>{
@@ -227,7 +243,7 @@ export default {
 						tempStyle:{},
 						tempAttr:{},
 						node:null,
-						type:null
+						type:null,
 					})
 				},200)
 			}

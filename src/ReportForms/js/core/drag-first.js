@@ -133,6 +133,7 @@ export default {
 				node.style.height = '99px'
 			}else if(type === 'table'){
 				node.style.width = '99px'
+				node.setAttribute('loop', 1)
 			}
 			
 			// 拖动标点

@@ -135,5 +135,12 @@ export default {
 	},
 	toBool(p,v){
 		return p === v
+	},
+	clear:null,
+	leak(callback){
+		clearTimeout(this.clear)
+		this.clear = setTimeout(()=>{
+			callback()
+		},200)
 	}
 }
