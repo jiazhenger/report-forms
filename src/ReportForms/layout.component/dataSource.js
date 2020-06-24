@@ -23,7 +23,8 @@ export default class extends React.Component {
 		model: JSON.parse(JSON.stringify(model)),
 		firstSource:{},
 		data:{},
-		treeData:[]
+		treeData:[],
+		key:0
 	}
 	componentDidMount(){
 		// 读取文件
@@ -115,7 +116,7 @@ export default class extends React.Component {
 		if(this.state.firstField !== v){
 			const firstSource = data[v]
 			// 递归重组数据
-			let copyData = JSON.parse(JSON.stringify(data))
+			let copyData = JSON.parse(JSON.stringify({ [v]: firstSource}))
 			const f = (data, model, url) => {
 				let rs = data
 				if($fn.hasArray(data)){
@@ -128,7 +129,7 @@ export default class extends React.Component {
 					for(let i in rs){
 						const n = $fn.hasArray(rs[i]) ? '/0' : ''
 						const urls = url + '/' + i + n
-						model[i] = { FieldName: i, FieldUrl: urls  }
+						model[i] = { FieldName: i, FieldUrl: urls.replace('/',''), checked:0  }
 						if(typeof( rs[i] ) === 'object'){
 							f(rs[i], model[i], urls )
 						}
@@ -136,25 +137,70 @@ export default class extends React.Component {
 				}
 				return model
 			}
+			const result = f(copyData,{},'')
 			
-			const result = f(copyData,{},v)
 			this.setState({
 				firstField: v, 
 				firstSource,
-				checkData:result
+				key: this.state.key + 1,
+				checkData:result[v]
 			})
-			
 		}else{
 			this.setState({firstField:null, firstSource:{} })
 		}
 	}
 	// 选择字段
-	selectField(v){
-		
+	onTreeSelect = (url, checked) => {
+		const { node } = this.props
+		if(!node){ return $fn.toast('未选中目标') }
+		const $temp = node.querySelector('.template')
+		const type = node.getAttribute('type')
+		const f = data => {
+			for(let i in data){
+				if($fn.hasObject(data[i])){
+					if(url === data[i].FieldUrl){
+						data[i].checked = !data[i].checked
+					}else{
+						data[i].checked = 0
+					}
+					if($fn.hasObject(data[i])){
+						f(data[i])
+					}
+				}
+			}
+			return data
+		}
+		const checkData = f(this.state.checkData)
+		this.setState({ checkData })
+		if(!checked){
+			const bindData = Format.parse(this.state.data,url)
+			node.setAttribute('url',url)
+			if(type === 'text'){
+				$temp.textContent = bindData
+			}else if( type == 'img' ){
+				$temp.querySelector('img').src =  $fn.isString(bindData) ? bindData : window.location.origin +'/assets/images/img.png'
+			}
+		}else{
+			node.removeAttribute('url')
+			if(type === 'text'){
+				$temp.textContent = ''
+			}else if( type == 'img' ){
+				$temp.querySelector('img').src =  window.location.origin +'/assets/images/img.png'
+			}
+		}
 	}
 	
 	render(){
-		const { model, data, checkData, firstField, firstSource } = this.state
+		const { model, data, checkData, firstField, firstSource, key } = this.state
+		const TypeComponent = e => {
+			if($fn.hasArray(firstSource)){
+				return <i className='c0'>[ ]</i>
+			}else if($fn.hasObject(firstSource)){
+				return <i className='c0'>｛ ｝</i>
+			}else{
+				return null
+			}
+		}
 		return (
 			<>
 				<div className='abs_lt wh scroll'>
@@ -173,8 +219,15 @@ export default class extends React.Component {
 						</Panel>
 						{
 							firstField && (
-								<Panel header={firstField} key={1}>
-									<Tree data={firstSource} url={firstField} checkData={checkData} />
+								<Panel header={firstField} extra={<TypeComponent />} key={1}>
+									<Tree 
+										key 		= { key }
+										root 		= { data } 
+										data 		= { firstSource } 
+										url			= { firstField } 
+										checkData	= { checkData } 
+										onSelect	= { this.onTreeSelect }
+									/>
 								</Panel>
 							)
 						}

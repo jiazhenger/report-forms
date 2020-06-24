@@ -18,5 +18,24 @@ module.exports = {
 		}else{
 			return null
 		}
+	},
+	// 觖析 dataSoruce/icons/0/src 为 root['dataSoruce']['icons'][0]['src']
+	parse(root,str){
+		if((typeof str) === 'string'){
+			let arr = str.split('/')
+			if(!isNaN(+arr[arr.length-1])){
+				arr.pop()
+			}
+			let index = 0
+			while(index < arr.length){
+				let n = arr[index]
+					n = isNaN(+n) ? n : +n
+				root = root[n]	
+				index ++
+			}
+			return root
+		}else{
+			return null
+		}
 	}
 }
