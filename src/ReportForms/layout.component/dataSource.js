@@ -65,21 +65,19 @@ export default class extends React.Component {
 			// 获取文件
 			Dom.getNode(this.props.node).then(({ url, loop }) => {
 				if(url){
-					
 					const arr = url.split('/')
 					const firstField = arr[0]
 					const firstSource = this.state.data[firstField]
 					$fn.leak(()=>{
 						let copyData = JSON.parse(JSON.stringify({ [firstField] : this.state.data[firstField] }))
 						let result = getCheckList(copyData,{},'')
-						
 						let checkData = setCheckList(result[firstField], url)
-						
 						this.setState({ firstField, firstSource, checkData, loop  })
-					})
+					})()
 				}
 			})
 		})
+		if(!this.props.node) return
 		// 读取文件
 		this.refs.file.onchange = e => {
 			const file = e.target.files[0]
@@ -99,21 +97,11 @@ export default class extends React.Component {
 		document.addEventListener('mouseup',e => {
 			const t = Dom.parents(e.target,'drag')
 			if(t){
-				const field = Format.getField(t.getAttribute('data-url'))
-				if(field){
-					const a = field[0] ? field[0] : null
-					const b = field[1] ? field[1] : null
-					this.setState({
-						firstField:a, 
-						firstSource:this.state.data[a], 
-						secondField:b, 
-						secondData:this.state.firstSource[b],
-					})
-				}
+				
 			}else{
 				$fn.leak(()=>{
-					this.setState({firstField:null, firstSource:{}, secondField:null, secondData:{}})
-				})
+					this.setState({firstField:null, firstSource:{}, checkData:null, loop:0 })
+				})()
 			}
 		})
 	}

@@ -1,4 +1,6 @@
 import React from 'react'
+// ===================================================================== js
+import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -17,8 +19,8 @@ export default ({ node, dragStyle }) => {
 			const style = dragStyle || {}
 			leftRef.current.setValue($fn.toNum(style.left))
 			topRef.current.setValue($fn.toNum(style.top))
-			widthRef.current.setValue($fn.toNum(style.width))
-			heightRef.current.setValue(node.clientHeight)
+			widthRef.current.setValue($fn.toNum(node.clientWidth))
+			heightRef.current.setValue($fn.toNum(node.clientHeight))
 			indexRef.current.setValue($fn.toNum(style.zIndex))
 		}
 	},[ dragStyle, node ])
@@ -30,8 +32,7 @@ export default ({ node, dragStyle }) => {
 				obj.label = i
 				obj.value = name[i]
 			}
-			
-			node.style[obj.label] = obj.value === '' ? '' : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + unit)
+			Dom.getStyleNode(node).style[obj.label] = obj.value === '' ? '' : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + unit)
 		}else{
 			window.$fn.toast('未选中目标')
 		}
@@ -42,12 +43,14 @@ export default ({ node, dragStyle }) => {
 				<List.Input label='宽' ref={widthRef} name='width' onChange={v=>onChange(v,'px')}  isHalf />
 				<List.Input label='高' ref={heightRef} name='height' onChange={v=>onChange(v,'px')}  isHalf />
 			</div>
-			<div className='fx'>
-				<List.Input label='左' ref={leftRef} name='left' onChange={v=>onChange(v,'px')}  isHalf />
-				<List.Input label='上' ref={topRef} name='top' onChange={v=>onChange(v,'px')}  isHalf />
-			</div>
-			<div className='fx'>
-				<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')}  isHalf />
+			<div className={Dom.isTemplate(node) ? '' : 'dn'}>
+				<div className='fx'>
+					<List.Input label='左' ref={leftRef} name='left' onChange={v=>onChange(v,'px')}  isHalf />
+					<List.Input label='上' ref={topRef} name='top' onChange={v=>onChange(v,'px')}  isHalf />
+				</div>
+				<div className='fx'>
+					<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')}  isHalf />
+				</div>
 			</div>
 		</>
 	)

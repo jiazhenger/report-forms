@@ -1,9 +1,7 @@
 import Drag from '../public/drag'
 import Dom from '../public/dom'
 import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from '../public/config'
-
-let clear
-
+const { $fn } = window
 export default {
 	// 默认执行
 	init(_this){
@@ -139,35 +137,34 @@ export default {
 		})
 		// 单击
 		$drag.addEventListener('click',e=>{
-			const { target } = e
-			const t = Dom.parents(target,'drag')
-			const t2 = Dom.parents(target,'loopNode')
-			if(t){
-				const type = t.getAttribute('type')
-				const url = t.getAttribute('url')
-				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
-					v.querySelector('.point-mark').style.display = 'none'
-					v.style.border = '1px dashed ' + stopBorderColor
-				})
-				t.querySelector('.point-mark').style.display = 'block'
-				t.style.borderColor = '#fff'
-				_this.setState({ type, url, node:t, key: _this.state.key+1})
-			}
-			if(t2){
-				const url = t2.getAttribute('url')
-				for(let node of t2.parentNode.children){
-					node.style.removeProperty('background')
+			$fn.leak(()=>{
+				const { target } = e
+				const t = Dom.parents(target,'drag')
+				const t2 = Dom.parents(target,'loopNode')
+				if(t){
+					Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
+						v.querySelector('.point-mark').style.display = 'none'
+						v.style.border = '1px dashed ' + stopBorderColor
+					})
+					t.querySelector('.point-mark').style.display = 'block'
+					t.style.borderColor = '#fff'
+					_this.setState({ node:t, key: _this.state.key+1 })
 				}
-				t2.style.setProperty('background','yellow','important')
-				_this.setState({ node:t2, url })
-			}else{
-				const nodes = document.querySelectorAll('.loopNode')
-				if(nodes){
-					for(let node of nodes){
+				if(t2){
+					for(let node of t2.parentNode.children){
 						node.style.removeProperty('background')
 					}
+					t2.style.setProperty('background','yellow','important')
+					_this.setState({ node:t2, key: _this.state.key+1 })
+				}else{
+					const nodes = document.querySelectorAll('.loopNode')
+					if(nodes){
+						for(let node of nodes){
+							node.style.removeProperty('background')
+						}
+					}
 				}
-			}
+			})()
 		})
 		// 双击
 		$drag.addEventListener('dblclick',e=>{
@@ -221,36 +218,34 @@ export default {
 				}
 			}
 			let m = Dom.parents(target,'move')
+			// 获取样式
 			if(t || m){
 				const d = t || m
-				const $temp = d.querySelector('.template')
+				const t2 = Dom.parents(target,'loopNode')
+				const $temp = t2 ? t2 : d.querySelector('.template')
 				const $img = $temp ? $temp.querySelector('img') : null
-				window.$fn.leak(()=>{
+				
+				$fn.leak(()=>{
 					_this.setState({
-						index: _this.state.index + 1,
+						// index: _this.state.index + 1,
 						dragStyle:d.style,
 						tempStyle: $temp ? $temp.style : {},
 						tempAttr:{
 							src: $img ? $img.src : ''
 						}
 					})
-				})
+				})()
 			}else{
-				clearTimeout(clear)
-				clear = setTimeout(()=>{
+				// 清除选中 node
+				$fn.leak(()=>{
 					_this.setState({
 						dragStyle:{},
 						tempStyle:{},
 						tempAttr:{},
 						node:null,
-						type:null,
 					})
-				},200)
+				})()
 			}
-			
-			Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
-				
-			})
 			
 			// 清除标线
 			const $axes = _this.$axes.querySelectorAll('i')

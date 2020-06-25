@@ -41,12 +41,11 @@ const IconButton2 = ({ icon, label, onDragStart}) => (
 export default class extends React.Component {
 	state = {
 		node:null,
-		type:null,
 		dragStyle:{},
 		tempStyle:{},
 		tempAttr:{},
-		index:0,
-		key:0
+		key:0,
+		activeKey: 0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -59,8 +58,13 @@ export default class extends React.Component {
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
+	// tabs 控制
+	onTabChange = v => {
+		this.setState({ activeKey: +v })
+	}
 	render( ) {
-		const { hasNode, type, dragStyle, tempStyle, tempAttr, index, node, key } = this.state
+		const { hasNode, dragStyle, tempStyle, tempAttr, node, key, activeKey } = this.state
+		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
 				{/* header */}
@@ -92,16 +96,22 @@ export default class extends React.Component {
 					</section>
 					{/*  控制面版 */}
 					<div className='bcf nosel' style={{width:rightWidth}} id='control'>
-						<Tabs defaultActiveKey='2'>
-							<TabPane tab='样式' key={1}>
-								{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} /> }
-								{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
-								{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} key={index} tempAttr={tempAttr} /> }
+						<Tabs defaultActiveKey={activeKey} onChange={this.onTabChange}>
+							<TabPane tab='样式' key={0}>
+								{
+									activeKey === 0 && (
+										<>
+											{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
+											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+										</>
+									)
+								}
 							</TabPane>
-							<TabPane tab='数据' key={2}>
-								<DataSourceComponent node={node} key={key} />
+							<TabPane tab='数据' key={1}>
+								{ activeKey === 1 && <DataSourceComponent node={node} key={key} />}
 							</TabPane>
-							<TabPane tab='报表' key={3}>
+							<TabPane tab='报表' key={2}>
 								
 							</TabPane>
 						</Tabs>

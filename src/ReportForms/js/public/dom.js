@@ -46,10 +46,11 @@ module.exports = {
 		}
 		
 	},
+	// 获取节点信息
 	getNode(node, callback){
 		return new Promise(resolve=>{
 			if(node){
-				const $temp = node.querySelector('.template')
+				const $temp = node.querySelector('.template') || node
 				const type = node.getAttribute('type')
 				const loop = node.getAttribute('loop')
 				const url = node.getAttribute('url')
@@ -59,4 +60,8 @@ module.exports = {
 			}
 		})
 	},
+	// 获取添加样式的 node
+	getStyleNode(node){ return this.hasClass(node,'loopNode') ? node : node.querySelector('.template') },
+	// 判断 node 是否有 template
+	isTemplate(node){ return node.querySelector('.template') }
 }

@@ -149,6 +149,7 @@ export default {
 				<p class='dir bc-h'><s></s></p>
 				<p class='dir lc-w'><s></s></p>
 			`
+			point.style.background = 'rgba(255,255,255,.5)'
 			node.appendChild(point)
 			_this.node = node
 			

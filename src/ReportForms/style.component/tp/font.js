@@ -1,4 +1,6 @@
 import React from 'react'
+// ===================================================================== js
+import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -79,10 +81,11 @@ export default ({ node,  tempStyle }) => {
 				obj.label = i
 				obj.value = name[i]
 			}
+			const $template = Dom.getStyleNode(node)
 			if({}.toString.call(obj.value) === '[object Boolean]'){
-				(node.querySelector('.template') || node).style[obj.label] = obj.value ? value : (none ? none : 'normal')
+				$template.style[obj.label] = obj.value ? value : (none ? none : 'normal')
 			}else{
-				(node.querySelector('.template') || node).style[obj.label] = obj.value === undefined ? value : obj.value
+				$template.style[obj.label] = obj.value === undefined ? value : obj.value
 			}
 		}else{
 			window.$fn.toast('未选中目标')

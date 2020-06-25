@@ -1,4 +1,6 @@
 import React from 'react'
+// ===================================================================== js
+import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 const { $fn } = window
@@ -24,8 +26,7 @@ export default ({ node, tempStyle }) => {
 				obj.label = i
 				obj.value = name[i]
 			}
-			console.log(obj)
-			node.querySelector('.template').style[obj.label] = obj.value === '' ? (def ? def : 0) : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
+			Dom.getStyleNode(node).style[obj.label] = obj.value === '' ? (def ? def : 0) : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
 		}else{
 			window.$fn.toast('未选中目标')
 		}

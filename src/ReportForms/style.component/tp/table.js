@@ -48,6 +48,7 @@ export default ({ node, dragStyle }) => {
 					const td = document.createElement('td')
 					td.className += ' loopNode'
 					td.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;'
+					td.setAttribute('type','text')
 					tdFragment.appendChild(td)
 				}
 				tr.appendChild(tdFragment)
