@@ -151,6 +151,7 @@ export default {
 					_this.setState({ node:t, key: _this.state.key+1 })
 				}
 				if(t2){
+					console.log(e.relatedTarget)
 					for(let node of t2.parentNode.children){
 						node.style.removeProperty('background')
 					}
@@ -164,28 +165,28 @@ export default {
 						}
 					}
 				}
-			})()
+			})(110)
 		})
 		// 双击
 		$drag.addEventListener('dblclick',e=>{
 			const { target } = e
-			let t = Dom.parents(target,'drag')
-			_this.stop = true
-			if(t && t.getAttribute('type') === 'text'){
+			const t = Dom.parents(target,'drag')
+			
+			if(t){
+				_this.stop = true
 				t.className = 'drag hide'
-				if(!t.getAttribute('contenteditable')){
-					t = t.children[0]
-					t.setAttribute('contenteditable', true)
-					t.focus()
-					t.addEventListener('focus',function(e){
-						// t.style.cursor = 'default'
-					})
-					t.addEventListener('blur',function(e){
-						this.setAttribute('contenteditable', false)
-					})
+				const t2 = Dom.parents(target,'loopNode')
+				const $temp = t2 ? t2 : t.querySelector('.template')
+				const type = $temp.getAttribute('type')
+				if(type === 'text'){
+					$temp.contentEditable = true
+					$temp.focus()
+					$temp.onblur = function(){
+						$temp.contentEditable = false
+					}
+				}else if(type === 'table'){
+					t.className = 'drag hide'
 				}
-			}else if(t && t.getAttribute('type') === 'table'){
-				t.className = 'drag hide'
 			}
 		})
 		document.body.addEventListener('click',e=>{
@@ -197,6 +198,7 @@ export default {
 		document.body.addEventListener('mouseup',e=>{
 			const { target } = e
 			let t = Dom.parents(target,'drag')
+			let m = Dom.parents(target,'move')
 			if( _this.dargNode ){
 				_this.dargNode.querySelector('.point-mark').style.display = 'block'
 				_this.dargNode.style.borderColor = '#fff'
@@ -217,7 +219,7 @@ export default {
 					})
 				}
 			}
-			let m = Dom.parents(target,'move')
+			
 			// 获取样式
 			if(t || m){
 				const d = t || m

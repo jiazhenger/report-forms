@@ -3,12 +3,14 @@
 .drag-list li:nth-child(3n){.mr;}
 
 .move{.bor(@main-color)}
-.drag{.bor(#fff)}
+.drag{.bor(#fff);
+	.template:extend(.rel){.index(-1)}
+}
 .hide{
-	.template:extend(.rel){.index(2)}
+	.template{.index(20)}
 }
 
-.point-mark:extend(.abs){.bor(@main-color);.l_t(-1);.bm(-1);.r(-1);.dn;
+.point-mark:extend(.abs){.bor(@main-color);.l_t(-1);.bm(-1);.r(-1);.dn;.index(10);
 	@w:6;
 	@f:-@w/2;
 	p:extend(.abs,.r100px){.ww(@w);.bc(@main-color);.p(2);

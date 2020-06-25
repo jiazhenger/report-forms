@@ -1,6 +1,6 @@
 import React from 'react'
 // ===================================================================== js
-import Dom from '../../js/public/dom'
+// import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -60,8 +60,8 @@ export default ({ node, dragStyle }) => {
 			$temp.innerHTML = ''
 			$temp.appendChild(table)
 			
-			Dom.editorNode(table.querySelectorAll('td'))
-			Dom.editorNode(table.querySelectorAll('th'))
+			// Dom.editorNode(table.querySelectorAll('td'))
+			// Dom.editorNode(table.querySelectorAll('th'))
 		}else{
 			window.$fn.toast('未选中目标')
 		}

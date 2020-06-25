@@ -142,7 +142,7 @@ export default {
 			clearTimeout(clear)
 			clear = setTimeout(()=>{
 				callback()
-			},time || 100)
+			},time || 200)
 		}
 	}
 }

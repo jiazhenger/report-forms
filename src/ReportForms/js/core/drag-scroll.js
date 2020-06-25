@@ -48,7 +48,7 @@ export default {
 		
 		$scroll.addEventListener('mousedown',function(e){
 			const { target } = e
-			const t = Dom.parents(target,'drag')
+			const t = Dom.parents(target,'paper')
 			if(!t){
 				this.style.cursor = 'move'
 				$scroll.addEventListener('mousemove',mousemove)

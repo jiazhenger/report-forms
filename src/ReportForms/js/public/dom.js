@@ -44,7 +44,6 @@ module.exports = {
 		}else if(this.isNodeList(node)){
 			for(let n of node){ editor(n) }
 		}
-		
 	},
 	// 获取节点信息
 	getNode(node, callback){

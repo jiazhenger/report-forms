@@ -124,6 +124,7 @@ export default {
 			node.innerHTML = Html[type]
 			node.children[0].className = 'template'
 			node.setAttribute('type',type)
+			node.querySelector('.template').setAttribute('type',type)
 			
 			if(type === 'text'){
 				node.style.width = '99px'
@@ -149,8 +150,10 @@ export default {
 				<p class='dir bc-h'><s></s></p>
 				<p class='dir lc-w'><s></s></p>
 			`
-			point.style.background = 'rgba(255,255,255,.5)'
+			point.style.background = 'rgba(0,0,0,0.05)'
+			point.addEventListener('click',e=> e.stopPropagation())
 			node.appendChild(point)
+			
 			_this.node = node
 			
 			_this.setState({hasNode:true, node, type})
