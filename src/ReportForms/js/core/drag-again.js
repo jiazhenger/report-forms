@@ -137,35 +137,37 @@ export default {
 		})
 		// 单击
 		$drag.addEventListener('click',e=>{
-			$fn.leak(()=>{
-				const { target } = e
-				const t = Dom.parents(target,'drag')
-				const t2 = Dom.parents(target,'loopNode')
-				if(t){
-					Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
-						v.querySelector('.point-mark').style.display = 'none'
-						v.style.border = '1px dashed ' + stopBorderColor
-					})
-					t.querySelector('.point-mark').style.display = 'block'
-					t.style.borderColor = '#fff'
-					_this.setState({ node:t, key: _this.state.key+1 })
+			const { target } = e
+			const t = Dom.parents(target,'drag')
+			const t2 = Dom.parents(target,'loopNode')
+			if(t){
+				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
+					v.querySelector('.point-mark').style.display = 'none'
+					v.style.border = '1px dashed ' + stopBorderColor
+				})
+				t.querySelector('.point-mark').style.display = 'block'
+				t.style.borderColor = '#fff'
+				_this.setState({ node:t, key: _this.state.key+1 },()=>{
+					_this.runNode()
+				})
+			}
+			
+			if(t2){
+				for(let node of t2.parentNode.children){
+					node.style.removeProperty('background')
 				}
-				if(t2){
-					console.log(e.relatedTarget)
-					for(let node of t2.parentNode.children){
+				t2.style.setProperty('background','yellow')
+				_this.setState({ node:t2, key: _this.state.key+1 }, ()=>{
+					_this.runNode()
+				})
+			}else{
+				const nodes = document.querySelectorAll('.loopNode')
+				if(nodes){
+					for(let node of nodes){
 						node.style.removeProperty('background')
 					}
-					t2.style.setProperty('background','yellow','important')
-					_this.setState({ node:t2, key: _this.state.key+1 })
-				}else{
-					const nodes = document.querySelectorAll('.loopNode')
-					if(nodes){
-						for(let node of nodes){
-							node.style.removeProperty('background')
-						}
-					}
 				}
-			})(110)
+			}
 		})
 		// 双击
 		$drag.addEventListener('dblclick',e=>{
@@ -175,14 +177,22 @@ export default {
 			if(t){
 				_this.stop = true
 				t.className = 'drag hide'
-				const t2 = Dom.parents(target,'loopNode')
-				const $temp = t2 ? t2 : t.querySelector('.template')
-				const type = $temp.getAttribute('type')
+				let $editor = t.querySelector('.template')
+				let type = t.getAttribute('type')
+				
+				if(type !== 'text'){
+					$editor = target
+					type =  $editor.getAttribute('type')
+				}
+				
 				if(type === 'text'){
-					$temp.contentEditable = true
-					$temp.focus()
-					$temp.onblur = function(){
-						$temp.contentEditable = false
+					$editor.contentEditable = true
+					$editor.focus()
+					$editor.onblur = function(){
+						this.contentEditable = false
+					}
+					$editor.onfocus = function(){
+						
 					}
 				}else if(type === 'table'){
 					t.className = 'drag hide'
@@ -245,7 +255,9 @@ export default {
 						tempStyle:{},
 						tempAttr:{},
 						node:null,
+						key: _this.state.key - 1
 					})
+					_this.cancelNode()
 				})()
 			}
 			

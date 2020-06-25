@@ -17,15 +17,38 @@ const Tree  =  Async(()=>import('../public.component/tree'))
 const { $fn } = window
 // ===================================================================== page component
 const model = { name:'dataSoruce1', url:'' }
+// 重组判断列表数据
+const getCheckList = (data, model, url) => {
+	let rs = data
+	if($fn.hasArray(data)){
+		rs = data[0]
+	}else if($fn.hasObject(data)){
+		rs = data
+	}
+	
+	if($fn.hasObject(rs)){
+		for(let i in rs){
+			const n = $fn.hasArray(rs[i]) ? '/0' : ''
+			const urls = url + '/' + i + n
+			model[i] = { FieldName: i, FieldUrl: urls.replace('/',''), checked:0  }
+			if(typeof( rs[i] ) === 'object'){
+				getCheckList(rs[i], model[i], urls )
+			}
+		}
+	}
+	return model
+}
 export default class extends React.Component {
 	state = {
 		model: JSON.parse(JSON.stringify(model)),
-		rootData:{},
+		firstSource:{},
 		data:$fn.local('dataSource') || {},
 		treeData:[],
 		key:0
 	}
 	componentDidMount(){
+		// 获取文件
+		if(!this.props.node) return
 		// 读取文件
 		this.refs.file.onchange = e => {
 			const file = e.target.files[0]
@@ -40,8 +63,56 @@ export default class extends React.Component {
 				this.newData = JSON.parse(reader.result)
 			}
 		}
-		// 获取文件
-		if(!this.props.node) return
+	}
+	/* ================================================== 获取 node 上的数据 ================================================== */
+	getNodeData = () => {
+		Dom.getNode(this.props.node).then(({ url, loop, node, rootUrl }) => {
+			const drag = Dom.parents(node,'drag')
+			const dragLoop = Boolean(drag.getAttribute('loop'))
+			const dragUrl = drag.getAttribute('url')
+			url = url ? url : dragUrl
+			if(url){
+				const firstField = Format.getRootUrl(url)
+				const firstSource = this.state.data[firstField]
+				$fn.leak(()=>{
+					let copyData = JSON.parse(JSON.stringify({ [firstField] : this.state.data[firstField] }))
+					let result = getCheckList(copyData,{},'')
+					let checkData = this.setCheckList(result[firstField], url, dragUrl)
+					this.setState({ firstField, firstSource, checkData, loop, dragLoop, key: this.state.key + 1  })
+				})()
+			}else if(rootUrl){  // 如果有根 url 
+				console.log(rootUrl)
+				const firstField = Format.getRootUrl(rootUrl)
+				const firstSource = this.state.data[firstField]
+				let copyData = JSON.parse(JSON.stringify({ [firstField] : this.state.data[firstField] }))
+				let result = getCheckList(copyData,{},'')
+				let checkData = this.setCheckList(result[firstField], rootUrl)
+				this.setState({ firstField, firstSource, checkData, key: this.state.key + 1  })
+			}
+		})
+	}
+	// 设置 checked
+	setCheckList = (data, currentUrl, dragUrl) => {
+		for(let i in data){
+			const FieldUrl = data[i].FieldUrl
+			if($fn.hasObject(data[i])){
+				
+				if(currentUrl === FieldUrl){
+					data[i].checked = !data[i].checked
+				}else{
+					data[i].checked = 0
+				}
+				
+				if(dragUrl === FieldUrl){
+					data[i].checked = 1
+				}
+				
+				if($fn.hasObject(data[i])){
+					this.setCheckList(data[i], currentUrl, dragUrl)
+				}
+			}
+		}
+		return data
 	}
 	/* ================================================== 弹窗 ================================================== */
 	onAdd = e => {
@@ -87,111 +158,69 @@ export default class extends React.Component {
 		delete this.state.data[this.delName]
 		this.refs.comfirm.close()
 		$fn.local('dataSource', this.state.data)
-		if(this.state.rootField === this.delName){
-			this.setState({rootField:null, rootData:{}, secondField:null, secondData:{}})
+		if(this.state.firstField === this.delName){
+			this.setState({firstField:null, firstSource:{}, secondField:null, secondData:{}})
 		}
 		this.delName = null
 	}
-	/* ================================================== 获取 node 上的数据 ================================================== */
-	getNode = () => {
-		Dom.getNode(this.props.node).then(({ url, group, node, rootUrl, loop, isLoopNode }) => {
-			if(url){
-				const rootField = Format.getRootUrl(url)
-				const rootData = this.state.data[rootField]
-				let myData = Format.formatData(rootData, rootField, url, group)
-				this.setState({ rootField, rootData, myData })
-				console.log(url)
-			}else if(rootUrl){  // 如果有根 url
-				const rootField = Format.getRootUrl(rootUrl)
-				const rootData = this.state.data[rootField]
-				console.log(isLoopNode)
-				const myData = Format.formatData(rootData,rootField, rootUrl, group, isLoopNode)
-				this.setState({ rootField, rootData, myData })
-			}else{
-				this.cancelNode()
-			}
-		})
-	}
-	cancelNode = () => {
-		this.setState({rootField:null, rootData:{}})
-	}
-	/* ================================================== 选择根数据 ================================================== */
-	selectRoot(data, field){
-		Dom.getNode(this.props.node).then(({ loop, group, node, $temp, type }) => {
-			if(this.state.rootField !== field){
-				const rootData = data[field]
-				// 添加根 url，并移出当前 url
-				node.setAttribute('rootUrl',field)
-				$temp.removeAttribute('url')
+	/* ================================================== 选择第一层数据 ================================================== */
+	selectData(data, v){
+		Dom.getNode(this.props.node).then(({ loop, group, node }) => {
+			if(this.state.firstField !== v){
+				const firstSource = data[v]
 				// 递归重组数据
-				const myData = Format.formatData(rootData,field,field, group)
+				let copyData = JSON.parse(JSON.stringify({ [v]: firstSource}))
+				const result = getCheckList(copyData,{},'')
+				// 添加根 url，并移出当前 url
+				node.setAttribute('rootUrl',v)
+				node.removeAttribute('url')
+				
 				this.setState({
-					rootField: field, 
-					rootData,
-					myData,
+					firstField: v, 
+					firstSource,
 					key: this.state.key + 1,
+					checkData:result[v],
 					loop
 				})
-				
-				if(type === 'table'){
-					Dom.createTable($temp, Format.parse(this.state.data, field))
-				}
 			}else{
-				this.cancelNode()
-				node.removeAttribute('rootUrl')
-				$temp.removeAttribute('url')
+				this.setState({firstField:null, firstSource:{}, key: this.state.key - 1})
 			}
 		})
 	}
-	/* ================================================== 选择树上的数据 ================================================== */
-	onTreeSelect = v => {
-		Dom.getNode(this.props.node).then(({ node, $temp, dragType, type, group, loop })=>{
+	// 选择字段
+	onTreeSelect = (currentUrl, checked) => {
+		Dom.getNode(this.props.node).then(({ node, $temp, type })=>{
 			const drag = Dom.parents(node,'drag')
-			v.checked = !v.checked
-			const { checked, url, value, isArray, isObject, root } = v
-			let myData = this.state.myData
-			if(checked){
-				myData = Format.formatCheckedData(myData,v)
-				if(group && (isObject || isArray)){
-					node.setAttribute('rootUrl',url)
-					node.setAttribute('loop',1)
-				}else{
-					$temp.setAttribute('url',url)
-				}
-				
+			
+			// 
+			if(!checked){
+				const bindData = Format.parse(this.state.data,currentUrl)
+				node.setAttribute('url',currentUrl)
 				if(type === 'text'){
-					$temp.textContent = value
+					$temp.textContent = bindData
 				}else if( type === 'img' ){
-					$temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
-				}else if( type === 'table' ){
-					Dom.createTable($temp, Format.parse(this.state.data, url))
+					$temp.querySelector('img').src =  $fn.isString(bindData) ? bindData : window.location.origin +'/assets/images/img.png'
 				}
 			}else{
-				if(group && (isObject || isArray)){
-					node.setAttribute('rootUrl',root)
-					node.removeAttribute('loop')
-				}else{
-					$temp.removeAttribute('url')
-				}
+				node.removeAttribute('url')
 				if(type === 'text'){
 					$temp.textContent = ''
 				}else if( type === 'img' ){
 					$temp.querySelector('img').src =  window.location.origin +'/assets/images/img.png'
-				}else if( type === 'table' ){
-					
 				}
 			}
-			
-			this.setState({ myData })
+			// 选择效果
+			const checkData = this.setCheckList(this.state.checkData, currentUrl, drag.getAttribute('url'))
+			this.setState({ checkData })
 		})
 	}
 	
 	render(){
-		const { model, data, myData, rootField, rootData, key } = this.state
+		const { model, data, checkData, firstField, firstSource, key, loop, dragLoop } = this.state
 		const TypeComponent = e => {
-			if($fn.hasArray(rootData)){
+			if($fn.hasArray(firstSource)){
 				return <i className='c0'>[ ]</i>
-			}else if($fn.hasObject(rootData)){
+			}else if($fn.hasObject(firstSource)){
 				return <i className='c0'>｛ ｝</i>
 			}else{
 				return null
@@ -205,7 +234,7 @@ export default class extends React.Component {
 							<ul>
 								{
 									$fn.hasObject(data) && Object.keys(data).map( (v,i) =>(
-										<li key={i} className={`fxmj f12 cp ${v === rootField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectRoot.bind(this,data,v)}>
+										<li key={i} className={`fxmj f12 cp ${v === firstField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectData.bind(this,data,v)}>
 											<h6>{v}</h6>
 											<Button size='small' ghost icon={<DeleteOutlined />} onClick={ e=>this.onDel.bind(this,e,v)()} />
 										</li>
@@ -214,12 +243,18 @@ export default class extends React.Component {
 							</ul>
 						</Panel>
 						{
-							rootField && (
-								<Panel header={rootField} extra={<TypeComponent />} key={1}>
-									<Tree
+							firstField && (
+								<Panel header={firstField} extra={<TypeComponent />} key={1}>
+									<Tree 
 										key 		= { key }
-										data 		= { myData } 
+										root 		= { data } 
+										data 		= { firstSource } 
+										url			= { firstField } 
+										checkData	= { checkData }
+										rootCheckData	= { checkData } 
 										onSelect	= { this.onTreeSelect }
+										loop		= { loop }
+										dragLoop	= { dragLoop }
 									/>
 								</Panel>
 							)

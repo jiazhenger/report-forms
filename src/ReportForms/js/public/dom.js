@@ -1,6 +1,7 @@
 /**
  * dom 操作
  * */
+const { $fn } = window
 module.exports = {
 	// 判断元素是否有 className
 	hasClass(el,className){
@@ -29,6 +30,7 @@ module.exports = {
 	isElement(node){ return node instanceof HTMLElement },
 	isNodeList(node){ return node instanceof NodeList },
 	// 编辑节点
+	/*
 	editorNode(node){
 		const editor = function(n){
 			n.ondblclick = function(){
@@ -45,22 +47,56 @@ module.exports = {
 			for(let n of node){ editor(n) }
 		}
 	},
+	*/
 	// 获取节点信息
 	getNode(node, callback){
 		return new Promise(resolve=>{
 			if(node){
-				const $temp = node.querySelector('.template') || node
+				const $temp = this.getStyleNode(node)
+				const drag = this.parents($temp,'drag')
+				const dragType = drag.getAttribute('type')
 				const type = node.getAttribute('type')
-				const loop = node.getAttribute('loop')
-				const url = node.getAttribute('url')
-				resolve({ node, $temp, type, loop, url })
+				const loop = Boolean(drag.getAttribute('loop'))
+				const group = Boolean(drag.getAttribute('group'))
+				const url = $temp.getAttribute('url')
+				const rootUrl = drag.getAttribute('rootUrl')
+				const isLoopNode = this.parents($temp,'loopNode')
+				
+				resolve({ node, $temp, type, dragType, loop, url, rootUrl, group, isLoopNode })
 			}else{
 				window.$fn.toast('未选中目标')
 			}
 		})
 	},
-	// 获取添加样式的 node
+	// 获取模板 node
 	getStyleNode(node){ return this.hasClass(node,'loopNode') ? node : node.querySelector('.template') },
 	// 判断 node 是否有 template
-	isTemplate(node){ return node.querySelector('.template') }
+	isTemplate(node){ return node.querySelector('.template') },
+	// 创建表格
+	createTable($temp, data){
+		if(!$fn.hasArray(data)) return
+		$temp.innerHTML = ''
+		const tr = document.createElement('tr')
+		const table = document.createElement('table')
+		const tbody = document.createElement('tbody')
+		const trFragment = document.createDocumentFragment()
+		data.forEach( v => {
+			const tr = document.createElement('tr')
+			const tdFragment = document.createDocumentFragment()
+			for(let i in v){
+				const td = document.createElement('td')
+				td.className = 'loopNode'
+				td.style.cssText = 'border:1px solid #ddd;height:28px;padding:4px 5px;'
+				td.setAttribute('type','text')
+				td.textContent = v[i]
+				tdFragment.appendChild(td)
+			}
+			tr.appendChild(tdFragment)
+			trFragment.appendChild(tr)
+		})
+		tbody.appendChild(trFragment)
+		table.appendChild(tbody)
+		$temp.innerHTML = ''
+		$temp.appendChild(table)
+	}
 }

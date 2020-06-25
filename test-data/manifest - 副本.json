@@ -1,0 +1,17 @@
+{
+  "test":{
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+	  "con": {
+		  "src": "logo512.png",
+		  "type": "image/png",
+		  "sizes": "512x512"
+		}
+    },
+	"mast":{
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+}

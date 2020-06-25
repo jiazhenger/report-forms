@@ -32,6 +32,7 @@ export default ({ node, dragStyle }) => {
 				for(let i=0; i<col; i++){
 					const th = document.createElement('th')
 					th.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;background:#f5f5f5'
+					th.setAttribute('type','text')
 					thFragment.appendChild(th)
 				}
 				trThead.appendChild(thFragment)
@@ -46,7 +47,7 @@ export default ({ node, dragStyle }) => {
 				const tdFragment = document.createDocumentFragment()
 				for(let j=0; j<col; j++){
 					const td = document.createElement('td')
-					td.className += ' loopNode'
+					td.className = 'loopNode'
 					td.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;'
 					td.setAttribute('type','text')
 					tdFragment.appendChild(td)

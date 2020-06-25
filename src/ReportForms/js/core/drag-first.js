@@ -134,11 +134,11 @@ export default {
 				node.style.height = '99px'
 			}else if(type === 'table'){
 				node.style.width = '99px'
-				node.setAttribute('loop', 1)
+				node.setAttribute('group', 1)
 			}
 			
 			// 拖动标点
-			const point = document.createElement('span')
+			const point = document.createElement('div')
 			point.className = 'point-mark'
 			point.innerHTML = `
 				<p class='dir lt-wh'><s></s></p>

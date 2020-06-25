@@ -12,7 +12,8 @@ import { Tabs } from 'antd'
 // const Tabs = ()=>import('@antd/tabs')
 // ===================================================================== layout component
 import ContentComponent from './layout.component/content'
-const DataSourceComponent = Async(()=>import('./layout.component/dataSource'))
+import DataSourceComponent from './layout.component/dataSource'
+// const DataSourceComponent = Async(()=>import('./layout.component/dataSource'))
 // ===================================================================== style component
 const Text  =  Async(()=>import('./style.component/text'))
 const Image  =  Async(()=>import('./style.component/image'))
@@ -22,6 +23,7 @@ const { TabPane } = Tabs
 // const { $fn } = window
 const rightWidth = '350px'
 const leftWidth = '200px'
+const { $fn } = window
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode}) => (
 	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`}>
@@ -45,7 +47,7 @@ export default class extends React.Component {
 		tempStyle:{},
 		tempAttr:{},
 		key:0,
-		activeKey: 0
+		activeKey: $fn.local('activeKey') || 0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -60,7 +62,19 @@ export default class extends React.Component {
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
 	// tabs 控制
 	onTabChange = v => {
-		this.setState({ activeKey: +v })
+		this.setState({ activeKey: v },()=>{
+			$fn.local('activeKey',v)
+			this.runNode()
+		})
+	}
+	// 获取到 node 时执行
+	runNode = () => {
+		this.refs.dataSource && this.refs.dataSource.getNode()
+		// console.log(this.refs.dataSource)
+	}
+	// 取消 node 时执行
+	cancelNode = () => {
+		this.refs.dataSource && this.refs.dataSource.cancelNode()
 	}
 	render( ) {
 		const { hasNode, dragStyle, tempStyle, tempAttr, node, key, activeKey } = this.state
@@ -99,7 +113,7 @@ export default class extends React.Component {
 						<Tabs defaultActiveKey={activeKey} onChange={this.onTabChange}>
 							<TabPane tab='样式' key={0}>
 								{
-									activeKey === 0 && (
+									+activeKey === 0 && (
 										<>
 											{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
 											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
@@ -109,7 +123,7 @@ export default class extends React.Component {
 								}
 							</TabPane>
 							<TabPane tab='数据' key={1}>
-								{ activeKey === 1 && <DataSourceComponent node={node} key={key} />}
+								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} />}
 							</TabPane>
 							<TabPane tab='报表' key={2}>
 								

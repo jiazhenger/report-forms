@@ -1,70 +1,43 @@
 import React from 'react'
 import Checkbox from '@antd/checkbox'
-
+// ===================================================================== public js
+import Format from '../js/public/format'
 const { $fn } = window
 // ===================================================================== page component
-const Tree = ({ data, checkData, layer, url, onSelect, loop }) => {
+const Tree = ({ data, layer, url, onSelect,}) => {
 	const [ result, setResult ] = React.useState({})
 	const index = isNaN(layer) ? 0 : layer
-	React.useEffect(()=>{
-		
-		if($fn.hasArray(data)){
-			setResult(data[0])
-		}else if($fn.hasObject(data)){
-			setResult(data)
-		}else if(data !== null && data !== undefined){
-			setResult(data)
-		}
-		
-	},[ data, checkData ])
-	const onClick = React.useCallback( (url,checked) => {
-		// currentList.checked = !currentList.checked
-		onSelect && onSelect(url, checked)
+	const onClick = React.useCallback( v => {
+		onSelect && onSelect(v)
 	},[onSelect])
 	
 	return (
 		<ul layer={ index }>
 			{
-				$fn.hasObject(result) && Object.keys(result).sort().map(( v, i ) => {
-					let num = $fn.hasArray(result[v]) ? '/0' : ''
-					let urls = url + '/' + v + num
-					if(index === 0 && $fn.hasArray(data)){
-						urls = url + num + '/0/' + v
-					}
+				$fn.hasArray(data) && data.map(( v, i ) => {
+					const { name, value, children, checked, url, isArray, isObject, disabled } = v
 					const TypeComponent = e => {
-						if($fn.hasArray(result[v])){
+						if(isArray){
 							return <i className='c0'>[ ]</i>
-						}else if($fn.hasObject(result[v])){
+						}else if(isObject){
 							return <i className='c0'>｛ ｝</i>
 						}else{
 							return null
 						}
 					}
-					let disabled = false
-					// const disabled = $fn.hasArray(result[v]) || $fn.hasObject(result[v])  // 禁用数组
-					if( +loop === 1 ){
-						disabled = !$fn.hasArray(result[v]) || $fn.hasObject(result[v])
-					}else{
-						disabled = urls.indexOf('0') >= 0 || $fn.hasObject(result[v])
-					}
 					return (
-						<li key={ i } style={ index === 0 ? {} : {marginLeft:'2em'} }>
-							<div className={`fx ${disabled?'':'tap cp'}`} onClick={disabled ? null : onClick.bind(null, urls, checkData[v].checked,)}>
-								<Checkbox value={checkData[v].checked} disabled={disabled} />
-								<div className='ml5 ex f13'>{ v } {<TypeComponent />}</div>
-								{
-									typeof(result[v]) === 'string' && <div className='ml5 g9 f12 omits-1'>{ result[v] }</div>
-								}
-							</div>
+						<li key={ i } style={ index === 0 ? {} : {marginLeft:'2em'} } url={url}>
+							<h3 className={`fx ${disabled?'':'tap cp'}`} onClick={disabled ? null : onClick.bind(null, v)}>
+								<Checkbox value={checked} disabled={disabled} />
+								<span className='ml5 ex f13'>{ name } {<TypeComponent />}</span>
+								<span className='ml5 g9 f12 omits-1'>{ value }</span>
+							</h3>
 							{
-								typeof( result[v] ) === 'object' && (
+								$fn.hasArray(children) && (
 									<Tree 
-										data		= { result[v] } 
-										checkData	= { checkData[v] } 
-										layer		= { index + 1 } 
-										url			= { urls }
-										onSelect	= { onSelect }
-										loop		= { loop }
+										data			= { children }
+										layer			= { index + 1 } 
+										onSelect		= { onSelect }
 									/>
 								)
 							}
