@@ -145,6 +145,12 @@ export default class extends React.Component {
 			})
 		}
 	}
+	downloadPdf = () => {
+		window.open(window.$config.api + 'downloadPdf')
+	}
+	downloadHtml = () => {
+		window.open(window.$config.api + 'downloadHtml')
+	}
 	render( ) {
 		const { hasNode, dragStyle, tempStyle, tempAttr, node, activeKey } = this.state
 		const type = node ? node.getAttribute('type') : null
@@ -155,8 +161,10 @@ export default class extends React.Component {
 					<h5 className='f12 b ml5 c0'>报表编辑器</h5>
 					<div className='ex h'>
 						<ul className='fxmc h'>
-							<IconButton label='生成 html' onClick={e=>this.createHtml(e)} hasNode={true}/>
-							<IconButton label='生成 pdf' onClick={e=>this.createPdf(e)} hasNode={true}/>
+							<IconButton label='生成 html' onClick={ this.createHtml } hasNode={true}/>
+							<IconButton label='生成 pdf' onClick={ this.createPdf } hasNode={true}/>
+							<IconButton label='下载 pdf' onClick={ this.downloadPdf } hasNode={true}/>
+							<IconButton label='下载 html' onClick={ this.downloadHtml } hasNode={true}/>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
 							<IconButton label='删除全部' id='delAll' hasNode={hasNode} />
 						</ul>

@@ -24,7 +24,7 @@ router.post('/html',async ctx => {
 })
 // 下载 pdf
 router.get('/downloadHtml', async ctx => {
-	let src = './api/pdf/report.pdf'
+	let src = './api/pdf/report.html'
     ctx.attachment(src)
     await send(ctx, src)
 })
