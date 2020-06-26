@@ -1,6 +1,6 @@
 import React from 'react'
 // ===================================================================== js
-// import Dom from '../../js/public/dom'
+import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -19,11 +19,10 @@ export default ({ node, dragStyle }) => {
 	const ceateTable = React.useCallback(()=>{
 		if(row <= 0){ return $fn.toast('行数必须大于 0')}
 		if(col <= 0){ return $fn.toast('列数必须大于 0')}
-		if(node){
+		Dom.getNode(node).then(({ node })=>{
 			node.style.height = 'auto'
 			const $temp = node.querySelector('.template')
 			const table = document.createElement('table')
-			table.style.cssText = 'border-collapse:collapse;'
 			// thead
 			if(checked){
 				const thead = document.createElement('thead') 			// thead
@@ -63,9 +62,7 @@ export default ({ node, dragStyle }) => {
 			
 			// Dom.editorNode(table.querySelectorAll('td'))
 			// Dom.editorNode(table.querySelectorAll('th'))
-		}else{
-			window.$fn.toast('未选中目标')
-		}
+		})
 	}, [node, col, row, checked])
 	return (
 		<>

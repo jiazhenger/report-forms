@@ -10,9 +10,10 @@ export default {
 	//  获取元素各种信息
 	getInfo : function(s){	
 		const r = s.getBoundingClientRect( )
+		const { offsetTop, offsetLeft } = this.getOffset(s)
 		return {
-			offsetTop		: r.top,
-			offsetLeft		: r.left,
+			offsetTop		: offsetTop,
+			offsetLeft		: offsetLeft,
 			offsetRight		: r.right,
 			offsetBottom	: r.bottom,
 			width 			: r.width,
@@ -36,6 +37,17 @@ export default {
 			left : parseInt(s.style.left),
 			top  : parseInt(s.style.top)
 		}
+	},
+	getOffset(e){
+		let offsetTop = e.offsetTop
+		let offsetLeft = e.offsetLeft 
+		let parent = e.offsetParent
+		while(parent){
+			offsetTop += parent.offsetTop
+			offsetLeft += parent.offsetLeft 
+			parent = parent.offsetParent
+		}
+		return { offsetTop, offsetLeft}
 	},
 	mark(_this, $axes, left) {
 		const n = parseInt(left / 20)

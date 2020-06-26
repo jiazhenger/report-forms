@@ -1,8 +1,9 @@
 /**
  * dom 操作
  * */
+import Html from './html'
 const { $fn } = window
-module.exports = {
+export default {
 	// 判断元素是否有 className
 	hasClass(el,className){
 		if(el){
@@ -76,7 +77,6 @@ module.exports = {
 	createTable($temp, data){
 		if(!$fn.hasArray(data)) return
 		$temp.innerHTML = ''
-		const tr = document.createElement('tr')
 		const table = document.createElement('table')
 		const tbody = document.createElement('tbody')
 		const trFragment = document.createDocumentFragment()
@@ -96,7 +96,44 @@ module.exports = {
 		})
 		tbody.appendChild(trFragment)
 		table.appendChild(tbody)
-		$temp.innerHTML = ''
 		$temp.appendChild(table)
+	},
+	// 创建列表
+	createList($temp, data){
+		if(typeof data !== 'object') return
+		$temp.innerHTML = ''
+		const ul = document.createElement('ul')
+		ul.style.cssText = `width:100%;padding-left:2em;list-style:outside decimal`
+		const fragment = document.createDocumentFragment()
+		
+		for(let i in data){
+			let li =  null
+			const value = data[i]
+			
+			if($fn.isString(value) || $fn.isNumber(value)){
+				li = document.createElement('li')
+				li.textContent =  value
+			}else if($fn.isObject(value) && $fn.hasArray(data)){
+				li = document.createElement('li')
+				const arr = Object.keys(value)
+				li.textContent =  value[arr[0]]
+			}
+			
+			if(li){
+				li.className = 'loopNode'
+				li.style.cssText = 'padding:5px 0;border-bottom:1px dashed #eee;'
+				li.setAttribute('type','text')
+				fragment.appendChild(li)
+			}
+		}
+		
+		ul.appendChild(fragment)
+		// last
+		$temp.appendChild(ul)
+	},
+	// 清空数据
+	reset($temp,type){
+		const _type = Html[type]
+		$temp.innerHTML = _type
 	}
 }

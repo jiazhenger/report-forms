@@ -1,11 +1,10 @@
 import React from 'react'
 import Checkbox from '@antd/checkbox'
 // ===================================================================== public js
-import Format from '../js/public/format'
+// import Format from '../js/public/format'
 const { $fn } = window
 // ===================================================================== page component
 const Tree = ({ data, layer, url, onSelect,}) => {
-	const [ result, setResult ] = React.useState({})
 	const index = isNaN(layer) ? 0 : layer
 	const onClick = React.useCallback( v => {
 		onSelect && onSelect(v)

@@ -78,7 +78,6 @@ export default class extends React.Component {
 	}
 	/* ================================================== 删除数据源 ================================================== */
 	onDel(e,v){
-		console.log(e)
 		this.refs.comfirm.open()
 		this.delName = v
 		e.stopPropagation()
@@ -94,18 +93,16 @@ export default class extends React.Component {
 	}
 	/* ================================================== 获取 node 上的数据 ================================================== */
 	getNode = () => {
-		Dom.getNode(this.props.node).then(({ url, group, node, rootUrl, loop, isLoopNode }) => {
+		Dom.getNode(this.props.node).then(({ url, type, node, rootUrl, loop, isLoopNode }) => {
 			if(url){
 				const rootField = Format.getRootUrl(url)
 				const rootData = this.state.data[rootField]
-				let myData = Format.formatData(rootData, rootField, url, group)
+				let myData = Format.formatData(rootData, rootField, url, type, isLoopNode)
 				this.setState({ rootField, rootData, myData })
-				console.log(url)
 			}else if(rootUrl){  // 如果有根 url
 				const rootField = Format.getRootUrl(rootUrl)
 				const rootData = this.state.data[rootField]
-				console.log(isLoopNode)
-				const myData = Format.formatData(rootData,rootField, rootUrl, group, isLoopNode)
+				const myData = Format.formatData(rootData,rootField, rootUrl, type, isLoopNode)
 				this.setState({ rootField, rootData, myData })
 			}else{
 				this.cancelNode()
@@ -117,14 +114,14 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择根数据 ================================================== */
 	selectRoot(data, field){
-		Dom.getNode(this.props.node).then(({ loop, group, node, $temp, type }) => {
+		Dom.getNode(this.props.node).then(({ loop, type, node, $temp }) => {
 			if(this.state.rootField !== field){
 				const rootData = data[field]
 				// 添加根 url，并移出当前 url
 				node.setAttribute('rootUrl',field)
 				$temp.removeAttribute('url')
 				// 递归重组数据
-				const myData = Format.formatData(rootData,field,field, group)
+				const myData = Format.formatData(rootData,field, field, type)
 				this.setState({
 					rootField: field, 
 					rootData,
@@ -135,18 +132,29 @@ export default class extends React.Component {
 				
 				if(type === 'table'){
 					Dom.createTable($temp, Format.parse(this.state.data, field))
+				}else if( type === 'ul' ){
+					Dom.createList($temp, Format.parse(this.state.data, field))
 				}
 			}else{
 				this.cancelNode()
 				node.removeAttribute('rootUrl')
 				$temp.removeAttribute('url')
+				
+				Dom.reset($temp,type)
 			}
 		})
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
-		Dom.getNode(this.props.node).then(({ node, $temp, dragType, type, group, loop })=>{
-			const drag = Dom.parents(node,'drag')
+		Dom.getNode(this.props.node).then(({ node, $temp, dragType, type, group, loop, isLoopNode })=>{
+			if(type === 'table' && !isLoopNode &&　!v.isArray){
+				return $fn.toast('数据必须是数组')
+			}
+			
+			if((type === 'text' || type === 'img') && !v.isString){
+				return $fn.toast('数据必须是字符串')
+			}
+			
 			v.checked = !v.checked
 			const { checked, url, value, isArray, isObject, root } = v
 			let myData = this.state.myData
@@ -165,6 +173,8 @@ export default class extends React.Component {
 					$temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
 				}else if( type === 'table' ){
 					Dom.createTable($temp, Format.parse(this.state.data, url))
+				}else if( type === 'ul' ){
+					Dom.createList($temp, Format.parse(this.state.data, url))
 				}
 			}else{
 				if(group && (isObject || isArray)){
@@ -173,13 +183,8 @@ export default class extends React.Component {
 				}else{
 					$temp.removeAttribute('url')
 				}
-				if(type === 'text'){
-					$temp.textContent = ''
-				}else if( type === 'img' ){
-					$temp.querySelector('img').src =  window.location.origin +'/assets/images/img.png'
-				}else if( type === 'table' ){
-					
-				}
+				
+				Dom.reset($temp,type)
 			}
 			
 			this.setState({ myData })

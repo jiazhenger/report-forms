@@ -2,16 +2,16 @@
  * 格式化数据
  * */
 const { $fn } = window
-module.exports = {
+export default {
 	// 重新格式化数组源
-	formatData(data, field, currentUrl, group, isLoopNode){
+	formatData(data, field, currentUrl, type, isLoopNode){
 		const recursion = (data, arr, url) => {
 			url = url ? url : field
+			const n = $fn.hasArray(data) ? '/0' : ''
 			data = $fn.hasArray(data) ? data[0] : data
 			if($fn.hasObject(data)){
 				Object.keys(data).forEach((v,i)=>{
 					// 生成 url
-					const n = $fn.hasArray(data[v]) ? '/0' : ''
 					const urls = url + '/' + v + n
 					// 新数据组合
 					const obj = { name: v, url: urls, root:field, checked: currentUrl === urls }
@@ -19,6 +19,16 @@ module.exports = {
 					obj.parentUrl = this.getParentUrl(urls)
 					// 获取最后结果
 					arr[i] = ( typeof data[v] === 'object' ) ? {...obj, children:[] } :  { ...obj, value: data[v], isString:1 }
+					// 禁用
+					if( type === 'table' && !isLoopNode){
+						if(!$fn.hasArray(data[v])){ arr[i].disabled = true }  // 组合节点禁用非数组
+					}else if(type === 'ul'){
+						if($fn.isString(data[v])){ arr[i].disabled = true } // 对象节点禁用
+					}else{
+						if(typeof data[v] === 'object'){ arr[i].disabled = true } // 对象节点禁用
+						if( this.isArrayChild(urls) ){ arr[i].disabled = true } // 数组子元素禁用
+					}
+					// 递归
 					if( typeof data[v] === 'object' ){
 						// 判断数据类型
 						if($fn.isArray(data[v])){
@@ -26,11 +36,7 @@ module.exports = {
 						}else if($fn.isObject(data[v])){
 							arr[i].isObject = 1
 						}
-						// arr[i].disabled = isLoopNode
 						recursion(data[v], arr[i].children, urls)
-					}else{
-						// if(group){ arr[i].disabled = group }
-						// arr[i].disabled = !isLoopNode	
 					}
 				})
 			}
@@ -120,7 +126,7 @@ module.exports = {
 	isArrayChild(url){
 		const arr = url.split('/')
 		const len = arr.length
-		return !isNaN(arr[len-2])
+		return !isNaN(arr[len-1])
 	},
 	// 根据数组元素 url 推出父组数组的 url
 	getParentUrl(url){

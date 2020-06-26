@@ -147,25 +147,28 @@ export default {
 				})
 				t.querySelector('.point-mark').style.display = 'block'
 				t.style.borderColor = '#fff'
-				_this.setState({ node:t, key: _this.state.key+1 },()=>{
-					_this.runNode()
-				})
-			}
-			
-			if(t2){
-				for(let node of t2.parentNode.children){
-					node.style.removeProperty('background')
+				if(Dom.hasClass(t,'hide')){
+					const nodes = document.querySelectorAll('.loopNode')
+					if(nodes.length > 0){
+						if(t2){
+							for(let node of nodes){ node.style.removeProperty('background') }   // 移除背景
+							t2.style.setProperty('background','yellow')  // 添加背景
+							_this.setState({ node:t2, key: _this.state.key+1 }, ()=>{
+								_this.runNode()
+							})
+						}else{
+							for(let node of nodes){ node.style.removeProperty('background') } // 移除背景
+						}
+					}
+				}else{
+					_this.setState({ node:t, key: _this.state.key+1 },()=>{
+						_this.runNode()
+					})
 				}
-				t2.style.setProperty('background','yellow')
-				_this.setState({ node:t2, key: _this.state.key+1 }, ()=>{
-					_this.runNode()
-				})
 			}else{
 				const nodes = document.querySelectorAll('.loopNode')
-				if(nodes){
-					for(let node of nodes){
-						node.style.removeProperty('background')
-					}
+				if(nodes.length > 0){
+					for(let node of nodes){ node.style.removeProperty('background') }
 				}
 			}
 		})

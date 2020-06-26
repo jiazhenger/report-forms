@@ -24,7 +24,7 @@ const config = (opt)=>{
 		{ 'Content-Type' 	: contentType } : 
 		{ 
 			'Content-Type'	: contentType,
-			'Authorization'	: $fn.getToken()
+			// 'Authorization'	: $fn.getToken()
 		}
                 
 	return {
@@ -106,9 +106,9 @@ const coreRequest = (url, param, action, defined) => {
 	return new Promise((resolve, reject) => {
 		promise.then(res => {	// 接口正确接收数据处理
 			let data = res.data;
-			let code = data.status;
+			let code = data.code;
 			
-			if(code === 1){	// 数据请求成功
+			if(code === 200){	// 数据请求成功
 				resolve(data.data);
 				logMsg(url + '===', data.data);
 			} else if(code === 501){	// 登录信息已过期，请重新登录!
@@ -277,6 +277,7 @@ const pull = (_this,api,option)=>{
 	})
 }
 // ===================================================== 分页
+/*
 const paging = (_this,api,option)=>{
 	let opt = {
 		dataName		: 'data',				// 数据名字
@@ -345,5 +346,5 @@ const paging = (_this,api,option)=>{
 			opt.callback && opt.callback(data);
 		})
 	})
-}
-export default { submit, pull, paging }
+}*/
+export default { submit, pull }

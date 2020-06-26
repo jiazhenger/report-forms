@@ -100,8 +100,10 @@ export default {
 					if(type === 'table'){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
+					}else if( type === 'ul'){
+						_this.node.style.width = '200px'
 					}
-							
+					_this.runNode()		
 					_this.node.querySelector('.point-mark').style.display = 'block'
 				},
 				onFail:()=>{
@@ -122,9 +124,10 @@ export default {
 			node.className = 'move'
 			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:0;`
 			node.innerHTML = Html[type]
-			node.children[0].className = 'template'
+			node.children[0].className += ' template'
 			node.setAttribute('type',type)
-			node.querySelector('.template').setAttribute('type',type)
+			const $temp = node.querySelector('.template')
+			$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
 			
 			if(type === 'text'){
 				node.style.width = '99px'
@@ -133,6 +136,9 @@ export default {
 				node.style.width = '99px'
 				node.style.height = '99px'
 			}else if(type === 'table'){
+				node.style.width = '99px'
+				node.setAttribute('group', 1)
+			}else if(type === 'ul'){
 				node.style.width = '99px'
 				node.setAttribute('group', 1)
 			}

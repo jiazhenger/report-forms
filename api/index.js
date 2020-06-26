@@ -4,6 +4,7 @@ const views = require('koa-views')
 const bodyParser = require('koa-bodyparser')
 // api
 const pdf = require('./api/pdf')
+const html = require('./api/html')
 const test = require('./api/test')
 // declare
 const app = new Koa()
@@ -22,8 +23,9 @@ app.use( async (ctx,next) => {
 app.use( views( path.join(__dirname, './views'), { extension: 'ejs' } ) )
 // 路由
 app.use(pdf.routes()).use(pdf.allowedMethods())
+app.use(html.routes()).use(html.allowedMethods())
 app.use(test.routes()).use(test.allowedMethods())
 // 服务
 app.listen(port, ()=>{
-	console.log('localhost:',3005)
+	console.log('localhost:',port)
 })
