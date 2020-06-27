@@ -55,7 +55,21 @@ export default class Index extends React.Component {
 				allowClear
 			>
 				{
-					$fn.hasArray(xdata) && xdata.map( (v,i) => <Select.Option key={v[iStr]} value={v[iStr]} style={{marginRight:'20px'}}>{v[nStr]}</Select.Option> )
+					$fn.hasArray(xdata) && xdata.map((v,i)=>{
+						return (
+							<React.Fragment key={i}>
+								{
+									v.group ? (
+										<Select.OptGroup key={i} label={v.group}>
+											{
+												$fn.hasArray(v.children) && v.children.map((p, j) => <Select.Option key={p[iStr]} value={p[iStr]} style={{marginRight:'20px'}}>{p[nStr]}</Select.Option>)
+											}
+										</Select.OptGroup>
+									): <Select.Option key={i} value={v[iStr]} style={{marginRight:'20px'}}>{v[nStr]}</Select.Option>
+								}
+							</React.Fragment>
+						)
+					})
 				}
 			</Select>
 		)

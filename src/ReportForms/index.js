@@ -14,6 +14,7 @@ import { Tabs } from 'antd'
 // ===================================================================== layout component
 import ContentComponent from './layout.component/content'
 import DataSourceComponent from './layout.component/dataSource'
+const PaperComponent = Async(()=>import('./layout.component/paper'))
 // const DataSourceComponent = Async(()=>import('./layout.component/dataSource'))
 // ===================================================================== style component
 const Text  =  Async(()=>import('./style.component/text'))
@@ -184,7 +185,7 @@ export default class extends React.Component {
 					</nav>
 					{/*  中心展示 */}
 					<section className='ex rel nosel'>
-						<div className='abs_full scrollXY' style={{padding:'15px'}} id='scrollbox'>
+						<div className='abs_full scrollXY fxc' style={{padding:'15px'}} id='scrollbox'>
 							<ContentComponent onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
 						</div>
 					</section>
@@ -208,7 +209,7 @@ export default class extends React.Component {
 								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} />}
 							</TabPane>
 							<TabPane tab='报表' key={2}>
-								
+								{ +activeKey === 2 && <PaperComponent $paper={this.paper} />}
 							</TabPane>
 						</Tabs>
 					</div>

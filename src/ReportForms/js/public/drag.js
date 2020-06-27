@@ -34,8 +34,8 @@ export default {
 	},
 	getPos(s){
 		return {
-			left : parseInt(s.style.left),
-			top  : parseInt(s.style.top)
+			left : s ? parseInt(s.style.left) : 0,
+			top  : s ? parseInt(s.style.top) : 0
 		}
 	},
 	getOffset(e){
