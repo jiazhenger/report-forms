@@ -252,16 +252,24 @@ export default {
 				})()
 			}else{
 				// 清除选中 node
-				$fn.leak(()=>{
-					_this.setState({
-						dragStyle:{},
-						tempStyle:{},
-						tempAttr:{},
-						node:null,
-						key: _this.state.key - 1
-					})
-					_this.cancelNode()
-				})()
+				let drag = $drag.querySelectorAll('.drag')
+				let hasDrag = false
+				if(drag){
+					hasDrag = [].slice.call(drag).some(v => v.style.display === 'block')
+				}
+				
+				if(!hasDrag){
+					$fn.leak(()=>{
+						_this.setState({
+							dragStyle:{},
+							tempStyle:{},
+							tempAttr:{},
+							node:null,
+							key: _this.state.key - 1
+						})
+						_this.cancelNode()
+					})()
+				}
 			}
 			
 			// 清除标线

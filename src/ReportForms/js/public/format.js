@@ -7,11 +7,12 @@ export default {
 	formatData(data, field, currentUrl, type, isLoopNode){
 		const recursion = (data, arr, url) => {
 			url = url ? url : field
-			const n = $fn.hasArray(data) ? '/0' : ''
+			
 			data = $fn.hasArray(data) ? data[0] : data
 			if($fn.hasObject(data)){
 				Object.keys(data).forEach((v,i)=>{
 					// 生成 url
+					const n = $fn.hasArray(data[v]) ? '/0' : ''
 					const urls = url + '/' + v + n
 					// 新数据组合
 					const obj = { name: v, url: urls, root:field, checked: currentUrl === urls }
