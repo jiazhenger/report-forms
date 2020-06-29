@@ -64,7 +64,8 @@ export default {
 					_this.node.style.top = top + 'px'
 				}
 				
-				_this.node.querySelector('.point-mark').style.display = 'none'
+				const $mark = _this.node.querySelector('.point-mark')
+				if($mark){ $mark.style.display = 'none' }
 				_this.node.style.border = '1px solid ' + moveBorderColor
 				
 				Drag.mark(_this,'.axesY', left)
@@ -127,12 +128,14 @@ export default {
 				
 				return false
 			}
-			if(t){
+			if(t && _this.node){
 				const { left, top } = Drag.getPos(_this.node) 
 				_this.node.style.left = left - (left % axesSpace) + 1  + 'px'
 				_this.node.style.top = top  - (top % (axesSpace/2)) + 1 + 'px'
-				_this.node.querySelector('.point-mark').style.display = 'block'
-				_this.node.style.borderColor = '#fff' 
+				_this.node.style.borderColor = '#fff'
+				
+				const $mark = _this.node.querySelector('.point-mark')
+				if($mark){ $mark.style.display = 'block' }
 			}
 		})
 		// 单击
@@ -141,23 +144,28 @@ export default {
 			const t = Dom.parents(target,'drag')
 			const t2 = Dom.parents(target,'loopNode')
 			if(t){
+				Dom.createPointMark(t) // 拖动标点
 				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
-					v.querySelector('.point-mark').style.display = 'none'
-					v.style.border = '1px dashed ' + stopBorderColor
+					const $mark = v.querySelector('.point-mark')
+					if($mark){ $mark.style.display = 'none' }
+					v.style.outline = '1px dashed ' + stopBorderColor
 				})
-				t.querySelector('.point-mark').style.display = 'block'
+				
+				const $mark = t.querySelector('.point-mark')
+				if($mark){ $mark.style.display = 'block' }
+				
 				t.style.borderColor = '#fff'
 				if(Dom.hasClass(t,'hide')){
 					const nodes = document.querySelectorAll('.loopNode')
 					if(nodes.length > 0){
 						if(t2){
-							for(let node of nodes){ node.style.removeProperty('background') }   // 移除背景
-							t2.style.setProperty('background','yellow')  // 添加背景
+							Dom.removeClass(nodes,'activeLoop') // 移除背景
+							t2.className += ' activeLoop'  // 添加背景
 							_this.setState({ node:t2, key: _this.state.key+1 }, ()=>{
 								_this.runNode()
 							})
 						}else{
-							for(let node of nodes){ node.style.removeProperty('background') } // 移除背景
+							Dom.removeClass(nodes,'activeLoop') // 移除背景
 						}
 					}
 				}else{
@@ -168,7 +176,7 @@ export default {
 			}else{
 				const nodes = document.querySelectorAll('.loopNode')
 				if(nodes.length > 0){
-					for(let node of nodes){ node.style.removeProperty('background') }
+					Dom.removeClass(nodes,'activeLoop') // 移除背景
 				}
 			}
 		})
@@ -213,8 +221,9 @@ export default {
 			let t = Dom.parents(target,'drag')
 			let m = Dom.parents(target,'move')
 			if( _this.dargNode ){
-				_this.dargNode.querySelector('.point-mark').style.display = 'block'
-				_this.dargNode.style.borderColor = '#fff'
+				const $pointMark = _this.dargNode.querySelector('.point-mark')
+				if($pointMark){ $pointMark.style.display = 'block' }
+				// _this.dargNode.style.outline = '1px dashed ' + stopBorderColor
 			}else{
 				if(t){
 					Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
@@ -224,7 +233,6 @@ export default {
 					_this.stop = false
 					Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
 						v.className='drag'
-						v.style.border = '1px dashed ' + stopBorderColor
 						const $mark = v.querySelector('.point-mark')
 						if($mark){
 							v.querySelector('.point-mark').style.display = 'none'
@@ -257,6 +265,8 @@ export default {
 				if(drag){
 					hasDrag = [].slice.call(drag).some(v => v.style.display === 'block')
 				}
+				
+				// for(let v of drag){ v.style.removeProperty('outline')}
 				
 				if(!hasDrag){
 					$fn.leak(()=>{

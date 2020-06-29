@@ -54,16 +54,16 @@ export default {
 		return new Promise(resolve=>{
 			if(node){
 				const $temp = this.getStyleNode(node)
-				const drag = this.parents($temp,'drag')
-				const dragType = drag.getAttribute('type')
+				const $drag = this.parents($temp,'drag')
+				const dragType = $drag.getAttribute('type')
 				const type = node.getAttribute('type')
-				const loop = Boolean(drag.getAttribute('loop'))
-				const group = Boolean(drag.getAttribute('group'))
+				const loop = Boolean($drag.getAttribute('loop'))
+				const group = Boolean($drag.getAttribute('group'))
 				const url = $temp.getAttribute('url')
-				const rootUrl = drag.getAttribute('rootUrl')
+				const rootUrl = $drag.getAttribute('rootUrl')
 				const isLoopNode = this.parents($temp,'loopNode')
 				
-				resolve({ node, $temp, type, dragType, loop, url, rootUrl, group, isLoopNode })
+				resolve({ node, $temp, type, dragType, loop, url, rootUrl, group, isLoopNode, $drag })
 			}else{
 				window.$fn.toast('未选中目标')
 			}
@@ -135,5 +135,37 @@ export default {
 	reset($temp,type){
 		const _type = Html[type]
 		$temp.innerHTML = _type
+	},
+	// 移除 calssName
+	removeClass(node,className){
+		if(node instanceof NodeList){
+			for(let v of node){
+				const c = v.className.replace(' ' + className,'')
+				v.className = c
+			}
+		}else{
+			const c = node.className.replace(' ' + className,'')
+			node.className = c
+		}
+	},
+	createPointMark(node){
+		if(!node.querySelector('point-mark')){
+			// 拖动标点
+			const point = document.createElement('div')
+			point.className = 'point-mark'
+			point.innerHTML = `
+				<p class='dir lt-wh'><s></s></p>
+				<p class='dir rt-wh'><s></s></p>
+				<p class='dir rb-wh'><s></s></p>
+				<p class='dir lb-wh'><s></s></p>
+				<p class='dir tc-h'><s></s></p>
+				<p class='dir rc-w'><s></s></p>
+				<p class='dir bc-h'><s></s></p>
+				<p class='dir lc-w'><s></s></p>
+			`
+			point.style.background = 'rgba(0,0,0,0.05)'
+			point.addEventListener('click',e=> e.stopPropagation())
+			node.appendChild(point)
+		}
 	}
 }

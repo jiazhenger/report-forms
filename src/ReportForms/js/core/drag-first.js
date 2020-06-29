@@ -1,6 +1,7 @@
 import Drag from '../public/drag'
+import Dom from '../public/dom'
 import Html from '../public/html'
-import { differ, axesSpace  } from '../public/config'
+import { differ, axesSpace, stopBorderColor  } from '../public/config'
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -105,6 +106,7 @@ export default {
 					}
 					_this.runNode()		
 					_this.node.querySelector('.point-mark').style.display = 'block'
+					_this.node.style.outline = '1px dashed ' + stopBorderColor
 				},
 				onFail:()=>{
 					removeHtml()
@@ -143,22 +145,8 @@ export default {
 				node.setAttribute('group', 1)
 			}
 			
-			// 拖动标点
-			const point = document.createElement('div')
-			point.className = 'point-mark'
-			point.innerHTML = `
-				<p class='dir lt-wh'><s></s></p>
-				<p class='dir rt-wh'><s></s></p>
-				<p class='dir rb-wh'><s></s></p>
-				<p class='dir lb-wh'><s></s></p>
-				<p class='dir tc-h'><s></s></p>
-				<p class='dir rc-w'><s></s></p>
-				<p class='dir bc-h'><s></s></p>
-				<p class='dir lc-w'><s></s></p>
-			`
-			point.style.background = 'rgba(0,0,0,0.05)'
-			point.addEventListener('click',e=> e.stopPropagation())
-			node.appendChild(point)
+			
+			Dom.createPointMark(node) // 拖动标点
 			
 			_this.node = node
 			

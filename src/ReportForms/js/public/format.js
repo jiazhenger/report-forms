@@ -22,12 +22,12 @@ export default {
 					arr[i] = ( typeof data[v] === 'object' ) ? {...obj, children:[] } :  { ...obj, value: data[v], isString:1 }
 					// 禁用
 					if( type === 'table' && !isLoopNode){
-						if(!$fn.hasArray(data[v])){ arr[i].disabled = true }  // 组合节点禁用非数组
+						// if(!$fn.hasArray(data[v])){ arr[i].disabled = true }  // 组合节点禁用非数组
 					}else if(type === 'ul'){
 						if($fn.isString(data[v])){ arr[i].disabled = true } // 对象节点禁用
 					}else{
 						if(typeof data[v] === 'object'){ arr[i].disabled = true } // 对象节点禁用
-						if( this.isArrayChild(urls) ){ arr[i].disabled = true } // 数组子元素禁用
+						if( this.isArray(urls) ){ arr[i].disabled = true } // 数组元素禁用
 					}
 					// 递归
 					if( typeof data[v] === 'object' ){
@@ -127,7 +127,7 @@ export default {
 	isArrayChild(url){
 		const arr = url.split('/')
 		const len = arr.length
-		return !isNaN(arr[len-1])
+		return !isNaN(arr[len-2])
 	},
 	// 根据数组元素 url 推出父组数组的 url
 	getParentUrl(url){
@@ -139,6 +139,11 @@ export default {
 			arr.pop()
 		}
 		return arr.join('/')
+	},
+	// 获取字段名
+	getUrlField(url){
+		let arr = url.split('/')
+		return arr[arr.length - 1]
 	},
 	// 获取根数据 url
 	getRootUrl(url){

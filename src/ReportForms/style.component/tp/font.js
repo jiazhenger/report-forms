@@ -48,6 +48,12 @@ const FontFamily = [
 	{ label:'楷体', value:'楷体'},
 	{ label:'Arial', value:'Arial'},
 ]
+const TextAlign = [
+	{ label:'居左对齐', value:'left'},
+	{ label:'居中对齐', value:'center'},
+	{ label:'居右对齐', value:'right'},
+	{ label:'两端对齐', value:'justify'},
+]
 // ===================================================================== page component
 export default ({ node,  tempStyle }) => {
 	// select
@@ -55,6 +61,7 @@ export default ({ node,  tempStyle }) => {
 	const fontSize = React.useRef()
 	const lineHeight = React.useRef()
 	const letterSpacing = React.useRef()
+	const textAlign = React.useRef()
 	// switch
 	const fontWeight = React.useRef()
 	const fontStyle = React.useRef()
@@ -68,6 +75,7 @@ export default ({ node,  tempStyle }) => {
 		fontSize.current.setValue(style.fontSize)
 		lineHeight.current.setValue(style.lineHeight)
 		letterSpacing.current.setValue(style.letterSpacing)
+		textAlign.current.setValue(style.textAlign)
 		// switch
 		fontWeight.current.setValue(style.fontWeight === 'bold')
 		fontStyle.current.setValue(style.fontStyle === 'italic')
@@ -101,6 +109,9 @@ export default ({ node,  tempStyle }) => {
 			<div className='fx'>
 				<List.Select label='行高'  ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
 				<List.Select label='间距'  ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
+			</div>
+			<div className='fx'>
+				<List.Select label='对齐'  ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={v=>onChange(v,'left')} />
 			</div>
 			<div className='fxj'>
 				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={v=>onChange(v,'bold')}/>

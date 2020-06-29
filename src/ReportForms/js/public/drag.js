@@ -58,5 +58,5 @@ export default {
 				v.style.background = axesColor
 			}
 		})
-	},
+	}
 }

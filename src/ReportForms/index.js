@@ -7,6 +7,7 @@ import TextImage from '@img/icon/text.png'
 import ListImage from '@img/icon/list.png'
 // ===================================================================== dom js
 import MouseEvent from './js/index'
+import { stopBorderColor  } from './js/public/config'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
@@ -60,14 +61,19 @@ export default class extends React.Component {
 		this.$control =  document.querySelector('#control') 		// 控制面版
 		MouseEvent.init(this)
 		// Size(this)
-		this.$drag.innerHTML = $fn.local('html')
+		const local = $fn.local('html')
+		this.$drag.innerHTML = local ? $fn.local('html') : ''
+		
+		for(let v of this.$drag.querySelectorAll('.drag')){
+			v.style.outline = '1px dashed ' + stopBorderColor
+		}
 		
 		setInterval(()=>{
 			const html = $fn.local('html')
 			if(this.$drag.innerHTML !== '' && this.$drag.innerHTML !== html ){
-				$fn.local('html', this.$drag.innerHTML)
+				$fn.local('html', this.clearNode().innerHTML)
 			}
-		},5000)
+		},3000)
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
@@ -87,21 +93,35 @@ export default class extends React.Component {
 	cancelNode = () => {
 		this.refs.dataSource && this.refs.dataSource.cancelNode()
 	}
-	getHtml = isHtml => {
+	clearNode = () => {
 		const node = document.createElement('div')
 		node.innerHTML = this.$drag.innerHTML
-		const drag = node.querySelectorAll('.drag')
-		if(drag){
-			for(let v of drag){
-				v.style.removeProperty('border')
-				const mark = v.querySelector('.point-mark')
+		const $drag = node.querySelectorAll('.drag')
+		const $loop = node.querySelectorAll('.loopNode')
+		if($loop){
+			for(let v of $loop){
+				v.className = 'loopNode'
+			}
+		}
+		if($drag){
+			for(let v of $drag){
+				v.style.removeProperty('outline')
 				const temp = v.querySelector('.template')
-				mark.parentNode.removeChild(mark)
 				if(temp.textContent === '' || temp.querySelector('img')){
 					v.parentNode.removeChild(v)
 				}
+				
+				const $mark = v.querySelector('.point-mark')
+				if($mark){
+					$mark.parentNode.removeChild($mark)
+				}
 			}
 		}
+		
+		return node
+	}
+	getHtml = isHtml => {
+		const node = this.clearNode()
 		if(node.innerHTML === ''){
 			$fn.toast('还没有添加内容')
 			return null

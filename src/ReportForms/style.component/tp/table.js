@@ -30,7 +30,8 @@ export default ({ node, dragStyle }) => {
 				const thFragment = document.createDocumentFragment()	// th
 				for(let i=0; i<col; i++){
 					const th = document.createElement('th')
-					th.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;background:#f5f5f5'
+					th.className = 'loopNode'
+					th.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;background-color:#f5f5f5'
 					th.setAttribute('type','text')
 					thFragment.appendChild(th)
 				}

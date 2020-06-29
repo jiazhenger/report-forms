@@ -146,7 +146,7 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
-		Dom.getNode(this.props.node).then(({ node, $temp, dragType, type, group, loop, isLoopNode })=>{
+		Dom.getNode(this.props.node).then(({ node, $temp, $drag, dragType, type, group, loop, isLoopNode })=>{
 			if(type === 'table' && !isLoopNode &&　!v.isArray){
 				return $fn.toast('数据必须是数组')
 			}
@@ -168,7 +168,51 @@ export default class extends React.Component {
 				}
 				
 				if(type === 'text'){
-					$temp.textContent = value
+					if(dragType === 'table'){
+						if(Format.isArrayChild(url)){
+							const field = Format.getUrlField(url)
+							const arrUrl = Format.getParentUrl(url)
+							const data = Format.parse(this.state.data, arrUrl) // 获取数组
+							console.log(data)
+							if($fn.hasArray(data)){
+								([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
+									if(Dom.hasClass(v,'activeLoop')){
+										const trLen = $drag.querySelectorAll('tbody tr').length
+										const tdLen = $drag.querySelectorAll('tr td').length
+										const dataLen = data.length
+										const len = dataLen - trLen
+										if(len > 0){
+											const trFragment = document.createDocumentFragment()
+											for(let i=0; i<len; i++ ){
+												const tr = document.createElement('tr')
+												const tdFragment = document.createDocumentFragment()
+												for(let j=0; j<tdLen; j++){
+													const td = document.createElement('td')
+													td.className = 'loopNode'
+													td.style.cssText = 'border:1px solid #ddd;height:28px;padding:4px 5px;'
+													td.setAttribute('type','text')
+													tdFragment.appendChild(td)
+												}
+												tr.appendChild(tdFragment)
+												trFragment.appendChild(tr)
+											}
+											$drag.querySelector('tbody').appendChild(trFragment)
+										}
+										console.log(data);
+										( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
+											p.children[index].textContent = data[k][field]
+										})
+									}
+								})
+							}else{
+								$fn.toast('必须是数组子元素')
+							}
+						}else{
+							$temp.textContent = value
+						}
+					}else{
+						$temp.textContent = value
+					}
 				}else if( type === 'img' ){
 					$temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
 				}else if( type === 'table' ){
@@ -183,8 +227,18 @@ export default class extends React.Component {
 				}else{
 					$temp.removeAttribute('url')
 				}
-				
-				Dom.reset($temp,type)
+				// 重置数据
+				if(isLoopNode && Format.isArrayChild(url)){
+					([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
+						if(Dom.hasClass(v,'activeLoop')){
+							( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
+								p.children[index].textContent = ''
+							})
+						}
+					})
+				}else{
+					Dom.reset($temp,type)
+				}
 			}
 			
 			this.setState({ myData })
