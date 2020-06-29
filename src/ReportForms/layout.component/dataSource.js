@@ -173,7 +173,6 @@ export default class extends React.Component {
 							const field = Format.getUrlField(url)
 							const arrUrl = Format.getParentUrl(url)
 							const data = Format.parse(this.state.data, arrUrl) // 获取数组
-							console.log(data)
 							if($fn.hasArray(data)){
 								([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
 									if(Dom.hasClass(v,'activeLoop')){
@@ -198,7 +197,6 @@ export default class extends React.Component {
 											}
 											$drag.querySelector('tbody').appendChild(trFragment)
 										}
-										console.log(data);
 										( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
 											p.children[index].textContent = data[k][field]
 										})
