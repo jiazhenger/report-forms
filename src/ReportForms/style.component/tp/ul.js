@@ -14,6 +14,13 @@ const ListType = [
 	{ label:'大写字母', 		value:'upper-alpha' },
 	{ label:'汉字',			value:'cjk-ideographic' }
 ]
+const BorderStyle = [
+	{ label:'无', 			value:'none' },
+	{ label:'实', 			value:'solid' },
+	{ label:'虚线', 			value:'dashed' },
+	{ label:'点线', 			value:'dotted' },
+	{ label:'点线', 			value:'double' },
+]
 // ===================================================================== page component
 export default ({ node }) => {
 	const [ row, setRow] = React.useState(2)
@@ -27,6 +34,15 @@ export default ({ node }) => {
 			}
 		}
 		setValue(v)
+	}, [node])
+	// 选择
+	const onBorderStyle = React.useCallback(v => {
+		if(node){
+			const li = node.querySelectorAll('li')
+			for(let n of li){
+				n.style.borderBottomStyle = v
+			}
+		}
 	}, [node])
 	// 动态创建列表
 	const createList = React.useCallback(()=>{
@@ -55,6 +71,9 @@ export default ({ node }) => {
 			<div className='fx'>
 				<List.Input label='列数' value={row} onChange={v=>setRow(v)}  isHalf /> 
 				<List.Select label='样式' value={value} data={ListType} p='选择样式' isHalf onChange={onSelectType} />
+			</div>
+			<div className='fx'>
+				<List.Select label='下边线' value='dashed' data={BorderStyle} p='选择样式' isHalf onChange={onBorderStyle} />
 			</div>
 			<div className='fx'>
 				<List.Button label='' name='src' text='生成列表' onClick={createList} />

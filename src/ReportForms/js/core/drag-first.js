@@ -103,6 +103,13 @@ export default {
 						_this.node.style.width = '100%'
 					}else if( type === 'ul'){
 						_this.node.style.width = '200px'
+					}else if( type === 'devider'){
+						_this.node.style.left = 0
+						_this.node.style.width = '100%'
+						const devider = _this.node.querySelector('.template')
+						devider.innerHTML = '<div></div>'
+						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px dashed #ddd'
+						_this.node.style.height = '5px'
 					}
 					_this.runNode()		
 					_this.node.querySelector('.point-mark').style.display = 'block'
@@ -130,19 +137,17 @@ export default {
 			node.setAttribute('type',type)
 			const $temp = node.querySelector('.template')
 			$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
-			
+			node.style.width = '99px'
 			if(type === 'text'){
-				node.style.width = '99px'
 				node.style.height = '24px'
 			}else if(type === 'img'){
-				node.style.width = '99px'
 				node.style.height = '99px'
 			}else if(type === 'table'){
-				node.style.width = '99px'
 				node.setAttribute('group', 1)
 			}else if(type === 'ul'){
-				node.style.width = '99px'
 				node.setAttribute('group', 1)
+			}else if(type==='devider'){
+				node.style.height = '99px'
 			}
 			
 			

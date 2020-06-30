@@ -5,16 +5,38 @@ import Dom from '../../js/public/dom'
 import List from '../../public.component/list'
 // ===================================================================== data
 const { $fn } = window
+
 // ===================================================================== page component
 export default ({ node, dragStyle }) => {
 	const [ col, setCol] = React.useState(3)
 	const [ row, setRow] = React.useState(1)
 	const [ checked, setChecked] = React.useState(true)
-	const theadRef = React.useRef()
+	const [ border, setBorder] = React.useState(true)
 	//
 	const onHeadChange = React.useCallback(v=>{
 		setChecked(v)
-	}, [ ])
+		Dom.getNode(node).then(({ $drag } ) => {
+			const $table = $drag.querySelector('table')
+			if($table){
+				if(v){
+					Dom.createThead($table)
+				}else{
+					const $thead = $table.querySelector('thead')
+					if($thead){
+						$thead.parentNode.removeChild($thead)
+					}
+				}
+			}else{
+				setChecked(v)
+			}
+		})
+	}, [ node ])
+	const onBorderChange = React.useCallback(v=>{
+		Dom.getNode(node).then(({ $drag } ) => {
+			Dom.setTableBorder($drag.querySelector('table'), v)
+			setBorder(v)
+		})
+	}, [ node ])
 	// 动态创建表格
 	const ceateTable = React.useCallback(()=>{
 		if(row <= 0){ return $fn.toast('行数必须大于 0')}
@@ -23,22 +45,6 @@ export default ({ node, dragStyle }) => {
 			node.style.height = 'auto'
 			const $temp = node.querySelector('.template')
 			const table = document.createElement('table')
-			// thead
-			if(checked){
-				const thead = document.createElement('thead') 			// thead
-				const trThead = document.createElement('tr')			// tr
-				const thFragment = document.createDocumentFragment()	// th
-				for(let i=0; i<col; i++){
-					const th = document.createElement('th')
-					th.className = 'loopNode'
-					th.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;background-color:#f5f5f5'
-					th.setAttribute('type','text')
-					thFragment.appendChild(th)
-				}
-				trThead.appendChild(thFragment)
-				thead.appendChild(trThead)
-				table.appendChild(thead)
-			}
 			// tbody
 			const tbody = document.createElement('tbody')
 			const trFragment = document.createDocumentFragment()
@@ -57,6 +63,10 @@ export default ({ node, dragStyle }) => {
 			}
 			tbody.appendChild(trFragment)
 			table.appendChild(tbody)
+			
+			// thead
+			if(checked){ Dom.createThead(table) }
+			Dom.setTableBorder(table, border)
 			// last
 			$temp.innerHTML = ''
 			$temp.appendChild(table)
@@ -64,7 +74,7 @@ export default ({ node, dragStyle }) => {
 			// Dom.editorNode(table.querySelectorAll('td'))
 			// Dom.editorNode(table.querySelectorAll('th'))
 		})
-	}, [node, col, row, checked])
+	}, [node, col, row, checked, border])
 	return (
 		<>
 			<div className='fx'>
@@ -72,7 +82,8 @@ export default ({ node, dragStyle }) => {
 				<List.Input label='列' value={col} onChange={v=>setCol(v)}  isHalf />
 			</div>
 			<div className='fx'>
-				<List.Switch value={checked} label='表头' ref={theadRef} onChange={onHeadChange}/>
+				<List.Switch value={checked} label='表头' onChange={onHeadChange}/>
+				<List.Switch value={border} label='边框' onChange={onBorderChange}/>
 			</div>
 			<div className='fx'>
 				<List.Button label='' name='src' text='生成表格' onClick={ceateTable} />

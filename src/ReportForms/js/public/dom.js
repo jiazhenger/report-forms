@@ -98,6 +98,44 @@ export default {
 		table.appendChild(tbody)
 		$temp.appendChild(table)
 	},
+	// 创建 thead
+	createThead(table){
+		const col = table.querySelector('tr').querySelectorAll('td').length
+		const thead = document.createElement('thead') 			// thead
+		const trThead = document.createElement('tr')			// tr
+		const thFragment = document.createDocumentFragment()	// th
+		for(let i=0; i<col; i++){
+			const th = document.createElement('th')
+			th.className = 'loopNode'
+			th.style.cssText = 'height:30px;padding:4px 5px;background-color:#f5f5f5'
+			th.setAttribute('type','text')
+			thFragment.appendChild(th)
+		}
+		trThead.appendChild(thFragment)
+		thead.appendChild(trThead)
+		table.insertBefore(thead, table.querySelector('tbody'))
+	},
+	// 设置表格边框
+	setTableBorder($table, checked, color){
+		let c = color || '#ddd'
+		if($table){
+			if(checked){
+				for(let v of $table.querySelectorAll('th')){
+					v.style.border = '1px solid ' + c
+				}
+				for(let v of $table.querySelectorAll('td')){
+					v.style.border = '1px solid ' + c
+				}
+			}else{
+				for(let v of $table.querySelectorAll('th')){
+					v.style.border = 0
+				}
+				for(let v of $table.querySelectorAll('td')){
+					v.style.border = 0
+				}
+			}
+		}
+	},
 	// 创建列表
 	createList($temp, data){
 		if(typeof data !== 'object') return
@@ -149,7 +187,7 @@ export default {
 		}
 	},
 	createPointMark(node){
-		if(!node.querySelector('point-mark')){
+		if(!node.querySelector('.point-mark')){
 			// 拖动标点
 			const point = document.createElement('div')
 			point.className = 'point-mark'

@@ -251,7 +251,7 @@ export default {
 				$fn.leak(()=>{
 					_this.setState({
 						// index: _this.state.index + 1,
-						dragStyle:d.style,
+						dragStyle: d.style,
 						tempStyle: $temp ? $temp.style : {},
 						tempAttr:{
 							src: $img ? $img.src : ''

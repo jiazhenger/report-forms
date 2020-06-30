@@ -5,6 +5,7 @@ import TableImage from '@img/icon/table.png'
 import ImgImage from '@img/icon/img.png'
 import TextImage from '@img/icon/text.png'
 import ListImage from '@img/icon/list.png'
+import DeviderImage from '@img/icon/devider.png'
 // ===================================================================== dom js
 import MouseEvent from './js/index'
 import { stopBorderColor  } from './js/public/config'
@@ -70,7 +71,7 @@ export default class extends React.Component {
 		
 		setInterval(()=>{
 			const html = $fn.local('html')
-			if(this.$drag.innerHTML !== '' && this.$drag.innerHTML !== html ){
+			if(this.$drag.innerHTML !== '' && html !== this.clearNode().innerHTML ){
 				$fn.local('html', this.clearNode().innerHTML)
 			}
 		},3000)
@@ -110,14 +111,12 @@ export default class extends React.Component {
 				if(temp.textContent === '' || temp.querySelector('img')){
 					v.parentNode.removeChild(v)
 				}
-				
 				const $mark = v.querySelector('.point-mark')
 				if($mark){
 					$mark.parentNode.removeChild($mark)
 				}
 			}
 		}
-		
 		return node
 	}
 	getHtml = isHtml => {
@@ -200,6 +199,7 @@ export default class extends React.Component {
 								<IconButton2 icon={ImgImage} label='图片' onDragStart={e=>this.onDragStart(e,'img')}/>
 								<IconButton2 icon={TableImage} label='表格' onDragStart={e=>this.onDragStart(e,'table')}/>
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
+								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
 							</ul>
 						</div>
 					</nav>
@@ -220,7 +220,7 @@ export default class extends React.Component {
 											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 											{ type === 'ul' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'devider' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 										</>
 									)
 								}
