@@ -259,16 +259,20 @@ export default class extends React.Component {
 				<div className='abs_lt wh scroll'>
 					<Collapse bordered={false} defaultActiveKey={['0','1']}>
 						<Panel header='数据源' key={0} extra={<Button size='small' label='添加' onClick={this.onAdd} />}>
-							<ul>
-								{
-									$fn.hasObject(data) && Object.keys(data).map( (v,i) =>(
-										<li key={i} className={`fxmj f12 cp ${v === rootField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectRoot.bind(this,data,v)}>
-											<h6>{v}</h6>
-											<Button size='small' ghost icon={<DeleteOutlined />} onClick={ e=>this.onDel.bind(this,e,v)()} />
-										</li>
-									))
-								}
-							</ul>
+							{
+								$fn.hasObject(data) ? (
+									<ul>
+										{
+											Object.keys(data).map( (v,i) =>(
+												<li key={i} className={`fxmj f12 cp ${v === rootField ? 'c0' : ''}`} style={{padding:'2px 0'}} onClick={this.selectRoot.bind(this,data,v)}>
+													<h6>{v}</h6>
+													<Button size='small' ghost icon={<DeleteOutlined />} onClick={ e=>this.onDel.bind(this,e,v)()} />
+												</li>
+											))
+										}
+									</ul>
+								) : <div className='g9 tc f12 ptb20'>请先添加数据源</div>
+							}
 						</Panel>
 						{
 							rootField && (
