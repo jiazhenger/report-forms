@@ -6,6 +6,7 @@ import ImgImage from '@img/icon/img.png'
 import TextImage from '@img/icon/text.png'
 import ListImage from '@img/icon/list.png'
 import DeviderImage from '@img/icon/devider.png'
+import CheckboxImage from '@img/icon/checkbox.png'
 // ===================================================================== dom js
 import MouseEvent from './js/index'
 import { stopBorderColor  } from './js/public/config'
@@ -23,6 +24,8 @@ const Text  =  Async(()=>import('./style.component/text'))
 const Image  =  Async(()=>import('./style.component/image'))
 const Table = Async(()=>import('./style.component/table'))
 const List = Async(()=>import('./style.component/list'))
+const Devider = Async(()=>import('./style.component/devider'))
+const Checkbox = Async(()=>import('./style.component/checkbox'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -108,7 +111,7 @@ export default class extends React.Component {
 			for(let v of $drag){
 				v.style.removeProperty('outline')
 				const temp = v.querySelector('.template')
-				if(temp.textContent === '' || temp.querySelector('img')){
+				if(temp.innerHTML === '' || (temp.querySelector('img') && !temp.querySelector('img').getAttribute('temp'))){
 					v.parentNode.removeChild(v)
 				}
 				const $mark = v.querySelector('.point-mark')
@@ -199,6 +202,7 @@ export default class extends React.Component {
 								<IconButton2 icon={ImgImage} label='图片' onDragStart={e=>this.onDragStart(e,'img')}/>
 								<IconButton2 icon={TableImage} label='表格' onDragStart={e=>this.onDragStart(e,'table')}/>
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
+								<IconButton2 icon={CheckboxImage} label='选择框' onDragStart={e=>this.onDragStart(e,'checkbox')}/>
 								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
 							</ul>
 						</div>
@@ -219,8 +223,9 @@ export default class extends React.Component {
 											{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
 											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'ul' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'devider' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'devider' &&  <Devider node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 										</>
 									)
 								}

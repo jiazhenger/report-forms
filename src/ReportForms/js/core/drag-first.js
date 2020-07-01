@@ -98,18 +98,20 @@ export default {
 					
 					const type = _this.node.getAttribute('type')
 					
-					if(type === 'table'){
+					if( type === 'table' ){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
-					}else if( type === 'ul'){
+					}else if( type === 'ul' ){
 						_this.node.style.width = '200px'
-					}else if( type === 'devider'){
+					}else if( type === 'devider' ){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
 						const devider = _this.node.querySelector('.template')
 						devider.innerHTML = '<div></div>'
-						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px dashed #ddd'
+						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px solid #ddd'
 						_this.node.style.height = '5px'
+					}else if( type === 'checkbox' ){
+						_this.node.style.height = '20px'
 					}
 					_this.runNode()		
 					_this.node.querySelector('.point-mark').style.display = 'block'
@@ -131,7 +133,7 @@ export default {
 		}else{
 			const node = document.createElement('div')
 			node.className = 'move'
-			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:0;`
+			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:1;`
 			node.innerHTML = Html[type]
 			node.children[0].className += ' template'
 			node.setAttribute('type',type)
@@ -146,10 +148,12 @@ export default {
 				node.setAttribute('group', 1)
 			}else if(type === 'ul'){
 				node.setAttribute('group', 1)
-			}else if(type==='devider'){
+			}else if(type === 'devider'){
 				node.style.height = '99px'
+				$temp.style.removeProperty('background')
+			}else if(type === 'checkbox'){
+				node.style.width = '20px'
 			}
-			
 			
 			Dom.createPointMark(node) // 拖动标点
 			

@@ -103,15 +103,15 @@ export default ({ node,  tempStyle }) => {
 	return (
 		<>
 			<div className='fx'>
-				<List.Select label='字体'  ref={fontFamily} data={FontFamily} p='选择字体' isHalf name='fontFamily' onChange={onChange} />
-				<List.Select label='尺寸'  ref={fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={v=>onChange(v,'100%')}/>
+				<List.Select label='字体' ref={fontFamily} data={FontFamily} p='选择字体' isHalf name='fontFamily' onChange={onChange} />
+				<List.Select label='尺寸' ref={fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={v=>onChange(v,'100%')}/>
 			</div>
 			<div className='fx'>
-				<List.Select label='行高'  ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
-				<List.Select label='间距'  ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
+				<List.Select label='行高' ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
+				<List.Select label='间距' ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
 			</div>
 			<div className='fx'>
-				<List.Select label='对齐'  ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={v=>onChange(v,'left')} />
+				<List.Select label='对齐' ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={v=>onChange(v,'left')} />
 			</div>
 			<div className='fxj'>
 				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={v=>onChange(v,'bold')}/>

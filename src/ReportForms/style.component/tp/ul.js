@@ -19,7 +19,6 @@ const BorderStyle = [
 	{ label:'实', 			value:'solid' },
 	{ label:'虚线', 			value:'dashed' },
 	{ label:'点线', 			value:'dotted' },
-	{ label:'点线', 			value:'double' },
 ]
 // ===================================================================== page component
 export default ({ node }) => {

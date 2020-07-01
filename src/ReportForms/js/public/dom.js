@@ -1,14 +1,16 @@
-/**
- * dom 操作
- * */
 import Html from './html'
+
+import CheckboxImage from '@img/icon/checkbox.png'
+import checkedImage from '@img/icon/checked.png'
+
 const { $fn } = window
+
 export default {
 	// 判断元素是否有 className
 	hasClass(el,className){
 		if(el){
 			const c = el.className
-			if(c){
+			if($fn.isString(c)){
 				return c.indexOf(className) !== -1 
 			}else{
 				return false
@@ -22,7 +24,7 @@ export default {
 		if(this.hasClass(el,className)){
 			return el
 		}
-		var parent = el.parentNode;
+		var parent = el.parentNode
 		while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
 			parent = parent.parentNode
 		}
@@ -53,17 +55,25 @@ export default {
 	getNode(node, callback){
 		return new Promise(resolve=>{
 			if(node){
+				let model = {}
 				const $temp = this.getStyleNode(node)
 				const $drag = this.parents($temp,'drag')
-				const dragType = $drag.getAttribute('type')
 				const type = node.getAttribute('type')
-				const loop = Boolean($drag.getAttribute('loop'))
-				const group = Boolean($drag.getAttribute('group'))
-				const url = $temp.getAttribute('url')
-				const rootUrl = $drag.getAttribute('rootUrl')
-				const isLoopNode = this.parents($temp,'loopNode')
+				model = { node, $temp, $drag, type }
+				if($drag){
+					const dragType = $drag.getAttribute('type')
+					const rootUrl = $drag.getAttribute('rootUrl')
+					const loop = Boolean($drag.getAttribute('loop'))
+					const group = Boolean($drag.getAttribute('group'))
+					model = { ...model, dragType, rootUrl, loop, group,  }
+				}
+				if($temp){
+					const url = $temp.getAttribute('url')
+					const isLoopNode = this.parents($temp,'loopNode')
+					model = { ...model, url,  isLoopNode }
+				}
 				
-				resolve({ node, $temp, type, dragType, loop, url, rootUrl, group, isLoopNode, $drag })
+				resolve(model)
 			}else{
 				window.$fn.toast('未选中目标')
 			}
@@ -171,8 +181,8 @@ export default {
 	},
 	// 清空数据
 	reset($temp,type){
-		const _type = Html[type]
-		$temp.innerHTML = _type
+		if(type === 'devider'){ return }
+		$temp.innerHTML = Html[type]
 	},
 	// 移除 calssName
 	removeClass(node,className){
@@ -186,6 +196,7 @@ export default {
 			node.className = c
 		}
 	},
+	// 创建拖动标尺
 	createPointMark(node){
 		if(!node.querySelector('.point-mark')){
 			// 拖动标点
@@ -204,6 +215,38 @@ export default {
 			point.style.background = 'rgba(0,0,0,0.05)'
 			point.addEventListener('click',e=> e.stopPropagation())
 			node.appendChild(point)
+		}
+	},
+	// 创建 checkbox
+	createCheckbox($temp, data){
+		if(typeof data !== 'object'){
+			const $drag = this.parents($temp,'drag')
+			$drag.style.width = '20px'
+			$drag.style.height = '20px'
+			$temp.innerHTML = `<img temp='1' src=${Boolean(data) ? checkedImage : CheckboxImage} style='width:100%;height:100%' draggable='false' />`
+		}else if($fn.hasArray(data)){
+			const $drag = this.parents($temp,'drag')
+			$drag.style.removeProperty('width')
+			$drag.style.removeProperty('height')
+			const fragment = document.createElement('div')
+			fragment.style.overflow = 'hidden'
+			data.forEach((v,i)=>{
+				const div = document.createElement('div')
+				div.style.cssText = 'float:left;display:flex;align-items: center;'
+				if(i>0){ div.style.marginLeft = '10px' }
+				const img = document.createElement('img')
+				img.style.cssText = 'width:20px;height:20px;'
+				img.src = Boolean(v.value) ? checkedImage : CheckboxImage
+				img.setAttribute('temp',1)
+				const label = document.createElement('label')
+				label.textContent = v.label
+				label.style.cssText = 'margin-left:5px;'
+				div.appendChild(img)
+				div.appendChild(label)
+				fragment.appendChild(div)
+			})
+			$temp.innerHTML = ''
+			$temp.appendChild(fragment)
 		}
 	}
 }

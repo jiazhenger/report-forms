@@ -13,7 +13,6 @@ export default ({ node, dragStyle }) => {
 	const heightRef = React.useRef()
 	const indexRef = React.useRef()
 	
-	
 	React.useEffect(()=>{
 		if(node){
 			const style = dragStyle || {}

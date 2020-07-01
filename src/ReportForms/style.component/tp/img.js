@@ -67,11 +67,13 @@ export default ({ node, tempAttr }) => {
 			}
 			if($img){
 				$img.setAttribute(obj.label,obj.value)
+				$img.setAttribute('temp',1)
 			}else{
 				let imgNode = document.createElement('img')
 				imgNode.setAttribute(obj.label,obj.value)
 				imgNode.style.cssText = 'width:100%;height:100%'
 				imgNode.draggable = false
+				imgNode.setAttribute('temp',1)
 				node.querySelector('.template').appendChild(imgNode)
 			}
 		}else{

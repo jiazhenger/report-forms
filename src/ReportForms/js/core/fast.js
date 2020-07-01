@@ -29,5 +29,6 @@ export default {
 		[].slice.call(document.querySelectorAll('.drag')).forEach(v=>v.parentNode.removeChild(v))
 		_this.node = null
 		_this.setState({hasNode:null, node:null})
+		window.$fn.remove('html')
 	}
 }

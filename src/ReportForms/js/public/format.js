@@ -7,13 +7,13 @@ export default {
 	formatData(data, field, currentUrl, type, isLoopNode){
 		const recursion = (data, arr, url) => {
 			url = url ? url : field
-			
+			const root = $fn.hasArray(data) ? '/0' : false
 			data = $fn.hasArray(data) ? data[0] : data
 			if($fn.hasObject(data)){
 				Object.keys(data).forEach((v,i)=>{
 					// 生成 url
 					const n = $fn.hasArray(data[v]) ? '/0' : ''
-					const urls = url + '/' + v + n
+					const urls = root ? (url + root + '/' + v + n ) : (url + '/' + v + n)
 					// 新数据组合
 					const obj = { name: v, url: urls, root:field, checked: currentUrl === urls }
 					// 获取数组父级 url
@@ -24,7 +24,7 @@ export default {
 					if( type === 'table' && !isLoopNode){
 						// if(!$fn.hasArray(data[v])){ arr[i].disabled = true }  // 组合节点禁用非数组
 					}else if(type === 'ul'){
-						if($fn.isString(data[v])){ arr[i].disabled = true } // 对象节点禁用
+						if(typeof data[v] !== 'object'){ arr[i].disabled = true } // 对象节点禁用
 					}else{
 						if(typeof data[v] === 'object'){ arr[i].disabled = true } // 对象节点禁用
 						if( this.isArray(urls) ){ arr[i].disabled = true } // 数组元素禁用

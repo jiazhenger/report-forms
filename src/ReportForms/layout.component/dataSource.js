@@ -48,10 +48,20 @@ export default class extends React.Component {
 		this.refs.modal.open()
 		e.stopPropagation()
 	}
-	onChange = v => this.setState({ model : {...this.state.model,...v} })
-	openFile = v => this.refs.file.click( )
+	onChange = v => {
+		if(v === ''){
+			this.refs.file.value = ''
+		}else{
+			this.setState({ model : {...this.state.model,...v} })
+		}
+	}
+	openFile = v => {
+		this.refs.file.click( )
+		this.refs.file.value = ''
+	}
 	// 添加数据
 	addNewData = () => {
+		if(this.refs.url.getValue() && ! this.newData) return $fn.toast('上传数据格式不正确，请检查')
 		if(this.newData){
 			const data = $fn.local('dataSource')
 			const { name } = this.state.model
@@ -61,6 +71,7 @@ export default class extends React.Component {
 			}
 			
 			const dataSource = {...data, [name]: this.newData}
+			
 			$fn.local('dataSource', dataSource)
 			this.setState({ data: dataSource}, ()=>{
 				this.refs.modal.close()
@@ -114,16 +125,25 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择根数据 ================================================== */
 	selectRoot(data, field){
-		Dom.getNode(this.props.node).then(({ loop, type, node, $temp }) => {
+		Dom.getNode(this.props.node).then(({ loop, type, node, $temp, isLoopNode }) => {
+			if(type==='devider'){
+				return $fn.toast('此元素无法绑定数据')
+			}
+			
+			const rootData = data[field]
+			
+			if(isLoopNode && (typeof rootData === 'object')){
+				return $fn.toast('此元素无法绑定复杂数据')
+			}
+			
 			if(this.state.rootField !== field){
-				const rootData = data[field]
 				// 添加根 url，并移出当前 url
 				node.setAttribute('rootUrl',field)
 				$temp.removeAttribute('url')
 				// 递归重组数据
-				const myData = Format.formatData(rootData,field, field, type)
+				const myData = Format.formatData(rootData, field, field, type)
 				this.setState({
-					rootField: field, 
+					rootField: field,
 					rootData,
 					myData,
 					key: this.state.key + 1,
@@ -134,6 +154,8 @@ export default class extends React.Component {
 					Dom.createTable($temp, Format.parse(this.state.data, field))
 				}else if( type === 'ul' ){
 					Dom.createList($temp, Format.parse(this.state.data, field))
+				}else if( type === 'checkbox' ){
+					Dom.createCheckbox($temp, Format.parse(this.state.data, field))
 				}
 			}else{
 				this.cancelNode()
@@ -217,6 +239,8 @@ export default class extends React.Component {
 					Dom.createTable($temp, Format.parse(this.state.data, url))
 				}else if( type === 'ul' ){
 					Dom.createList($temp, Format.parse(this.state.data, url))
+				}else if( type === 'checkbox' ){
+					Dom.createCheckbox($temp, Format.parse(this.state.data, url))
 				}
 			}else{
 				if(group && (isObject || isArray)){
@@ -226,7 +250,7 @@ export default class extends React.Component {
 					$temp.removeAttribute('url')
 				}
 				// 重置数据
-				if(isLoopNode && Format.isArrayChild(url)){
+				if(isLoopNode && Format.isArrayChild(url) && type === 'table'){
 					([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
 						if(Dom.hasClass(v,'activeLoop')){
 							( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
