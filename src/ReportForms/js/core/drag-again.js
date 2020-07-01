@@ -206,7 +206,7 @@ export default {
 						
 					}
 				}else if(type === 'table'){
-					t.className = 'drag hide'
+					Dom.addClass(t,'hide')
 				}
 			}
 		})
@@ -232,7 +232,8 @@ export default {
 				}else{
 					_this.stop = false
 					Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
-						v.className='drag'
+						Dom.removeClass(v,'hide')
+						
 						const $mark = v.querySelector('.point-mark')
 						if($mark){
 							v.querySelector('.point-mark').style.display = 'none'

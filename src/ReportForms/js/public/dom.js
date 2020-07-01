@@ -19,6 +19,17 @@ export default {
 			return false
 		}
 	},
+	addClass(el,className){
+		if(!this.hasClass(el,className)){
+			el.className += ' ' + className
+		}
+	},
+	removeClass(el,className){
+		if(this.hasClass(el,className)){
+			const name = el.className.replace(' ' + className, '')
+			el.className = name
+		}
+	},
 	// 查找有指定样式的父级元素
 	parents(el,className){
 		if(this.hasClass(el,className)){
@@ -103,6 +114,8 @@ export default {
 			}
 			tr.appendChild(tdFragment)
 			trFragment.appendChild(tr)
+			
+			this.addClass(this.parents($temp,'drag'),'more')
 		})
 		tbody.appendChild(trFragment)
 		table.appendChild(tbody)
@@ -182,6 +195,11 @@ export default {
 	// 清空数据
 	reset($temp,type){
 		if(type === 'devider'){ return }
+		if(type === 'table' || type === 'ul'){
+			const $drag = this.parents($temp,'drag')
+			$drag.style.height = 'auto'
+			this.removeClass($drag,'more')
+		}
 		$temp.innerHTML = Html[type]
 	},
 	// 移除 calssName
