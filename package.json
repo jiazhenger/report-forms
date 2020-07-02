@@ -16,6 +16,7 @@
     "koa-views": "^6.3.0",
     "koa2-cors": "^2.0.6",
     "nodemon": "^2.0.4",
+    "pdfmake": "^0.1.66",
     "puppeteer": "^4.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

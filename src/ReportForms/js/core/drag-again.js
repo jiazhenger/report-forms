@@ -187,7 +187,7 @@ export default {
 			
 			if(t){
 				_this.stop = true
-				t.className = 'drag hide'
+				Dom.addClass(t,'hide')
 				let $editor = t.querySelector('.template')
 				let type = t.getAttribute('type')
 				

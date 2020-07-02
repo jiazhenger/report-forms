@@ -5,7 +5,22 @@ import Dom from '../../js/public/dom'
 import List from '../../public.component/list'
 // ===================================================================== data
 const { $fn } = window
-
+const BorderStyle = [
+	{ label:'无', 			value:'none' },
+	{ label:'实', 			value:'solid' },
+	{ label:'虚线', 			value:'dashed' },
+	{ label:'点线', 			value:'dotted' },
+]
+const myBorder = (node, borderStyle) => {
+	for(let value of node){
+		if(borderStyle === 'none' ){
+			value.style.border = borderStyle
+		}else{
+			value.style.removeProperty('border')
+			value.style.borderBottom = '1px '+ borderStyle +' #ddd'
+		}
+	}
+}
 // ===================================================================== page component
 export default ({ node, dragStyle }) => {
 	const [ col, setCol] = React.useState(3)
@@ -35,6 +50,13 @@ export default ({ node, dragStyle }) => {
 		Dom.getNode(node).then(({ $drag } ) => {
 			Dom.setTableBorder($drag.querySelector('table'), v)
 			setBorder(v)
+		})
+	}, [ node ])
+	// 设置边框
+	const onSelectStyle = React.useCallback(v => {
+		Dom.getNode(node).then(({ $drag } ) => {
+			myBorder($drag.querySelectorAll('td'), v)
+			myBorder($drag.querySelectorAll('th'), v)
 		})
 	}, [ node ])
 	// 动态创建表格
@@ -80,6 +102,9 @@ export default ({ node, dragStyle }) => {
 			<div className='fx'>
 				<List.Input label='行' value={row} onChange={v=>setRow(v)}  isHalf />
 				<List.Input label='列' value={col} onChange={v=>setCol(v)}  isHalf />
+			</div>
+			<div className='fx'>
+				<List.Select label='样式' data={BorderStyle} p='选择样式' isHalf onChange={onSelectStyle} />
 			</div>
 			<div className='fx'>
 				<List.Switch value={checked} label='表头' onChange={onHeadChange}/>

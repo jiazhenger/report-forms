@@ -24,10 +24,18 @@ export default {
 			el.className += ' ' + className
 		}
 	},
+	// 移除 calssName
 	removeClass(el,className){
-		if(this.hasClass(el,className)){
-			const name = el.className.replace(' ' + className, '')
-			el.className = name
+		if(el instanceof NodeList){
+			for(let v of el){
+				const c = v.className.replace(' ' + className,'')
+				v.className = c
+			}
+		}else{
+			if(this.hasClass(el,className)){
+				const c = el.className.replace(' ' + className,'')
+				el.className = c
+			}
 		}
 	},
 	// 查找有指定样式的父级元素
@@ -201,18 +209,6 @@ export default {
 			this.removeClass($drag,'more')
 		}
 		$temp.innerHTML = Html[type]
-	},
-	// 移除 calssName
-	removeClass(node,className){
-		if(node instanceof NodeList){
-			for(let v of node){
-				const c = v.className.replace(' ' + className,'')
-				v.className = c
-			}
-		}else{
-			const c = node.className.replace(' ' + className,'')
-			node.className = c
-		}
 	},
 	// 创建拖动标尺
 	createPointMark(node){

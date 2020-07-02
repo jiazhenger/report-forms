@@ -137,10 +137,10 @@ export default class extends React.Component {
 				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
 				<title>报表</title>
 				<style>
-					html,body{font:14px/24px Microsoft YaHei; color:#333}
+					html,body{font:14px/20px Microsoft YaHei; color:#333}
 					*{margin:0;padding:0;box-sizing:border-box}
 					img{border:0;display:block}
-					table{width:100%;border-collapse:collapse}
+					table{width:100%;border-collapse:collapse;border-spacing:0}
 					.fxmc{display:flex;align-items: center;justify-content: center}
 					${ isHtml ? 'body{padding:10px} #container{position:relative}' : ''}
 				</style>

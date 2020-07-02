@@ -102,7 +102,9 @@ export default {
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
 					}else if( type === 'ul' ){
-						_this.node.style.width = '200px'
+						_this.node.style.left = 0
+						_this.node.style.width = '100%'
+						// _this.node.style.width = '200px'
 					}else if( type === 'devider' ){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
