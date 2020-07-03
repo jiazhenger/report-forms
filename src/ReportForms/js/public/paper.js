@@ -3,6 +3,7 @@
  * 1 英寸 = 2.54cm
  * 1cm = ( 分辨率 / 2.54cm )
  */
+/*
 export const Ratio = [
 	{ label: '72像素/英寸', value: '72' },
 	{ label: '96像素/英寸', value: '96' },
@@ -39,4 +40,12 @@ export const Paper = [
 			{ label:'B8', value:'62*88' },
 		]
 	}
+]*/
+export const Paper = [
+	{ label:'A3', value:'A3' },
+	{ label:'A4', value:'A4' },
+	{ label:'A5', value:'A5' },
+	{ label:'Legal', value:'Legal' },
+	{ label:'Letter', value:'Letter' },
+	{ label:'Tabloid', value:'Tabloid' },
 ]

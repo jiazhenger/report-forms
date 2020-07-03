@@ -170,11 +170,12 @@ export default {
 	// 创建列表
 	createList($temp, data){
 		if(typeof data !== 'object') return
+		const $drag = this.parents($temp,'drag')
 		$temp.innerHTML = ''
 		const ul = document.createElement('ul')
 		ul.style.cssText = `width:100%;padding-left:2em;list-style:outside decimal`
 		const fragment = document.createDocumentFragment()
-		
+		this.addClass($drag,'more')
 		for(let i in data){
 			let li =  null
 			const value = data[i]
@@ -242,19 +243,22 @@ export default {
 			const $drag = this.parents($temp,'drag')
 			$drag.style.removeProperty('width')
 			$drag.style.removeProperty('height')
+			this.addClass($drag,'more')
 			const fragment = document.createElement('div')
 			fragment.style.overflow = 'hidden'
 			data.forEach((v,i)=>{
 				const div = document.createElement('div')
-				div.style.cssText = 'float:left;display:flex;align-items: center;'
-				if(i>0){ div.style.marginLeft = '10px' }
+				div.style.cssText = 'height:20px;line-height:20px;'
+				div.style.margin = '0 10px 10px 0'
 				const img = document.createElement('img')
-				img.style.cssText = 'width:20px;height:20px;'
+				img.style.cssText = 'width:20px;height:100%;float:left'
 				img.src = Boolean(v.value) ? checkedImage : CheckboxImage
 				img.setAttribute('temp',1)
+				img.draggable = false
+				
 				const label = document.createElement('label')
 				label.textContent = v.label
-				label.style.cssText = 'margin-left:5px;'
+				label.style.cssText = 'margin-left:5px;width:60px;float:left'
 				div.appendChild(img)
 				div.appendChild(label)
 				fragment.appendChild(div)

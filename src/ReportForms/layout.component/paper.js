@@ -10,7 +10,9 @@ const { Panel } = Collapse
 const { $fn } = window
 // const getPx = (mm, ratio) => Math.round(mm/10 * (ratio/2.54))  // 根据分辨与纸张获取元素宽度
 // ===================================================================== page component
-export default ({ $paper }) => {
+export default ({ $paper, $drag }) => {
+	// const fixedHeaderRef = React.useRef()
+	// const fixedFooterRef = React.useRef()
 	// const [ ratio, setRatio ] = React.useState(96)
 	// const [ paper, setPaper ] = React.useState('0*0')
 	// const getSize = React.useCallback(()=>{
@@ -35,6 +37,24 @@ export default ({ $paper }) => {
 			// const h = arr[1]
 		}
 	}, [  ])
+	// 固定头
+	/*
+	const onFixedHeader = React.useCallback(v=>{
+		const $drag = document.querySelector('#dragContent')
+		let header = $drag.querySelector('header')
+		if(v){
+			if(header){
+				header.parentNode.removeChild(header)
+			}
+			header = document.createElement('header')
+			
+			header.style.cssText = 'width:100%;height:300px;border:1px solid red'
+			$drag.appendChild(header)
+		}else{
+			header.parentNode.removeChild(header)
+		}
+	}, [  ])
+	*/
 	return (
 		<div className='abs_lt wh scroll'>
 			<h5 className='control-title'>报表</h5>
@@ -42,8 +62,14 @@ export default ({ $paper }) => {
 				<Panel header='常规选项'>
 					<div>
 						{/*<List.Select value={ratio} label='分辨率' data={Ratio} p='选择屏幕分辨率' onChange={onSelectRatio} />*/}
-						<List.Select value={'210*297'} label='纸张' data={Paper} p='选择纸张' onChange={onSelectPaper} />
+						<List.Select value={'A4'} label='纸张' data={Paper} p='选择纸张' onChange={onSelectPaper} />
 					</div>
+					{/*
+						<div>
+							<List.Switch label='页眉' ref={fixedHeaderRef}  onChange={onFixedHeader}/>
+							<List.Switch label='页脚' ref={fixedFooterRef}  onChange={onFixedHeader}/>
+						</div>
+					*/}
 				</Panel>
 			</Collapse>
 		</div>

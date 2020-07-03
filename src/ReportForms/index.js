@@ -234,7 +234,7 @@ export default class extends React.Component {
 								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} />}
 							</TabPane>
 							<TabPane tab='报表' key={2}>
-								{ +activeKey === 2 && <PaperComponent $paper={this.paper} />}
+								{ +activeKey === 2 && <PaperComponent />}
 							</TabPane>
 						</Tabs>
 					</div>

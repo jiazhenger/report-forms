@@ -11,8 +11,9 @@ export default ({ node }) => {
 	React.useEffect(()=>{
 		if(node){
 			const $temp = node.querySelector('.template').children[0].childNodes[0]
-			
-			switchRef.current.setValue( $temp.style.float === '' )
+			if($temp){
+				switchRef.current.setValue( $temp.style.float === '' )
+			}
 		}
 	},[node])
 	
@@ -21,14 +22,13 @@ export default ({ node }) => {
 			if(v){
 				[].slice.call($temp.children[0].childNodes).forEach((v,i)=>{
 					v.style.removeProperty('float')
-					v.style.removeProperty('margin-left')
-					if(i>0){v.style.marginTop = '10px'}
+					v.style.removeProperty('margin')
+					if(i>0){v.style.margin= '10px 0 0'}
 				})
 			}else{
 				[].slice.call($temp.children[0].childNodes).forEach((v,i)=>{
 					v.style.float = 'left'
-					v.style.removeProperty('margin-top')
-					if(i>0){v.style.marginLeft = '10px'}
+					v.style.margin = '0 10px 10px 0'
 				})
 			}
 		})

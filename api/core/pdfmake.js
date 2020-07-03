@@ -3,12 +3,13 @@ const path = require('path')
 // const pdfMake = require('pdfmake/build/pdfmake')
 // const pdfFonts = require('pdfmake/build/vfs_fonts')
 
+const fontPath = path.join(__dirname, '../core/fonts/yahei.ttf')
 const fonts = {
 	Roboto: {
-		normal: path.join(__dirname, '../core/fonts/STXIHEI.TTF'),
-		bold: path.join(__dirname, '../core/fonts/STXIHEI.TTF'),
-		italics: path.join(__dirname, '../core/fonts/STXIHEI.TTF'),
-		bolditalics: path.join(__dirname, '../core/fonts/STXIHEI.TTF')
+		normal: fontPath,
+		bold: fontPath,
+		italics: fontPath,
+		bolditalics: fontPath
 	}
 }
 

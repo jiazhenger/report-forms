@@ -71,9 +71,9 @@ export default ({ node, tempAttr }) => {
 			}else{
 				let imgNode = document.createElement('img')
 				imgNode.setAttribute(obj.label,obj.value)
+				imgNode.setAttribute('temp',1)
 				imgNode.style.cssText = 'width:100%;height:100%'
 				imgNode.draggable = false
-				imgNode.setAttribute('temp',1)
 				node.querySelector('.template').appendChild(imgNode)
 			}
 		}else{
@@ -90,9 +90,11 @@ export default ({ node, tempAttr }) => {
 					
 					if($img){
 						$img.setAttribute('src',base64)
+						$img.setAttribute('temp',1)
 					}else{
 						let imgNode = document.createElement('img')
 						imgNode.setAttribute('src',base64)
+						imgNode.setAttribute('temp',1)
 						imgNode.style.cssText = 'width:100%;height:100%'
 						imgNode.draggable = false
 						node.querySelector('.template').appendChild(imgNode)

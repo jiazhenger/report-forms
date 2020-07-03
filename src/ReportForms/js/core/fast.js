@@ -26,9 +26,10 @@ export default {
 	},
 	// 删除全部
 	delAll(_this){
-		[].slice.call(document.querySelectorAll('.drag')).forEach(v=>v.parentNode.removeChild(v))
-		_this.node = null
-		_this.setState({hasNode:null, node:null})
+		// [].slice.call(document.querySelectorAll('.drag')).forEach(v=>v.parentNode.removeChild(v))
+		// _this.node = null
+		// _this.setState({hasNode:null, node:null})
+		_this.$drag.innerHTML = ''
 		window.$fn.remove('html')
 	}
 }
