@@ -111,11 +111,15 @@ export default {
 						const devider = _this.node.querySelector('.template')
 						devider.innerHTML = '<div></div>'
 						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px solid #ddd'
-						_this.node.style.height = '5px'
+						_this.node.style.height = 'auto'
 					}else if( type === 'checkbox' ){
 						_this.node.style.height = '20px'
+					}else if( type === 'header'){
+						_this.node.style.left = 0
+						_this.node.style.width = '100%'
+						_this.node.style.outlineColor = 'blue'
 					}
-					_this.runNode()		
+					_this.runNode()
 					_this.node.querySelector('.point-mark').style.display = 'block'
 					_this.node.style.outline = '1px dashed ' + stopBorderColor
 				},
@@ -134,27 +138,32 @@ export default {
 			
 		}else{
 			const node = document.createElement('div')
+			node.setAttribute('type',type)
 			node.className = 'move'
 			node.style.cssText = `position:absolute;left:${x-10}px;top:${y-10}px;z-index:1;`
-			node.innerHTML = Html[type]
-			node.children[0].className += ' template'
-			node.setAttribute('type',type)
-			const $temp = node.querySelector('.template')
-			$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
-			node.style.width = '99px'
-			if(type === 'text'){
-				node.style.height = '24px'
-			}else if(type === 'img'){
+			if( Html[type] ){
+				node.innerHTML = Html[type]
+				node.children[0].className += ' template'
+				const $temp = node.querySelector('.template')
+				$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
+				node.style.width = '99px'
+				if(type === 'text'){
+					node.style.height = '24px'
+				}else if(type === 'img'){
+					node.style.height = '99px'
+				}else if(type === 'table'){
+					node.setAttribute('group', 1)
+				}else if(type === 'ul'){
+					node.setAttribute('group', 1)
+				}else if(type === 'devider'){
+					node.style.height = '99px'
+					$temp.style.removeProperty('background')
+				}else if(type === 'checkbox'){
+					node.style.width = '20px'
+				}
+			}else{
+				node.style.width = '99px'
 				node.style.height = '99px'
-			}else if(type === 'table'){
-				node.setAttribute('group', 1)
-			}else if(type === 'ul'){
-				node.setAttribute('group', 1)
-			}else if(type === 'devider'){
-				node.style.height = '99px'
-				$temp.style.removeProperty('background')
-			}else if(type === 'checkbox'){
-				node.style.width = '20px'
 			}
 			
 			Dom.createPointMark(node) // 拖动标点
@@ -162,6 +171,7 @@ export default {
 			_this.node = node
 			
 			_this.setState({hasNode:true, node, type})
+			
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)
 			document.body.addEventListener('mouseup',this.setNewPosition)

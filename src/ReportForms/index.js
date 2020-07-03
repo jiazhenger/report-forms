@@ -111,12 +111,14 @@ export default class extends React.Component {
 			for(let v of $drag){
 				v.style.removeProperty('outline')
 				const temp = v.querySelector('.template')
-				if(temp.innerHTML === '' || (temp.querySelector('img') && !temp.querySelector('img').getAttribute('temp'))){
-					v.parentNode.removeChild(v)
-				}
-				const $mark = v.querySelector('.point-mark')
-				if($mark){
-					$mark.parentNode.removeChild($mark)
+				if(temp){
+					if(temp.innerHTML === '' || (temp.querySelector('img') && !temp.querySelector('img').getAttribute('temp'))){
+						v.parentNode.removeChild(v)
+					}
+					const $mark = v.querySelector('.point-mark')
+					if($mark){
+						$mark.parentNode.removeChild($mark)
+					}
 				}
 			}
 		}
@@ -189,7 +191,7 @@ export default class extends React.Component {
 							<IconButton label='下载 pdf' onClick={ this.downloadPdf } hasNode={true}/>
 							<IconButton label='下载 html' onClick={ this.downloadHtml } hasNode={true}/>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
-							<IconButton label='删除全部' id='delAll' hasNode={hasNode} />
+							<IconButton label='删除全部' id='delAll' hasNode={true} />
 						</ul>
 					</div>
 				</header>
@@ -204,6 +206,9 @@ export default class extends React.Component {
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
 								<IconButton2 icon={CheckboxImage} label='选择框' onDragStart={e=>this.onDragStart(e,'checkbox')}/>
 								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
+								<IconButton2 icon={CheckboxImage} label='页眉' onDragStart={e=>this.onDragStart(e,'header')}/>
+								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
+								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
 							</ul>
 						</div>
 					</nav>
