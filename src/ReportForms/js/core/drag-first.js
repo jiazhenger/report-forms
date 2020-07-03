@@ -93,6 +93,8 @@ export default {
 					
 					_this.node.style.left = left + 'px'
 					_this.node.style.top = top + 'px'
+					_this.node.style.outline = '1px dashed ' + stopBorderColor
+					_this.node.querySelector('.point-mark').style.display = 'block'
 					
 					$drag.appendChild(_this.node)
 					
@@ -117,11 +119,11 @@ export default {
 					}else if( type === 'header'){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
-						_this.node.style.outlineColor = 'blue'
+						_this.node.style.outline = '1px dashed blue'
+						Dom.addClass(_this.node,'header')
 					}
 					_this.runNode()
-					_this.node.querySelector('.point-mark').style.display = 'block'
-					_this.node.style.outline = '1px dashed ' + stopBorderColor
+					
 				},
 				onFail:()=>{
 					removeHtml()
@@ -164,6 +166,7 @@ export default {
 			}else{
 				node.style.width = '99px'
 				node.style.height = '99px'
+				node.setAttribute('fixed',1)
 			}
 			
 			Dom.createPointMark(node) // 拖动标点

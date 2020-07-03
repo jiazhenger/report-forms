@@ -115,10 +115,10 @@ export default class extends React.Component {
 					if(temp.innerHTML === '' || (temp.querySelector('img') && !temp.querySelector('img').getAttribute('temp'))){
 						v.parentNode.removeChild(v)
 					}
-					const $mark = v.querySelector('.point-mark')
-					if($mark){
-						$mark.parentNode.removeChild($mark)
-					}
+				}
+				const $mark = v.querySelector('.point-mark')
+				if($mark){
+					$mark.parentNode.removeChild($mark)
 				}
 			}
 		}

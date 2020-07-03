@@ -66,6 +66,7 @@ export default {
 				
 				const $mark = _this.node.querySelector('.point-mark')
 				if($mark){ $mark.style.display = 'none' }
+				_this.node.style.outline = 0
 				_this.node.style.border = '1px solid ' + moveBorderColor
 				
 				Drag.mark(_this,'.axesY', left)
@@ -148,7 +149,12 @@ export default {
 				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
 					const $mark = v.querySelector('.point-mark')
 					if($mark){ $mark.style.display = 'none' }
-					v.style.outline = '1px dashed ' + stopBorderColor
+					// 给固定布局加不同颜色
+					if(v.getAttribute('fixed')){
+						v.style.outline = '1px dashed blue'
+					}else{
+						v.style.outline = '1px dashed ' + stopBorderColor
+					}
 				})
 				
 				const $mark = t.querySelector('.point-mark')
