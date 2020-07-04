@@ -2,6 +2,40 @@ import Drag from '../public/drag'
 import Dom from '../public/dom'
 import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from '../public/config'
 const { $fn } = window
+
+// 清除 mark
+const clearMark = node => {
+	for(let $mark of node.querySelectorAll('.point-mark')){
+		if($mark){ $mark.style.display = 'none' }
+	}
+}
+
+const dropInFixed = ($drag,node) =>{
+	let minusTop = { fixedTop:0, fixedHeight:0}
+	const $header = Dom.parent(node,'header')
+	const $main = Dom.parent(node,'main')
+	const $footer = Dom.parent(node,'footer')
+	
+	const Fixed = $f => {
+		if($f){
+			const _top = Drag.getPos($f).top
+			const f = Drag.getInfo($f)
+			const s = f.top + f.clientHeight
+			if(_top >= f.top && _top < s){
+				minusTop = {
+					fixedTop: f.top,
+					fixedHeight:f.clientHeight,
+					fixedLeft: f.left
+				}
+			}
+		}
+	}
+	Fixed($header)
+	Fixed($main)
+	Fixed($footer)
+	return minusTop
+}
+
 export default {
 	// 默认执行
 	init(_this){
@@ -27,10 +61,11 @@ export default {
 				}
 				// 左侧拖宽
 				if( findSize('lc-w') || findSize('lt-wh') || findSize('lb-wh')){
-					
+					const { fixedLeft } = dropInFixed($drag,_this.dargNode)
+					const _x = x + scrollLeft
 					if(left >= 0){
-						_this.dargNode.style.width = sizeOffsetLeft  - (x + scrollLeft) + sizeWidth  + 'px'
-						_this.dargNode.style.left = (x + scrollTop) - offsetLeft + 'px'
+						_this.dargNode.style.width = sizeOffsetLeft  - _x + sizeWidth  + 'px'
+						_this.dargNode.style.left = _x - fixedLeft - offsetLeft + 'px'
 					}
 				}
 				// 底部拖高
@@ -39,9 +74,11 @@ export default {
 				}
 				// 顶部拖高
 				if( findSize('tc-h') || findSize('rt-wh') || findSize('lt-wh')){
+					const { fixedTop } = dropInFixed($drag,_this.dargNode)
+					const _y = y + scrollTop
 					if(top >= 0){
-						_this.dargNode.style.height = sizeOffsetTop  - (y + scrollTop) + sizeHeight  + 'px'
-						_this.dargNode.style.top = (y + scrollTop) - offsetTop + 'px'
+						_this.dargNode.style.height = sizeOffsetTop - _y  + sizeHeight  + 'px'
+						_this.dargNode.style.top = _y - fixedTop - offsetTop + 'px'
 					}
 				}
 			}
@@ -54,14 +91,17 @@ export default {
 			const targetWidth = targetInfo.width
 			const targetHeight = targetInfo.height
 			if(_this.node){
-				let left = x - offsetLeft - startX
-				let top = y - offsetTop  - startY
+				const left = x - offsetLeft - startX
+				const top = y - offsetTop  - startY
+				const { fixedTop, fixedHeight } = dropInFixed($drag,_this.node)
+				const top2 = top - fixedTop
 				
 				if(left > 0 && left < width - targetWidth ){
 					_this.node.style.left = left + 'px'
 				}
-				if(top > 0  && top < height - targetHeight){
-					_this.node.style.top = top + 'px'
+				
+				if(top2 > 0  && top2 < (fixedHeight ? fixedHeight : height) - targetHeight){
+					_this.node.style.top = top2 + 'px'
 				}
 				
 				const $mark = _this.node.querySelector('.point-mark')
@@ -105,7 +145,7 @@ export default {
 			const t = Dom.parents(target,'drag')
 			// 获取拖动尺寸的元素
 			if( _this.dargNode ){
-				const { left, top, width, height } = Drag.getInfo(_this.dargNode) 
+				const { left, top, width, height } = Drag.getInfo(_this.dargNode)
 				// 右侧拖宽
 				if( findSize('rc-w') || findSize('rt-wh') || findSize('rb-wh')){
 					_this.dargNode.style.width = width - (width%axesSpace) + (width%axesSpace>0 ? axesSpace : 0) - 1 + 'px'
@@ -126,7 +166,6 @@ export default {
 					_this.dargNode.style.height = height - (height % ax) + (height%ax >0 ? ax : 0) - 1 + 'px'
 					_this.dargNode.style.top = top -  top % ax + 1 + 'px'
 				}
-				
 				return false
 			}
 			if(t && _this.node){
@@ -144,11 +183,11 @@ export default {
 			const { target } = e
 			const t = Dom.parents(target,'drag')
 			const t2 = Dom.parents(target,'loopNode')
+			e.stopPropagation()
 			if(t){
 				Dom.createPointMark(t) // 拖动标点
 				Array.prototype.slice.call($drag.querySelectorAll('.drag'),0).forEach(v => {
-					const $mark = v.querySelector('.point-mark')
-					if($mark){ $mark.style.display = 'none' }
+					clearMark(v) // 清除 mark
 					// 给固定布局加不同颜色
 					if(v.getAttribute('fixed')){
 						v.style.outline = '1px dashed blue'
@@ -157,10 +196,19 @@ export default {
 					}
 				})
 				
-				const $mark = t.querySelector('.point-mark')
-				if($mark){ $mark.style.display = 'block' }
+				if(Dom.hasMark(t)){
+					// const $mark = t.querySelector('.point-mark')
+					const $mark = Dom.children(t,'point-mark')
+					if($mark){ 
+						$mark.style.display = 'block' 
+						if(t.getAttribute('fixed') && !Dom.hasClass(t.children[0],'point-mark')){
+							$mark.style.zIndex = '0'
+							$mark.style.removeProperty('background')
+						}
+					}
+				}
 				
-				t.style.borderColor = '#fff'
+				// t.style.borderColor = '#fff'
 				if(Dom.hasClass(t,'hide')){
 					const nodes = document.querySelectorAll('.loopNode')
 					if(nodes.length > 0){
@@ -239,11 +287,7 @@ export default {
 					_this.stop = false
 					Array.prototype.slice.call($drag.querySelectorAll('.drag')).forEach(v => {
 						Dom.removeClass(v,'hide')
-						
-						const $mark = v.querySelector('.point-mark')
-						if($mark){
-							v.querySelector('.point-mark').style.display = 'none'
-						}
+						clearMark(v) // 清除 mark
 					})
 				}
 			}

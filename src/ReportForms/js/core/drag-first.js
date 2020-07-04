@@ -84,7 +84,6 @@ export default {
 					document.body.removeEventListener('mousemove',this.setHtmlPosition)
 					document.body.removeEventListener('mouseup',this.setNewPosition)
 					_this.node.className = 'drag'
-					
 					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
 					
@@ -95,10 +94,37 @@ export default {
 					_this.node.style.top = top + 'px'
 					_this.node.style.outline = '1px dashed ' + stopBorderColor
 					_this.node.querySelector('.point-mark').style.display = 'block'
-					
-					$drag.appendChild(_this.node)
-					
+					// 放置元素到不同的框
 					const type = _this.node.getAttribute('type')
+					let minusTop = 0
+					let isFixed = false
+					const $header = $drag.querySelector('.header')
+					const $main = $drag.querySelector('.main')
+					const $footer = $drag.querySelector('.footer')
+					
+					const _top = Drag.getPos(_this.node).top
+					const dropInFixed = $f => {
+						if($f){
+							const f = Drag.getInfo($f)
+							const s = f.top + f.clientHeight
+							if(_top >= f.top && _top < s){
+								if(type === 'header' || type === 'main' || type === 'footer'){
+									_this.node.remove()
+									isFixed = true
+									return window.$fn.toast('无法放置')
+								}else{
+									$f.appendChild(_this.node)
+									isFixed = true
+									minusTop = f.top
+									const top2 = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ - minusTop
+									_this.node.style.top = top2 + 'px'
+								}
+							}
+						}
+					}
+					dropInFixed($header)
+					dropInFixed($main)
+					dropInFixed($footer)
 					
 					if( type === 'table' ){
 						_this.node.style.left = 0
@@ -116,12 +142,26 @@ export default {
 						_this.node.style.height = 'auto'
 					}else if( type === 'checkbox' ){
 						_this.node.style.height = '20px'
-					}else if( type === 'header'){
+					}else if( type === 'header' || type === 'main' || type === 'footer'){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
 						_this.node.style.outline = '1px dashed blue'
-						Dom.addClass(_this.node,'header')
+						Dom.addClass(_this.node, type)
+						
+						if($drag.querySelector('.' + type)){
+							let txt = null
+							if(type === 'header'){ txt ='页眉' }
+							else if(type === 'main') { txt = '主体' }
+							else if(type === 'footer') { txt = '页脚' }
+							_this.node.remove()
+							return window.$fn.toast( txt + '已存在')
+						}
 					}
+					
+					if(!isFixed) {
+						$drag.appendChild(_this.node)
+					}
+					
 					_this.runNode()
 					
 				},

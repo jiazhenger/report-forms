@@ -1,5 +1,5 @@
 const Router = require('koa-router')
-const puppeteer = require('puppeteer')
+// const puppeteer = require('puppeteer')
 const send = require('koa-send')
 const path = require('path')
 const router = new Router()
@@ -22,7 +22,7 @@ async function create(pdf_string) {
 
 router.post('/pdf',async ctx => {
 	// create(ctx.request.body.html)
-	await pdf.make(ctx.request.body.html)
+	await pdf.make(ctx.request.body)
 	ctx.body = {
 		code: 200,
 		msg: 'ok',

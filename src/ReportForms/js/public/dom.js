@@ -43,33 +43,23 @@ export default {
 		if(this.hasClass(el,className)){
 			return el
 		}
-		var parent = el.parentNode
+		if(el){
+			var parent = el.parentElement
+			while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
+				parent = parent.parentElement
+			}
+		}
+		return parent === document.body ? null : parent
+	},
+	parent(el,className){
+		var parent = el.parentElement
 		while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
-			parent = parent.parentNode
+			parent = parent.parentElement
 		}
 		return parent === document.body ? null : parent
 	},
 	isElement(node){ return node instanceof HTMLElement },
 	isNodeList(node){ return node instanceof NodeList },
-	// 编辑节点
-	/*
-	editorNode(node){
-		const editor = function(n){
-			n.ondblclick = function(){
-				this.contentEditable = true
-				this.focus()
-			}
-			n.onblur = function(){
-				this.contentEditable = false
-			}
-		}
-		if(this.isElement(node)){
-			editor(node)
-		}else if(this.isNodeList(node)){
-			for(let n of node){ editor(n) }
-		}
-	},
-	*/
 	// 获取节点信息
 	getNode(node, callback){
 		return new Promise(resolve=>{
@@ -211,26 +201,40 @@ export default {
 		}
 		$temp.innerHTML = Html[type]
 	},
+	hasMark(node){
+		return ( [].slice.call(node.children).some( v => this.hasClass(v,'point-mark')) )
+	},
 	// 创建拖动标尺
 	createPointMark(node){
-		if(!node.querySelector('.point-mark')){
-			// 拖动标点
-			const point = document.createElement('div')
-			point.className = 'point-mark'
-			point.innerHTML = `
-				<p class='dir lt-wh'><s></s></p>
-				<p class='dir rt-wh'><s></s></p>
-				<p class='dir rb-wh'><s></s></p>
-				<p class='dir lb-wh'><s></s></p>
-				<p class='dir tc-h'><s></s></p>
-				<p class='dir rc-w'><s></s></p>
-				<p class='dir bc-h'><s></s></p>
-				<p class='dir lc-w'><s></s></p>
-			`
-			point.style.background = 'rgba(0,0,0,0.05)'
-			point.addEventListener('click',e=> e.stopPropagation())
-			node.appendChild(point)
+		if(node){
+			if(!this.hasMark(node)){
+				const point = document.createElement('div')
+				point.className = 'point-mark'
+				point.innerHTML = `
+					<p class='dir lt-wh'><s></s></p>
+					<p class='dir rt-wh'><s></s></p>
+					<p class='dir rb-wh'><s></s></p>
+					<p class='dir lb-wh'><s></s></p>
+					<p class='dir tc-h'><s></s></p>
+					<p class='dir rc-w'><s></s></p>
+					<p class='dir bc-h'><s></s></p>
+					<p class='dir lc-w'><s></s></p>
+				`
+				point.style.background = 'rgba(0,0,0,0.05)'
+				point.addEventListener('click',e=> e.stopPropagation())
+				node.appendChild(point)
+			}
 		}
+	},
+	// 查找字元素
+	children(node,className){
+		let rs = null
+		for(let v of node.children){
+			if(this.hasClass(v,className)){
+				rs = v
+			}
+		}
+		return rs
 	},
 	// 创建 checkbox
 	createCheckbox($temp, data){

@@ -74,8 +74,9 @@ export default class extends React.Component {
 		
 		setInterval(()=>{
 			const html = $fn.local('html')
-			if(this.$drag.innerHTML !== '' && html !== this.clearNode().innerHTML ){
-				$fn.local('html', this.clearNode().innerHTML)
+			const formatHtml = this.formatHtml(this.$drag)
+			if(this.$drag.innerHTML !== '' && html !==  formatHtml){
+				$fn.local('html', formatHtml)
 			}
 		},3000)
 	}
@@ -97,9 +98,10 @@ export default class extends React.Component {
 	cancelNode = () => {
 		this.refs.dataSource && this.refs.dataSource.cancelNode()
 	}
-	clearNode = () => {
+	formatHtml = el => {
+		if(!el) return null
 		const node = document.createElement('div')
-		node.innerHTML = this.$drag.innerHTML
+		node.innerHTML = el.innerHTML
 		const $drag = node.querySelectorAll('.drag')
 		const $loop = node.querySelectorAll('.loopNode')
 		if($loop){
@@ -122,11 +124,12 @@ export default class extends React.Component {
 				}
 			}
 		}
-		return node
+		return node.innerHTML
 	}
 	getHtml = isHtml => {
-		const node = this.clearNode()
-		if(node.innerHTML === ''){
+		const $main = this.$drag.querySelector('.main')
+		const html = this.formatHtml( $main ? $main : this.$drag)
+		if(html === ''){
 			$fn.toast('还没有添加内容')
 			return null
 		}
@@ -148,7 +151,7 @@ export default class extends React.Component {
 				</style>
 			</head>
 			<body>
-				<div id='container'>${node.innerHTML}</div>
+				<div id='container'>${html}</div>
 			</body>
 			</html>
 		`
@@ -156,7 +159,13 @@ export default class extends React.Component {
 	createPdf = () => {
 		const html = this.getHtml()
 		if(html){
-			$http.submit(null,'pdf',{ param:{ html } }).then(data=>{
+			$http.submit(null,'pdf',{ 
+				param:{ 
+					header: this.formatHtml(this.$drag.querySelector('.header')),
+					main: this.getHtml(),
+					footer: this.formatHtml(this.$drag.querySelector('.footer')),
+				}
+			}).then(data=>{
 				$fn.toast('生成 pdf 成功')
 			})
 		}
