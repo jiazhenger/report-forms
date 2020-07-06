@@ -98,10 +98,21 @@ export default class extends React.Component {
 	cancelNode = () => {
 		this.refs.dataSource && this.refs.dataSource.cancelNode()
 	}
-	formatHtml = el => {
+	formatHtml = (el,isPdf) => {
 		if(!el) return null
 		const node = document.createElement('div')
-		node.innerHTML = el.innerHTML
+		if(el.id === 'dragContent'){ node.innerHTML = el.innerHTML }
+		else {
+			// el.style.removeProperty('position')
+			if(isPdf){
+				const style = `<style>html,body{font:14px/20px Microsoft YaHei; color:#333}*{margin:0;padding:0;box-sizing:border-box}img{border:0;display:block}table{width:100%;border-collapse:collapse;border-spacing:0}</style>`
+				node.innerHTML = style + el.innerHTML
+			}else{
+				node.appendChild(el.cloneNode(true))
+			}
+			
+		}
+		
 		const $drag = node.querySelectorAll('.drag')
 		const $loop = node.querySelectorAll('.loopNode')
 		if($loop){
@@ -114,7 +125,8 @@ export default class extends React.Component {
 				v.style.removeProperty('outline')
 				const temp = v.querySelector('.template')
 				if(temp){
-					if(temp.innerHTML === '' || (temp.querySelector('img') && !temp.querySelector('img').getAttribute('temp'))){
+					const $img = temp.querySelector('img')
+					if(temp.innerHTML === '' || ($img && !$img.getAttribute('temp'))){
 						v.parentNode.removeChild(v)
 					}
 				}
@@ -157,19 +169,21 @@ export default class extends React.Component {
 		`
 	}
 	createPdf = () => {
-		const html = this.getHtml()
-		if(html){
-			$http.submit(null,'pdf',{ 
-				param:{ 
-					header: this.formatHtml(this.$drag.querySelector('.header')),
-					main: this.getHtml(),
-					footer: this.formatHtml(this.$drag.querySelector('.footer')),
-				}
-			}).then(data=>{
-				$fn.toast('生成 pdf 成功')
-			})
-		}
-		
+		const $header = this.$drag.querySelector('.header')
+		const $footer = this.$drag.querySelector('.footer')
+		const $main = this.$drag.querySelector('.main')
+		const mainHtml = $main ? this.formatHtml($main, true) : this.getHtml()
+		$http.submit(null,'pdf',{ 
+			param:{
+				header: this.formatHtml($header, true),
+				headerHeight: $header.style.height,
+				main: mainHtml,
+				footer: this.formatHtml($footer, true),
+				footerHeight: $footer.style.height
+			}
+		}).then(data=>{
+			$fn.toast('生成 pdf 成功')
+		})
 	}
 	createHtml = () => {
 		const html = this.getHtml(true)

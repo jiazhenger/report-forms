@@ -67,6 +67,7 @@ export default ({ node, dragStyle }) => {
 			node.style.height = 'auto'
 			const $temp = node.querySelector('.template')
 			const table = document.createElement('table')
+			table.style.cssText = 'width:100%;border-collapse:collapse;border-spacing:0'
 			// tbody
 			const tbody = document.createElement('tbody')
 			const trFragment = document.createDocumentFragment()

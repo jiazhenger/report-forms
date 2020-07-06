@@ -97,6 +97,7 @@ export default {
 		if(!$fn.hasArray(data)) return
 		$temp.innerHTML = ''
 		const table = document.createElement('table')
+		table.style.cssText = 'width:100%;border-collapse:collapse;border-spacing:0'
 		const tbody = document.createElement('tbody')
 		const trFragment = document.createDocumentFragment()
 		data.forEach( v => {

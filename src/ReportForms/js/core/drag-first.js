@@ -188,17 +188,19 @@ export default {
 				node.children[0].className += ' template'
 				const $temp = node.querySelector('.template')
 				$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
-				node.style.width = '99px'
+				node.style.width = '50px'
 				if(type === 'text'){
+					node.style.width = '99px'
 					node.style.height = '24px'
 				}else if(type === 'img'){
-					node.style.height = '99px'
+					node.style.height = '50px'
 				}else if(type === 'table'){
 					node.setAttribute('group', 1)
 				}else if(type === 'ul'){
 					node.setAttribute('group', 1)
 				}else if(type === 'devider'){
-					node.style.height = '99px'
+					node.style.width = '50px'
+					node.style.height = '20px'
 					$temp.style.removeProperty('background')
 				}else if(type === 'checkbox'){
 					node.style.width = '20px'
