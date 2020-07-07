@@ -87,12 +87,14 @@ export default {
 					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
 					
-					left = left - (left % axesSpace) + 1
-					top = top - (top % (axesSpace/2)) + 1
+					// left = left - (left % axesSpace) + 1
+					// top = top - (top % (axesSpace/2)) + 1
+					left = left - (left % axesSpace)
+					top = top - (top % axesSpace)
 					
 					_this.node.style.left = left + 'px'
 					_this.node.style.top = top + 'px'
-					_this.node.style.outline = '1px dashed ' + stopBorderColor
+					_this.node.style.border = '1px dashed ' + stopBorderColor
 					_this.node.querySelector('.point-mark').style.display = 'block'
 					// 放置元素到不同的框
 					const type = _this.node.getAttribute('type')
@@ -136,16 +138,21 @@ export default {
 					}else if( type === 'devider' ){
 						_this.node.style.left = 0
 						_this.node.style.width = '100%'
+						_this.node.style.height = '10px'
 						const devider = _this.node.querySelector('.template')
 						devider.innerHTML = '<div></div>'
 						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px solid #ddd'
-						_this.node.style.height = 'auto'
 					}else if( type === 'checkbox' ){
 						_this.node.style.height = '20px'
 					}else if( type === 'header' || type === 'main' || type === 'footer'){
 						_this.node.style.left = 0
+						if(type === 'header'){ 
+							_this.node.style.top = 0 
+						}else if( type === 'main'){
+							_this.node.style.height = '200px'
+						}
 						_this.node.style.width = '100%'
-						_this.node.style.outline = '1px dashed blue'
+						_this.node.style.border = '1px dashed blue'
 						Dom.addClass(_this.node, type)
 						
 						if($drag.querySelector('.' + type)){
@@ -190,8 +197,8 @@ export default {
 				$temp.style.cssText = 'width:100%;height:100%;background:#fff;overflow:hidden;'
 				node.style.width = '50px'
 				if(type === 'text'){
-					node.style.width = '99px'
-					node.style.height = '24px'
+					node.style.width = '100px'
+					node.style.height = '20px'
 				}else if(type === 'img'){
 					node.style.height = '50px'
 				}else if(type === 'table'){
@@ -200,10 +207,15 @@ export default {
 					node.setAttribute('group', 1)
 				}else if(type === 'devider'){
 					node.style.width = '50px'
-					node.style.height = '20px'
+					node.style.height = '10px'
 					$temp.style.removeProperty('background')
 				}else if(type === 'checkbox'){
 					node.style.width = '20px'
+				}else if(type === 'pages'){
+					node.style.width = '50px'
+					node.style.height = '20px'
+					node.style.lineHeight = '20px'
+					node.style.textAlign = 'center'
 				}
 			}else{
 				node.style.width = '99px'

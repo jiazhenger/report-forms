@@ -69,7 +69,7 @@ export default class extends React.Component {
 		this.$drag.innerHTML = local ? $fn.local('html') : ''
 		
 		for(let v of this.$drag.querySelectorAll('.drag')){
-			v.style.outline = '1px dashed ' + stopBorderColor
+			v.style.border = '1px dashed ' + stopBorderColor
 		}
 		
 		setInterval(()=>{
@@ -105,8 +105,17 @@ export default class extends React.Component {
 		else {
 			// el.style.removeProperty('position')
 			if(isPdf){
-				const style = `<style>html,body{font:14px/20px Microsoft YaHei; color:#333}*{margin:0;padding:0;box-sizing:border-box}img{border:0;display:block}table{width:100%;border-collapse:collapse;border-spacing:0}</style>`
-				node.innerHTML = style + el.innerHTML
+				// const style = `<style>html,body{font:14px/20px Microsoft YaHei; color:#333}*{margin:0;padding:0;box-sizing:border-box}img{border:0;display:block}table{border:0,width:100%;border-collapse:collapse;border-spacing:0}</style>`
+				const clone = el.cloneNode(true)
+				// clone.style.removeProperty('position')
+				clone.style.width = '100%'
+				clone.style.position = 'relative'
+				clone.style.left = 0
+				clone.style.top = 0
+				if(clone.getAttribute('type') === 'main'){
+					clone.style.removeProperty('height')
+				}
+				node.appendChild(clone)
 			}else{
 				node.appendChild(el.cloneNode(true))
 			}
@@ -122,7 +131,7 @@ export default class extends React.Component {
 		}
 		if($drag){
 			for(let v of $drag){
-				v.style.removeProperty('outline')
+				v.style.removeProperty('border')
 				const temp = v.querySelector('.template')
 				if(temp){
 					const $img = temp.querySelector('img')
@@ -176,10 +185,10 @@ export default class extends React.Component {
 		$http.submit(null,'pdf',{ 
 			param:{
 				header: this.formatHtml($header, true),
-				headerHeight: $header.style.height,
+				headerHeight: $header ? parseInt($header.style.height) : 0,
 				main: mainHtml,
 				footer: this.formatHtml($footer, true),
-				footerHeight: $footer.style.height
+				footerHeight: $footer ? parseInt($footer.style.height) : 0
 			}
 		}).then(data=>{
 			$fn.toast('生成 pdf 成功')
@@ -232,6 +241,7 @@ export default class extends React.Component {
 								<IconButton2 icon={CheckboxImage} label='页眉' onDragStart={e=>this.onDragStart(e,'header')}/>
 								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
 								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
+								<IconButton2 icon={CheckboxImage} label='分页' onDragStart={e=>this.onDragStart(e,'pages')}/>
 							</ul>
 						</div>
 					</nav>
@@ -248,7 +258,7 @@ export default class extends React.Component {
 								{
 									+activeKey === 0 && (
 										<>
-											{ type === 'text' &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
+											{ (type === 'text' || type === 'pages') &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
 											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
 											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }

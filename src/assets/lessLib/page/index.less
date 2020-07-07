@@ -2,7 +2,7 @@
 .drag-list li{.w(31.2%);.m(0 3% 10px 0);}
 .drag-list li:nth-child(3n){.mr;}
 
-.move{.bor(@main-color)}
+.move{.bor(@main-color);.cd;}
 .drag{
 	.template:extend(.rel){.index(-1)}
 }
@@ -31,11 +31,11 @@
 
 .drag{
 	&.more{.h(61)!important;}
-	.template{.db!important;}
+	.template{}
 	table{
 		tbody{
-			tr{filter:blur(3px)}
-			tr:first-child{filter:blur(0)}
+			// tr{filter:blur(3px)}
+			// tr:first-child{filter:blur(0)}
 		}
 	}
 }

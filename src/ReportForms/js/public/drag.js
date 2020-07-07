@@ -1,4 +1,4 @@
-import { axesColor, axesActiveColor } from './config'
+import { axesColor, axesActiveColor, axesSpace } from './config'
 export default {
 	// 获取鼠标信息
 	getMouse(e){
@@ -50,7 +50,7 @@ export default {
 		return { offsetTop, offsetLeft}
 	},
 	mark(_this, $axes, left) {
-		const n = parseInt(left / 20)
+		const n = parseInt(left / axesSpace)
 		Array.prototype.slice.call(_this.$axes.querySelector($axes).children,0).forEach((v,i)=>{
 			if(n === i){
 				v.style.background = axesActiveColor
