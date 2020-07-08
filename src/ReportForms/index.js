@@ -105,7 +105,15 @@ export default class extends React.Component {
 		else {
 			// el.style.removeProperty('position')
 			if(isPdf){
-				// const style = `<style>html,body{font:14px/20px Microsoft YaHei; color:#333}*{margin:0;padding:0;box-sizing:border-box}img{border:0;display:block}table{border:0,width:100%;border-collapse:collapse;border-spacing:0}</style>`
+				// const style = `
+				// 	<style>
+				// 		*{margin:0;padding:0;box-sizing:border-box;color:Red}
+				// 		body{font:12px/20px Microsoft YaHei;color:#333;}
+				// 		img{border:0;display:block}
+				// 		table{border:0,width:100%;border-collapse:collapse;border-spacing:0;}
+				// 		.fxmc{display:flex;align-items: center;justify-content: center}
+				// 	</style>
+				// `
 				const clone = el.cloneNode(true)
 				// clone.style.removeProperty('position')
 				clone.style.width = '100%'
@@ -116,6 +124,7 @@ export default class extends React.Component {
 					clone.style.removeProperty('height')
 				}
 				node.appendChild(clone)
+				// node.innerHTML = style + clone.innerHTML
 			}else{
 				node.appendChild(el.cloneNode(true))
 			}

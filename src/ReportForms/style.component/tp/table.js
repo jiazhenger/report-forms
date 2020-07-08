@@ -77,8 +77,9 @@ export default ({ node, dragStyle }) => {
 				for(let j=0; j<col; j++){
 					const td = document.createElement('td')
 					td.className = 'loopNode'
-					td.style.cssText = 'border:1px solid #ddd;height:30px;padding:4px 5px;'
+					td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
 					td.setAttribute('type','text')
+					td.textContent = '输入内容'
 					tdFragment.appendChild(td)
 				}
 				tr.appendChild(tdFragment)

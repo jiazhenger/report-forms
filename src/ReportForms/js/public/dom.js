@@ -106,7 +106,7 @@ export default {
 			for(let i in v){
 				const td = document.createElement('td')
 				td.className = 'loopNode'
-				td.style.cssText = 'border:1px solid #ddd;height:28px;padding:4px 5px;'
+				td.style.cssText = 'border:1px solid #ddd;padding:4px 5px;'
 				td.setAttribute('type','text')
 				td.textContent = v[i]
 				tdFragment.appendChild(td)
@@ -187,7 +187,6 @@ export default {
 				fragment.appendChild(li)
 			}
 		}
-		
 		ul.appendChild(fragment)
 		// last
 		$temp.appendChild(ul)

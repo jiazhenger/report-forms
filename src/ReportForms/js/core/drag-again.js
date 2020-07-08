@@ -146,9 +146,9 @@ export default {
 			// 获取拖动尺寸的元素
 			if( _this.dargNode ){
 				const { left, top, width, height } = Drag.getInfo(_this.dargNode)
-				// const fixed = _this.dargNode.getAttribute('fixed')
-				// const ax = fixed ? 0 : axesSpace
-				const ax = axesSpace
+				const fixed = _this.dargNode.getAttribute('fixed')
+				const ax = fixed ? 0 : axesSpace
+				// const ax = axesSpace
 				// 右侧拖宽
 				if( findSize('rc-w') || findSize('rt-wh') || findSize('rb-wh')){
 					_this.dargNode.style.width = width - (width%axesSpace) + (width%axesSpace>0 ? axesSpace : 0) + 'px'
@@ -170,9 +170,16 @@ export default {
 				return false
 			}
 			if(t && _this.node){
-				const { left, top } = Drag.getPos(_this.node) 
-				_this.node.style.left = left - (left % axesSpace) + 'px'
-				_this.node.style.top = top  - (top % (axesSpace)) + 'px'
+				const { left, top } = Drag.getPos(_this.node)
+				const type = _this.node.getAttribute('type')
+				if(type === 'devider'){
+					_this.node.style.left = left + 'px'
+					_this.node.style.top = top + 'px'
+				}else{
+					_this.node.style.left = left - (left % axesSpace) + 'px'
+					_this.node.style.top = top  - (top % axesSpace) + 'px'
+				}
+				
 				// _this.node.style.borderColor = '#fff'
 				
 				const $mark = _this.node.querySelector('.point-mark')
