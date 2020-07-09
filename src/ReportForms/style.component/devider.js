@@ -22,7 +22,7 @@ export default ({ node, dragStyle, tempStyle }) => (
 			</Panel>
 			<Panel header='分割线'><Border node={node} /></Panel>
 			<Panel header='位置 && 大小'><Position node={node} dragStyle={dragStyle} /></Panel>
-			<Panel header='页面布局'><Layout node={node}  tempStyle={tempStyle}/></Panel>
+			<Panel header='页面布局'><Layout node={node} tempStyle={tempStyle}/></Panel>
 		</Collapse>
 	</div>
 )

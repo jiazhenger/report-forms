@@ -1,8 +1,10 @@
 import React from 'react'
+import JsBarcode from 'jsbarcode'
 import Async from '@com/async'
 // ===================================================================== public js
 import Dom from '../js/public/dom'
 import Format from '../js/public/format'
+import { barcode } from '../js/public/config'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -241,6 +243,12 @@ export default class extends React.Component {
 					Dom.createList($temp, Format.parse(this.state.data, url))
 				}else if( type === 'checkbox' ){
 					Dom.createCheckbox($temp, Format.parse(this.state.data, url))
+				}else if( type === 'barcode' ){
+					const $img = $temp.querySelector('img')
+					$img.style.width = '100%'
+					$img.style.height = '100%'
+					$drag.style.height = 'auto'
+					JsBarcode($temp.querySelector('img'),Format.parse(this.state.data, url), barcode)
 				}
 			}else{
 				if(group && (isObject || isArray)){

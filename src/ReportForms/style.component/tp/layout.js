@@ -20,16 +20,14 @@ export default ({ node, tempStyle }) => {
 	},[ tempStyle ])
 	
 	const onChange = React.useCallback( (name, def) => {
-		if(node){
+		Dom.getNode(node).then(({ node } ) => {
 			const obj = {}
 			for(var i in name){
 				obj.label = i
 				obj.value = name[i]
 			}
 			Dom.getStyleNode(node).style[obj.label] = obj.value === '' ? (def ? def : 0) : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
-		}else{
-			window.$fn.toast('未选中目标')
-		}
+		})
 	}, [ node ])
 	return (
 		<>

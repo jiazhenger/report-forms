@@ -145,6 +145,9 @@ export default {
 					}else if( type === 'checkbox' ){
 						_this.node.style.width = '18px'
 						_this.node.style.height = '18px'
+					}else if( type === 'barcode' ){
+						_this.node.style.width = '200px'
+						_this.node.style.height = 'auto'
 					}else if( type === 'header' || type === 'main' || type === 'footer'){
 						_this.node.style.left = 0
 						if(type === 'header'){ 

@@ -44,14 +44,18 @@ const Upload = async e => {
 	}
 }
 // ===================================================================== page component
-export default ({ node, tempAttr }) => {
+export default ({ node }) => {
 	const file = React.useRef()
 	const link = React.useRef()
 	
 	React.useEffect(()=>{
-		const attr = tempAttr || {}
-		link.current.setValue(attr.src)
-	},[ tempAttr ])
+		if(node){
+			const $img = node.querySelector('img')
+			const attr = $img.src
+			link.current.setValue(attr)
+		}
+		
+	},[ node ])
 	
 	const onChange = React.useCallback( (name,value,none) => {
 		if(node){

@@ -9,5 +9,13 @@ module.exports =  {
 	moveBorderColor:'#aaa',
 	stopBorderColor:'#aaa',
 	// 拖动滚动
-	scrollSpace:10
+	scrollSpace:10,
+	// 条形码
+	barcode:{
+		lineColor:'black',
+		width:5,
+		height:100,
+		fontSize:32,
+		displayValue:true
+	}
 }

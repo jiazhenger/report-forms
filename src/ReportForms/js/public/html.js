@@ -10,4 +10,5 @@ export default {
 	checkbox: `<div class='fxmc'><img src='./assets/images/checkbox.png' style='width:20px;height:20px' draggable='false'/></div>`,
 	devider: `<div class='fxm'><img src='./assets/images/devider.png' style='width:100%;height:100%' draggable='false'/></div>`,
 	pages: `<div><span class='pageNumber'></span>/<span class='totalPages'></span> 页</div>`,
+	barcode: `<div class='fxmc'><img src='./assets/images/img.png' style='width:40px;height:40px' draggable='false'/></div>`,
 }

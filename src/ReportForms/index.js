@@ -26,6 +26,7 @@ const Table = Async(()=>import('./style.component/table'))
 const List = Async(()=>import('./style.component/list'))
 const Devider = Async(()=>import('./style.component/devider'))
 const Checkbox = Async(()=>import('./style.component/checkbox'))
+const Barcode = Async(()=>import('./style.component/barcode'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -141,7 +142,6 @@ export default class extends React.Component {
 			}else{
 				node.appendChild(el.cloneNode(true))
 			}
-			
 		}
 		
 		const $drag = node.querySelectorAll('.drag')
@@ -232,7 +232,7 @@ export default class extends React.Component {
 		window.open(window.$config.api + 'downloadHtml')
 	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, tempAttr, node, activeKey, width, height } = this.state
+		const { hasNode, dragStyle, tempStyle, node, activeKey, width, height } = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -261,6 +261,7 @@ export default class extends React.Component {
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
 								<IconButton2 icon={CheckboxImage} label='选择框' onDragStart={e=>this.onDragStart(e,'checkbox')}/>
 								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
+								<IconButton2 icon={CheckboxImage} label='条形码' onDragStart={e=>this.onDragStart(e,'barcode')}/>
 								<IconButton2 icon={CheckboxImage} label='页眉' onDragStart={e=>this.onDragStart(e,'header')}/>
 								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
 								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
@@ -282,11 +283,12 @@ export default class extends React.Component {
 									+activeKey === 0 && (
 										<>
 											{ (type === 'text' || type === 'pages') &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
-											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'devider' &&  <Devider node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
-											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle} tempStyle={tempStyle} tempAttr={tempAttr} /> }
+											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
+											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
+											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
+											{ type === 'devider' &&  <Devider node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
+											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle}/> }
+											{ type === 'barcode' &&  <Barcode node={node} dragStyle={dragStyle}/> }
 										</>
 									)
 								}
