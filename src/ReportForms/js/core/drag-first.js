@@ -143,7 +143,8 @@ export default {
 						devider.innerHTML = '<div></div>'
 						devider.children[0].style.cssText = 'width:100%;height:1px; border-top:1px solid #ddd'
 					}else if( type === 'checkbox' ){
-						_this.node.style.height = '20px'
+						_this.node.style.width = '18px'
+						_this.node.style.height = '18px'
 					}else if( type === 'header' || type === 'main' || type === 'footer'){
 						_this.node.style.left = 0
 						if(type === 'header'){ 

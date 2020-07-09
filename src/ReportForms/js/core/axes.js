@@ -17,6 +17,11 @@ const createAxes = (dom,width,height,space,isY) => {
 
 export default ( ) => {
 	const el = document.querySelector('#axes')
+	const $x = el.querySelector('.axesX')
+	const $y = el.querySelector('.axesY')
+	if($x){ $x.remove() }
+	if($y){ $y.remove() }
+	
 	const resize = () => {
 		const width = el.clientWidth
 		const height = el.clientHeight

@@ -42,10 +42,6 @@ export const Paper = [
 	}
 ]*/
 export const Paper = [
-	{ label:'A3', value:'A3' },
-	{ label:'A4', value:'A4' },
-	{ label:'A5', value:'A5' },
-	{ label:'Legal', value:'Legal' },
-	{ label:'Letter', value:'Letter' },
-	{ label:'Tabloid', value:'Tabloid' },
+	{ label:'A4', value:'A4*810px*1160px' },
+	{ label:'A5', value:'A5*570px*830px' },
 ]

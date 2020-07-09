@@ -240,8 +240,8 @@ export default {
 	createCheckbox($temp, data){
 		if(typeof data !== 'object'){
 			const $drag = this.parents($temp,'drag')
-			$drag.style.width = '20px'
-			$drag.style.height = '20px'
+			$drag.style.width = '18px'
+			$drag.style.height = '18px'
 			$temp.innerHTML = `<img temp='1' src=${Boolean(data) ? checkedImage : CheckboxImage} style='width:100%;height:100%' draggable='false' />`
 		}else if($fn.hasArray(data)){
 			const $drag = this.parents($temp,'drag')
@@ -252,10 +252,10 @@ export default {
 			fragment.style.overflow = 'hidden'
 			data.forEach((v,i)=>{
 				const div = document.createElement('div')
-				div.style.cssText = 'height:20px;line-height:20px;'
+				div.style.cssText = 'height:18px;line-height:18px;'
 				div.style.margin = '0 10px 10px 0'
 				const img = document.createElement('img')
-				img.style.cssText = 'width:20px;height:100%;float:left'
+				img.style.cssText = 'width:18px;height:100%;float:left'
 				img.src = Boolean(v.value) ? checkedImage : CheckboxImage
 				img.setAttribute('temp',1)
 				img.draggable = false

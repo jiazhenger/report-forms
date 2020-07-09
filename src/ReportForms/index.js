@@ -63,7 +63,13 @@ export default class extends React.Component {
 		this.$paper = document.querySelector('#paper')				// 纸张区域
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
-		MouseEvent.init(this)
+		// 纸张设置
+		const value = $fn.local('paper')
+		if($fn.hasObject(value)){
+			this.setState(value,()=>{
+				MouseEvent.init(this)
+			})
+		}
 		// Size(this)
 		const local = $fn.local('html')
 		this.$drag.innerHTML = local ? $fn.local('html') : ''
@@ -79,6 +85,8 @@ export default class extends React.Component {
 				$fn.local('html', formatHtml)
 			}
 		},3000)
+		
+		
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
@@ -124,6 +132,11 @@ export default class extends React.Component {
 					clone.style.removeProperty('height')
 				}
 				node.appendChild(clone)
+				
+				for(let v of node.querySelectorAll('.more')){
+					v.style.removeProperty('height')
+				}
+				
 				// node.innerHTML = style + clone.innerHTML
 			}else{
 				node.appendChild(el.cloneNode(true))
@@ -197,7 +210,8 @@ export default class extends React.Component {
 				headerHeight: $header ? parseInt($header.style.height) : 0,
 				main: mainHtml,
 				footer: this.formatHtml($footer, true),
-				footerHeight: $footer ? parseInt($footer.style.height) : 0
+				footerHeight: $footer ? parseInt($footer.style.height) : 0,
+				format: this.state.format || 'A5'
 			}
 		}).then(data=>{
 			$fn.toast('生成 pdf 成功')
@@ -218,7 +232,7 @@ export default class extends React.Component {
 		window.open(window.$config.api + 'downloadHtml')
 	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, tempAttr, node, activeKey } = this.state
+		const { hasNode, dragStyle, tempStyle, tempAttr, node, activeKey, width, height } = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -257,7 +271,7 @@ export default class extends React.Component {
 					{/*  中心展示 */}
 					<section className='ex rel nosel'>
 						<div className='abs_full scrollXY fxc' style={{padding:'15px'}} id='scrollbox'>
-							<ContentComponent onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
+							<ContentComponent width={width} height={height} onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
 						</div>
 					</section>
 					{/*  控制面版 */}
@@ -281,7 +295,15 @@ export default class extends React.Component {
 								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} />}
 							</TabPane>
 							<TabPane tab='报表' key={2}>
-								{ +activeKey === 2 && <PaperComponent />}
+								{ 
+									+activeKey === 2 && <PaperComponent 
+										onSelectPaper = { v => {
+											this.setState(v, ()=>{
+												MouseEvent.init(this)
+											})
+										}}
+									/>
+								}
 							</TabPane>
 						</Tabs>
 					</div>
