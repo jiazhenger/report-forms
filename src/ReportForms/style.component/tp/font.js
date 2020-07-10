@@ -62,6 +62,7 @@ export default ({ node,  tempStyle }) => {
 	const lineHeight = React.useRef()
 	const letterSpacing = React.useRef()
 	const textAlign = React.useRef()
+	const color = React.useRef()
 	// switch
 	const fontWeight = React.useRef()
 	const fontStyle = React.useRef()
@@ -76,6 +77,7 @@ export default ({ node,  tempStyle }) => {
 		lineHeight.current.setValue(style.lineHeight)
 		letterSpacing.current.setValue(style.letterSpacing)
 		textAlign.current.setValue(style.textAlign)
+		color.current.setValue(style.color)
 		// switch
 		fontWeight.current.setValue(style.fontWeight === 'bold')
 		fontStyle.current.setValue(style.fontStyle === 'italic')
@@ -112,6 +114,7 @@ export default ({ node,  tempStyle }) => {
 			</div>
 			<div className='fx'>
 				<List.Select label='对齐' ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={v=>onChange(v,'left')} />
+				<List.Input label='颜色' ref={color} p='颜色' isHalf name='color' onChange={v=>onChange(v)} />
 			</div>
 			<div className='fxj'>
 				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={v=>onChange(v,'bold')}/>

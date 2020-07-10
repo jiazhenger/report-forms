@@ -15,5 +15,8 @@ export default {
 	},
 	DragStart(e, _this,type){
 		DragFirst.DragStart(e, _this,type)
+	},
+	axes(){
+		Aexes()
 	}
 }

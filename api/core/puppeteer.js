@@ -35,7 +35,7 @@ module.exports = {
 		
 		const style = `
 			*{margin:0;padding:0;box-sizing:border-box;zoom:1!important; transfrom:scale(1)!important;}
-			body,.wraper{font:12px/20px Microsoft YaHei;color:#333;}
+			body,.wraper{font:13px/22px Microsoft YaHei;color:#333;}
 			img{border:0;display:block}
 			table{border:0;width:100%;border-collapse:collapse;border-spacing:0;font-size:inherit}
 			.fxmc{display:flex;align-items: center;justify-content: center}
@@ -57,8 +57,8 @@ module.exports = {
 		})
 		const headerStyle = `<style>${style}</style>`
 		const displayHeaderFooter = (header || footer ) ? true : false
-		const top = headerHeight ? (headerHeight + headerHeight*0.06) : 0
-		const bottom = footerHeight ? (footerHeight + footerHeight*0.022) : 15
+		const top = headerHeight ? (headerHeight + headerHeight*0.2) : 0
+		const bottom = footerHeight ? (footerHeight + footerHeight*0.6) : 15
 		const headerTemplate = header ? `${headerStyle}<div class='wraper'>${header}</div>` : ''
 		const footerTemplate = footer ? `${headerStyle}<div class='wraper' style='position:relative;top:${footerHeight*0.28}px'>${footer}</div>` : ''
 		

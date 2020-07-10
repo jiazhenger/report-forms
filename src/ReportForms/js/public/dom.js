@@ -1,5 +1,8 @@
-import Html from './html'
+import JsBarcode from 'jsbarcode'
+import QRCode from 'qrcode'
 
+import Html from './html'
+import { barcode, qrcode } from '../../js/public/config'
 
 import CheckboxImage from '@img/icon/checkbox.png'
 import checkedImage from '@img/icon/checked.png'
@@ -130,8 +133,9 @@ export default {
 		for(let i=0; i<col; i++){
 			const th = document.createElement('th')
 			th.className = 'loopNode'
-			th.style.cssText = 'height:30px;padding:4px 5px;background-color:#f5f5f5'
+			th.style.cssText = 'padding:2px 5px;background-color:#f5f5f5'
 			th.setAttribute('type','text')
+			th.textContent = '标题'
 			thFragment.appendChild(th)
 		}
 		trThead.appendChild(thFragment)
@@ -271,5 +275,31 @@ export default {
 			$temp.innerHTML = ''
 			$temp.appendChild(fragment)
 		}
+	},
+	createBarcode($temp,data){
+		const $img = $temp.querySelector('img')
+		$img.style.width = '100%'
+		$img.style.height = '100%'
+		$img.setAttribute('temp',1)
+		$img.setAttribute('code',data)
+		$img.setAttribute('lineColor',barcode.lineColor)
+		$img.setAttribute('codeWidth',barcode.width)
+		$img.setAttribute('codeHeight',barcode.height)
+		$img.setAttribute('displayValue',barcode.displayValue)
+		$img.setAttribute('fontSize',barcode.fontSize)
+		JsBarcode($temp.querySelector('img'),data, barcode)
+	},
+	createQrcode($temp,data){
+		const $img = $temp.querySelector('img')
+		$img.setAttribute('temp',1)
+		console.log(123)
+		$img.setAttribute('text',data)
+		$img.setAttribute('colorDark',qrcode.colorDark)
+		$img.setAttribute('colorLight',qrcode.colorLight)
+		$img.setAttribute('margin',qrcode.margin)
+		
+		QRCode.toDataURL(data, qrcode).then(url=>{
+			$img.src = url
+		})
 	}
 }

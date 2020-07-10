@@ -27,6 +27,7 @@ const List = Async(()=>import('./style.component/list'))
 const Devider = Async(()=>import('./style.component/devider'))
 const Checkbox = Async(()=>import('./style.component/checkbox'))
 const Barcode = Async(()=>import('./style.component/barcode'))
+const Qrcode = Async(()=>import('./style.component/qrcode'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -65,12 +66,7 @@ export default class extends React.Component {
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
 		// 纸张设置
-		const value = $fn.local('paper')
-		if($fn.hasObject(value)){
-			this.setState(value,()=>{
-				MouseEvent.init(this)
-			})
-		}
+		MouseEvent.init(this)
 		// Size(this)
 		const local = $fn.local('html')
 		this.$drag.innerHTML = local ? $fn.local('html') : ''
@@ -204,6 +200,7 @@ export default class extends React.Component {
 		const $footer = this.$drag.querySelector('.footer')
 		const $main = this.$drag.querySelector('.main')
 		const mainHtml = $main ? this.formatHtml($main, true) : this.getHtml()
+		const paper = $fn.local('paper')
 		$http.submit(null,'pdf',{ 
 			param:{
 				header: this.formatHtml($header, true),
@@ -211,7 +208,7 @@ export default class extends React.Component {
 				main: mainHtml,
 				footer: this.formatHtml($footer, true),
 				footerHeight: $footer ? parseInt($footer.style.height) : 0,
-				format: this.state.format || 'A5'
+				format: paper.format || 'A4'
 			}
 		}).then(data=>{
 			$fn.toast('生成 pdf 成功')
@@ -232,7 +229,7 @@ export default class extends React.Component {
 		window.open(window.$config.api + 'downloadHtml')
 	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, node, activeKey, width, height } = this.state
+		const { hasNode, dragStyle, tempStyle, node, activeKey} = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -253,7 +250,8 @@ export default class extends React.Component {
 				<section className='ex fx'>
 					{/*  左侧操作 */}
 					<nav className='bcf rel' style={{width:leftWidth}}>
-						<div className='abs_full scroll'>
+						<div className='abs_full scroll pt10'>
+							<h2 className='plr10 b f12'>元素</h2>
 							<ul className='fxw plr5 pt10 drag-list nosel'>
 								<IconButton2 icon={TextImage} label='文本' onDragStart={e=>this.onDragStart(e,'text')}/>
 								<IconButton2 icon={ImgImage} label='图片' onDragStart={e=>this.onDragStart(e,'img')}/>
@@ -261,7 +259,14 @@ export default class extends React.Component {
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
 								<IconButton2 icon={CheckboxImage} label='选择框' onDragStart={e=>this.onDragStart(e,'checkbox')}/>
 								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
+							</ul>
+							<h2 className='plr10 b f12'>码</h2>
+							<ul className='fxw plr5 pt10 drag-list nosel'>
+								<IconButton2 icon={CheckboxImage} label='二维码' onDragStart={e=>this.onDragStart(e,'qrcode')}/>
 								<IconButton2 icon={CheckboxImage} label='条形码' onDragStart={e=>this.onDragStart(e,'barcode')}/>
+							</ul>
+							<h2 className='plr10 b f12'>布局</h2>
+							<ul className='fxw plr5 mt10 drag-list nosel'>
 								<IconButton2 icon={CheckboxImage} label='页眉' onDragStart={e=>this.onDragStart(e,'header')}/>
 								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
 								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
@@ -272,7 +277,7 @@ export default class extends React.Component {
 					{/*  中心展示 */}
 					<section className='ex rel nosel'>
 						<div className='abs_full scrollXY fxc' style={{padding:'15px'}} id='scrollbox'>
-							<ContentComponent width={width} height={height} onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
+							<ContentComponent onDrop={this.onDrop}  onDragOver={this.onDragOver}/>
 						</div>
 					</section>
 					{/*  控制面版 */}
@@ -289,6 +294,7 @@ export default class extends React.Component {
 											{ type === 'devider' &&  <Devider node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
 											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle}/> }
 											{ type === 'barcode' &&  <Barcode node={node} dragStyle={dragStyle}/> }
+											{ type === 'qrcode' &&  <Qrcode node={node} dragStyle={dragStyle}/> }
 										</>
 									)
 								}
@@ -298,12 +304,8 @@ export default class extends React.Component {
 							</TabPane>
 							<TabPane tab='报表' key={2}>
 								{ 
-									+activeKey === 2 && <PaperComponent 
-										onSelectPaper = { v => {
-											this.setState(v, ()=>{
-												MouseEvent.init(this)
-											})
-										}}
+									+activeKey === 2 && <PaperComponent
+										onChange = { () => MouseEvent.axes() }
 									/>
 								}
 							</TabPane>

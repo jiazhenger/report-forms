@@ -94,7 +94,6 @@ export default ({ node }) => {
 				}
 			}
 			model.code ? $img.setAttribute('code',model.code) : $img.removeAttribute('code')
-			console.log(option)
 			try{
 				JsBarcode($img,model.code,option)
 			}catch(e){

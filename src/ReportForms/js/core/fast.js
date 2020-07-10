@@ -6,13 +6,25 @@ export default {
 		// 监听键盘按键
 		document.addEventListener('keyup',e=>{
 			const { keyCode } = e
-			if((keyCode === 8 || keyCode === 110) && !_this.stop){
+			if((keyCode === 46 || keyCode === 110) && !_this.stop){
 				this.del(_this)
+			}
+			if(_this.node){
+				_this.node.onclick = null
 			}
 		})
 		document.querySelector('#del').addEventListener('click',e=>this.del(_this))
 		document.querySelector('#delAll').addEventListener('click',e=>this.delAll(_this))
 		
+		document.addEventListener('keydown',e=>{
+			// if(e.ctrlKey && _this.node){
+			// 	_this.node.onclick = e => this.copy(_this)
+			// }
+		})
+	},
+	copy(_this){
+		const clone = _this.node.cloneNode(true)
+		_this.node.parentElement.appendChild(clone)
 	},
 	// 删除选中的拖动元素
 	del(_this){

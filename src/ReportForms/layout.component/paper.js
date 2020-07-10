@@ -8,37 +8,75 @@ import { Paper } from '../js/public/paper'
 const { Panel } = Collapse
 const { $fn } = window
 // ===================================================================== page component
-export default ({ $paper, $drag, onSelectPaper }) => {
+export default ({ onSelectPaper, onChange }) => {
 	const [ value, setValue ] = React.useState('A4')
+	const heightRef = React.useRef()
 	React.useEffect(()=>{
-		const value = $fn.local('paper')
-		if($fn.hasObject(value)){
-			setValue(value.format)
+		const $paper = document.querySelector('#paper')
+		if($paper){
+			let height = 0
+			const paper = $fn.local('paper')
+			if($fn.hasObject(paper)){
+				setValue(paper.format)
+				height = paper.height
+				$paper.style.width =  paper.width
+			}
+			
+			height = $fn.local('myHeight')
+			
+			if(height){
+				$paper.style.height = height
+			}
+			
+			onChange && onChange()
+			
+			heightRef.current.setValue($paper.clientHeight)
 		}
-	},[ onSelectPaper ])
+	},[ onChange ])
 	const selectPaper = React.useCallback(v=>{
+		const $paper = document.querySelector('#paper')
 		const arr = v.split('*')
 		if($fn.hasArray(arr)){
 			const value = {format:arr[0], width: arr[1], height:arr[2]}
-			onSelectPaper && onSelectPaper(value)
+			
+			$paper.style.width = value.width
+			$paper.style.height = value.height
+			$fn.remove('myHeight',value)
+			heightRef.current.setValue(value.height)
+			
 			$fn.local('paper',value)
+			onChange && onChange()
 		}
-	}, [ onSelectPaper ])
+	}, [ onChange ])
+	
+	const selectHeight = React.useCallback(v=>{
+		const $paper = document.querySelector('#paper')
+		if(isNaN(+v) || +v === 0){
+			const paper = $fn.local('paper')
+			if($fn.hasObject(paper)){
+				$paper.style.height =  paper.height
+			}
+			heightRef.current.setValue(paper.height)
+			$fn.remove('myHeight')
+		}else{
+			const h = v + 'px'
+			$paper.style.height = h
+			$fn.local('myHeight', h)
+		}
+		onChange && onChange()
+	}, [ onChange ])
+	
 	return (
 		<div className='abs_lt wh scroll'>
 			<h5 className='control-title'>报表</h5>
 			<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
 				<Panel header='常规选项'>
 					<div>
-						{/*<List.Select value={ratio} label='分辨率' data={Ratio} p='选择屏幕分辨率' onChange={onSelectRatio} />*/}
 						<List.Select value={value} label='纸张' data={Paper} p='选择纸张' onChange={selectPaper} />
 					</div>
-					{/*
-						<div>
-							<List.Switch label='页眉' ref={fixedHeaderRef}  onChange={onFixedHeader}/>
-							<List.Switch label='页脚' ref={fixedFooterRef}  onChange={onFixedHeader}/>
-						</div>
-					*/}
+					<div>
+						<List.Input ref={heightRef} label='高度' p='选择纸张' onChange={selectHeight} />
+					</div>
 				</Panel>
 			</Collapse>
 		</div>

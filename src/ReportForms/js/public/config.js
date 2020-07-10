@@ -17,5 +17,14 @@ module.exports =  {
 		height:100,
 		fontSize:32,
 		displayValue:true
+	},
+	// 二维码
+	qrcode:{
+		type: 'image/png',
+		colorDark:'#000', // 前景色
+		colorLight:'#fff', // 背景色
+		errorCorrectionLevel:'H',
+		// version: 2,
+		margin:1
 	}
 }

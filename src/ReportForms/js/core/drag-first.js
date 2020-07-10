@@ -130,14 +130,14 @@ export default {
 					
 					if( type === 'table' ){
 						_this.node.style.left = 0
-						_this.node.style.width = '100%'
+						_this.node.style.width = $drag.clientWidth + 'px'
 					}else if( type === 'ul' ){
 						_this.node.style.left = 0
-						_this.node.style.width = '100%'
+						_this.node.style.width = $drag.clientWidth + 'px'
 						// _this.node.style.width = '200px'
 					}else if( type === 'devider' ){
 						_this.node.style.left = 0
-						_this.node.style.width = '100%'
+						_this.node.style.width = $drag.clientWidth + 'px'
 						_this.node.style.height = '10px'
 						const devider = _this.node.querySelector('.template')
 						devider.innerHTML = '<div></div>'
@@ -148,6 +148,9 @@ export default {
 					}else if( type === 'barcode' ){
 						_this.node.style.width = '200px'
 						_this.node.style.height = 'auto'
+					}else if( type === 'qrcode' ){
+						_this.node.style.width = '80px'
+						_this.node.style.height = '80px'
 					}else if( type === 'header' || type === 'main' || type === 'footer'){
 						_this.node.style.left = 0
 						if(type === 'header'){ 
@@ -155,7 +158,7 @@ export default {
 						}else if( type === 'main'){
 							_this.node.style.height = '200px'
 						}
-						_this.node.style.width = '100%'
+						_this.node.style.width = $drag.clientWidth + 'px'
 						_this.node.style.border = '1px dashed blue'
 						Dom.addClass(_this.node, type)
 						
