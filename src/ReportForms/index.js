@@ -165,13 +165,16 @@ export default class extends React.Component {
 		}
 		return node.innerHTML
 	}
-	getHtml = isHtml => {
+	getHtml = () => {
+		const $header = this.$drag.querySelector('.header')
+		const $footer = this.$drag.querySelector('.footer')
 		const $main = this.$drag.querySelector('.main')
-		const html = this.formatHtml( $main ? $main : this.$drag)
-		if(html === ''){
-			$fn.toast('还没有添加内容')
-			return null
-		}
+		
+		const header = this.formatHtml( $header )
+		const main = this.formatHtml( $main )
+		const footer = this.formatHtml( $footer )
+		
+	
 		return `
 			<!DOCTYPE html>
 			<html lang='en'>
@@ -181,16 +184,27 @@ export default class extends React.Component {
 				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
 				<title>报表</title>
 				<style>
-					html,body{font:14px/20px Microsoft YaHei; color:#333}
+					html,body{font:13px/20px Microsoft YaHei; color:#333}
+					body{padding:10px}
 					*{margin:0;padding:0;box-sizing:border-box}
 					img{border:0;display:block}
 					table{width:100%;border-collapse:collapse;border-spacing:0}
-					.fxmc{display:flex;align-items: center;justify-content: center}
-					${ isHtml ? 'body{padding:10px} #container{position:relative}' : ''}
+					.fxmc{display:flex; align-items: center;justify-content: center}
+					.fv{display:flex;flex-direction:column}
+					html,body,.container{width:100%;height:100%}
+					.ex{flex:1;position:relative}
 				</style>
 			</head>
 			<body>
-				<div id='container'>${html}</div>
+				<div class='container fv'>
+					<header>${header}</header>
+					<main class='ex'>
+						<div style='position:absolute;left:0;top:0;bottom:0;right:0'>
+							${main}
+						</div>
+					</main>
+					<footer>${footer}</footer>
+				</div>
 			</body>
 			</html>
 		`
@@ -199,7 +213,7 @@ export default class extends React.Component {
 		const $header = this.$drag.querySelector('.header')
 		const $footer = this.$drag.querySelector('.footer')
 		const $main = this.$drag.querySelector('.main')
-		const mainHtml = $main ? this.formatHtml($main, true) : this.getHtml()
+		const mainHtml = $main ? this.formatHtml($main, true) : this.formatHtml( this.$drag )
 		const paper = $fn.local('paper')
 		$http.submit(null,'pdf',{ 
 			param:{
@@ -215,12 +229,10 @@ export default class extends React.Component {
 		})
 	}
 	createHtml = () => {
-		const html = this.getHtml(true)
-		if(html){
-			$http.submit(null,'html',{ param:{ html } }).then(data=>{
-				$fn.toast('生成 html 成功')
-			})
-		}
+		const html = this.getHtml()
+		$http.submit(null,'html',{ param:{ html } }).then(data=>{
+			$fn.toast('生成 html 成功')
+		})
 	}
 	downloadPdf = () => {
 		window.open(window.$config.api + 'downloadPdf')
