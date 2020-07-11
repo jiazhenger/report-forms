@@ -210,7 +210,7 @@ export default class extends React.Component {
 												for(let j=0; j<tdLen; j++){
 													const td = document.createElement('td')
 													td.className = 'loopNode'
-													td.style.cssText = 'border:1px solid #ddd;height:28px;padding:4px 5px;'
+													td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
 													td.setAttribute('type','text')
 													tdFragment.appendChild(td)
 												}

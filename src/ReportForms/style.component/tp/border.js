@@ -1,6 +1,6 @@
 import React from 'react'
 // ===================================================================== js
-// import Dom from '../../js/public/dom'
+import Dom from '../../js/public/dom'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -11,18 +11,28 @@ const BorderStyle = [
 	{ label:'虚线', 			value:'dashed' },
 	{ label:'点线', 			value:'dotted' },
 ]
+const BorderSide = [
+	{ label:'上边', 			value:'borderTop' },
+	{ label:'左边', 			value:'borderLeft' },
+	{ label:'右边', 			value:'borderRight' },
+	{ label:'下边', 			value:'borderBottom' },
+]
 // ===================================================================== page component
 export default ({ node }) => {
-	const borderTopWidth = React.useRef()
-	const borderTopStyle = React.useRef()
-	const borderTopColor = React.useRef()
+	const borderWidthRef = React.useRef()
+	const borderStyleRef = React.useRef()
+	const borderColorRef = React.useRef()
+	const borderSideRef = React.useRef()
 	
 	React.useEffect(()=>{
 		if(node){
-			const style = node.querySelector('.template').children[0].style
-			borderTopWidth.current.setValue($fn.toNum(style.borderTopWidth))
-			borderTopStyle.current.setValue(style.borderTopStyle)
-			borderTopColor.current.setValue(style.borderTopColor)
+			Dom.getStyleTypeNode(node,{
+				onAll(el,style){
+					borderWidthRef.current.setValue($fn.toNum(style.borderWidth))
+					borderStyleRef.current.setValue(style.borderStyle)
+					borderColorRef.current.setValue(style.borderColor)
+				}
+			})
 		}
 	}, [node])
 	// 选择粗细
@@ -50,11 +60,12 @@ export default ({ node }) => {
 	return (
 		<>
 			<div className='fx'>
-				<List.Input label='宽度' ref={borderTopWidth} onChange={onSelecttWidth}  isHalf />
-				<List.Select label='样式' ref={borderTopStyle} data={BorderStyle} p='选择样式' isHalf onChange={onSelectStyle} />
+				<List.Input label='宽度' ref={borderWidthRef} onChange={onSelecttWidth}  isHalf />
+				<List.Select label='样式' ref={borderStyleRef} data={BorderStyle} p='选择样式' isHalf onChange={onSelectStyle} />
 			</div>
-			<div>
-				<List.Input label='颜色' ref={borderTopColor} onChange={onSelectColor} />
+			<div className='fx'>
+				<List.Select label='边' ref={borderSideRef} data={BorderSide} p='选择样式' isHalf onChange={onSelectStyle} />
+				<List.Input label='颜色' ref={borderColorRef} onChange={onSelectColor} />
 			</div>
 		</>
 	)

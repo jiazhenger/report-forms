@@ -62,8 +62,44 @@ export default {
 		}
 		return parent === document.body ? null : parent
 	},
+	// 判断是否有某个属性
+	hasAttr(el,attr){
+		if(el){
+			return el.hasAttribute(attr)
+		}else{
+			return false
+		}
+	},
+	// 查找有指定属性的父级元素
+	parentAttr(el,attr){
+		if(this.hasAttr(el,attr)){
+			return el
+		}
+		if(el){
+			var parent = el.parentElement
+			while ( !this.hasAttr(parent,attr) && parent !== document.body && parent !== null) {
+				parent = parent.parentElement
+			}
+		}
+		return parent === document.body ? null : parent
+	},
 	isElement(node){ return node instanceof HTMLElement },
 	isNodeList(node){ return node instanceof NodeList },
+	// 获取样式
+	getStyle(el){
+		 return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
+	},
+	// 获取能够添加样式类型的节点的节点
+	getStyleTypeNode(node,opt){
+		if(node){
+			const styleNode = this.parentAttr(node,'style-type')
+			const styleType = styleNode.getAttribute('style-type')
+			const style = this.getStyle(styleNode)
+			if(styleType === 'all' ){
+				opt.onAll && opt.onAll(styleNode, style)
+			}
+		}
+	},
 	// 获取节点信息
 	getNode(node, callback){
 		return new Promise(resolve=>{
@@ -110,7 +146,7 @@ export default {
 			for(let i in v){
 				const td = document.createElement('td')
 				td.className = 'loopNode'
-				td.style.cssText = 'border:1px solid #ddd;padding:4px 5px;'
+				td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
 				td.setAttribute('type','text')
 				td.textContent = v[i]
 				tdFragment.appendChild(td)
@@ -292,7 +328,6 @@ export default {
 	createQrcode($temp,data){
 		const $img = $temp.querySelector('img')
 		$img.setAttribute('temp',1)
-		console.log(123)
 		$img.setAttribute('text',data)
 		$img.setAttribute('colorDark',qrcode.colorDark)
 		$img.setAttribute('colorLight',qrcode.colorLight)

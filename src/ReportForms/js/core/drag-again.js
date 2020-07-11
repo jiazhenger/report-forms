@@ -254,7 +254,7 @@ export default {
 				let type = t.getAttribute('type')
 				
 				if(type !== 'text'){
-					$editor = target
+					$editor = Dom.parentAttr(target,'type')
 					type =  $editor.getAttribute('type')
 				}
 				
