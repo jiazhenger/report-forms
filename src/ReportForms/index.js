@@ -173,7 +173,6 @@ export default class extends React.Component {
 		const header = this.formatHtml( $header )
 		const main = this.formatHtml( $main )
 		const footer = this.formatHtml( $footer )
-		
 	
 		return `
 			<!DOCTYPE html>
