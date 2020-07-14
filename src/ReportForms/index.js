@@ -166,14 +166,37 @@ export default class extends React.Component {
 		return node.innerHTML
 	}
 	getHtml = () => {
-		const $header = this.$drag.querySelector('.header')
-		const $footer = this.$drag.querySelector('.footer')
-		const $main = this.$drag.querySelector('.main')
+		let $header = this.$drag.querySelector('.header')
+		let $footer = this.$drag.querySelector('.footer')
+		let $main = this.$drag.querySelector('.main')
+		const headerHeight = $header ? $header.clientHeight : 0
+		const footerHeight = $footer ? $footer.clientHeight: 0
+		const mainHeight = $main ? $main.clientHeight: 0
+		const width = this.$drag.clientWidth
+		const height = headerHeight + footerHeight + mainHeight
 		
-		const header = this.formatHtml( $header )
-		const main = this.formatHtml( $main )
-		const footer = this.formatHtml( $footer )
-	
+		let headerHtml = ''
+		let mainHtml = ''
+		let footerHtml = ''
+		if($header){
+			$header = $header.cloneNode(true)
+			$header.style.removeProperty('position')
+			headerHtml = this.formatHtml( $header ) 
+		}
+		if($footer){
+			$footer = $footer.cloneNode(true)
+			$footer.style.removeProperty('position')
+			footerHtml = this.formatHtml( $footer )
+		}
+		const main = ''
+		if($main){
+			$main = $main.cloneNode(true)
+			$main.style.removeProperty('position')
+			$main.style.removeProperty('left')
+			$main.style.removeProperty('top')
+			mainHtml = this.formatHtml( $main )
+		}
+		
 		return `
 			<!DOCTYPE html>
 			<html lang='en'>
@@ -183,26 +206,21 @@ export default class extends React.Component {
 				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
 				<title>报表</title>
 				<style>
-					html,body{font:13px/20px Microsoft YaHei; color:#333}
-					body{padding:10px}
+					html,body{font:13px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
 					*{margin:0;padding:0;box-sizing:border-box}
 					img{border:0;display:block}
 					table{width:100%;border-collapse:collapse;border-spacing:0}
 					.fxmc{display:flex; align-items: center;justify-content: center}
-					.fv{display:flex;flex-direction:column}
-					html,body,.container{width:100%;height:100%}
-					.ex{flex:1;position:relative}
+					footer,header,main{position:relative;}
+					.container{position:relative;margin:0 auto;border:1px solid #666;padding:10px}
+					[type='pages']{visibility:hidden}
 				</style>
 			</head>
 			<body>
-				<div class='container fv'>
-					<header>${header}</header>
-					<main class='ex'>
-						<div style='position:absolute;left:0;top:0;bottom:0;right:0'>
-							${main}
-						</div>
-					</main>
-					<footer>${footer}</footer>
+				<div class='container' style='width:${width+20}px;height:${height+20}px;'>
+					<header>${headerHtml}</header>
+					<main>${mainHtml}</main>
+					<footer>${footerHtml}</footer>
 				</div>
 			</body>
 			</html>
