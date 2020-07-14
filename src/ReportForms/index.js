@@ -165,6 +165,7 @@ export default class extends React.Component {
 		}
 		return node.innerHTML
 	}
+	// 获取生成 html 的内容
 	getHtml = () => {
 		let $header = this.$drag.querySelector('.header')
 		let $footer = this.$drag.querySelector('.footer')
@@ -226,6 +227,7 @@ export default class extends React.Component {
 			</html>
 		`
 	}
+	// 创建 pdf
 	createPdf = () => {
 		const $header = this.$drag.querySelector('.header')
 		const $footer = this.$drag.querySelector('.footer')
@@ -245,6 +247,7 @@ export default class extends React.Component {
 			$fn.toast('生成 pdf 成功')
 		})
 	}
+	// 创建 html
 	createHtml = () => {
 		const html = this.getHtml()
 		$http.submit(null,'html',{ param:{ html } }).then(data=>{
