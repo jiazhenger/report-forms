@@ -28,12 +28,20 @@ const Devider = Async(()=>import('./style.component/devider'))
 const Checkbox = Async(()=>import('./style.component/checkbox'))
 const Barcode = Async(()=>import('./style.component/barcode'))
 const Qrcode = Async(()=>import('./style.component/qrcode'))
+const Header = Async(()=>import('./style.component/header'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
 const rightWidth = '350px'
 const leftWidth = '200px'
 const { $fn, $http } = window
+// 默认纸张
+const paperParam = {
+	format: 'A4',
+	width:'810px',
+	height:'1160px',
+	name:'报表'
+}
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode, onClick}) => (
 	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`} onClick={onClick}>
@@ -55,7 +63,7 @@ export default class extends React.Component {
 		node:null,
 		dragStyle:{},
 		tempStyle:{},
-		tempAttr:{},
+		paperParam:{},
 		key:0,
 		activeKey: $fn.local('activeKey') || 0
 	}
@@ -65,7 +73,8 @@ export default class extends React.Component {
 		this.$paper = document.querySelector('#paper')				// 纸张区域
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
-		// 纸张设置
+		
+		this.setPaper()
 		MouseEvent.init(this)
 		// Size(this)
 		const local = $fn.local('html')
@@ -83,7 +92,26 @@ export default class extends React.Component {
 			}
 		},3000)
 		
+	}
+	// 纸张设置
+	setPaper = () =>{
+		// 纸张设置
+		let paperWidth = paperParam.width
+		let paperHeight = paperParam.height
+		const paper = $fn.local('paper')
+		if($fn.hasObject(paper)){
+			paperHeight = paper.height
+			paperWidth = paper.width
+		}else{
+			$fn.local('paper', paperParam)
+		}
+		const myHeight = $fn.local('myHeight')
+		const myWidth = $fn.local('myWidth')
+		if(myHeight){ paperHeight = myHeight }
+		if(myWidth) { paperWidth = myWidth}
 		
+		this.$paper.style.width =  paperWidth
+		this.$paper.style.height = paperHeight
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
@@ -189,7 +217,6 @@ export default class extends React.Component {
 			$footer.style.removeProperty('position')
 			footerHtml = this.formatHtml( $footer )
 		}
-		const main = ''
 		if($main){
 			$main = $main.cloneNode(true)
 			$main.style.removeProperty('position')
@@ -218,7 +245,7 @@ export default class extends React.Component {
 				</style>
 			</head>
 			<body>
-				<div class='container' style='width:${width+20}px;height:${height+20}px;'>
+				<div class='container' name='${this.reportName}' style='width:${width+20}px;height:${height+20}px;'>
 					<header>${headerHtml}</header>
 					<main>${mainHtml}</main>
 					<footer>${footerHtml}</footer>
@@ -229,11 +256,12 @@ export default class extends React.Component {
 	}
 	// 创建 pdf
 	createPdf = () => {
+		if(this.$drag.innerHTML === '') return $fn.toast('无内容')
 		const $header = this.$drag.querySelector('.header')
 		const $footer = this.$drag.querySelector('.footer')
 		const $main = this.$drag.querySelector('.main')
 		const mainHtml = $main ? this.formatHtml($main, true) : this.formatHtml( this.$drag )
-		const paper = $fn.local('paper')
+		const paper = $fn.local('paper') || paperParam
 		$http.submit(null,'pdf',{ 
 			param:{
 				header: this.formatHtml($header, true),
@@ -241,7 +269,8 @@ export default class extends React.Component {
 				main: mainHtml,
 				footer: this.formatHtml($footer, true),
 				footerHeight: $footer ? parseInt($footer.style.height) : 0,
-				format: paper.format || 'A4'
+				format: paper.format,
+				name: paper.name
 			}
 		}).then(data=>{
 			$fn.toast('生成 pdf 成功')
@@ -249,19 +278,20 @@ export default class extends React.Component {
 	}
 	// 创建 html
 	createHtml = () => {
+		if(this.$drag.innerHTML === '') return $fn.toast('无内容')
 		const html = this.getHtml()
-		$http.submit(null,'html',{ param:{ html } }).then(data=>{
+		$http.submit(null,'html',{ param:{ html, name: this.reportName } }).then(data=>{
 			$fn.toast('生成 html 成功')
 		})
 	}
 	downloadPdf = () => {
-		window.open(window.$config.api + 'downloadPdf')
+		window.open(window.$config.api + 'downloadPdf?=' + this.reportName)
 	}
 	downloadHtml = () => {
-		window.open(window.$config.api + 'downloadHtml')
+		window.open(window.$config.api + 'downloadHtml?name' + this.reportName)
 	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, node, activeKey} = this.state
+		const { hasNode, dragStyle, tempStyle, node, activeKey } = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -327,6 +357,7 @@ export default class extends React.Component {
 											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle}/> }
 											{ type === 'barcode' &&  <Barcode node={node} dragStyle={dragStyle}/> }
 											{ type === 'qrcode' &&  <Qrcode node={node} dragStyle={dragStyle}/> }
+											{ type === 'header' &&  <Header node={node}/> }
 										</>
 									)
 								}
@@ -337,7 +368,8 @@ export default class extends React.Component {
 							<TabPane tab='报表' key={2}>
 								{ 
 									+activeKey === 2 && <PaperComponent
-										onChange = { () => MouseEvent.axes() }
+										paperParam = { paperParam }
+										onChange = { ()=> MouseEvent.axes() }
 									/>
 								}
 							</TabPane>

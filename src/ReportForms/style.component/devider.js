@@ -5,10 +5,9 @@ import { Collapse } from 'antd'
 // ===================================================================== template
 import List from '../public.component/list'
 
-const Border  =  Async(()=>import('./tp/border'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
-// const Img  =  Async(()=>import('./tp/img'))
+const Devider  =  Async(()=>import('./tp/devider'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -20,9 +19,9 @@ export default ({ node, dragStyle, tempStyle }) => (
 				<List.Input label='名称' value='列表' />
 				<List.Input label='数据' />
 			</Panel>
-			<Panel header='分割线'><Border node={node} /></Panel>
-			<Panel header='位置 && 大小'><Position node={node} dragStyle={dragStyle} /></Panel>
+			<Panel header='分割线'><Devider node={node} /></Panel>
 			<Panel header='页面布局'><Layout node={node} tempStyle={tempStyle}/></Panel>
+			<Panel header='位置 && 大小'><Position node={node} dragStyle={dragStyle} /></Panel>
 		</Collapse>
 	</div>
 )

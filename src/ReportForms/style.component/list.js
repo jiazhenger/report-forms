@@ -16,7 +16,7 @@ const { Panel } = Collapse
 export default ({ node, dragStyle, tempStyle }) => (
 	<div className='abs_lt wh scroll'>
 		<h5 className='control-title'>列表</h5>
-		<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
+		<Collapse bordered={false} defaultActiveKey={['0','1','2','3','4']}>
 			<Panel header='常规选项'>
 				<List.Input label='名称' value='列表' />
 				<List.Input label='数据' />

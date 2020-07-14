@@ -229,7 +229,10 @@ export default {
 				node.style.height = '99px'
 				node.setAttribute('fixed',1)
 			}
-			
+			const types = ['text','img','qrcode','barcode','ul']
+			if( types.includes(type) ){
+				node.querySelector('.template').className += ' x-com-style'
+			}
 			Dom.createPointMark(node) // 拖动标点
 			
 			_this.node = node

@@ -8,31 +8,39 @@ import { Paper } from '../js/public/paper'
 const { Panel } = Collapse
 const { $fn } = window
 // ===================================================================== page component
-export default ({ onSelectPaper, onChange }) => {
-	const [ value, setValue ] = React.useState('A4')
+export default ({ paperParam, onChange }) => {
+	const [ value, setValue ] = React.useState()
 	const heightRef = React.useRef()
+	const nameRef = React.useRef()
+	const widthRef = React.useRef()
+	
 	React.useEffect(()=>{
-		const $paper = document.querySelector('#paper')
-		if($paper){
-			let height = 0
-			const paper = $fn.local('paper')
-			if($fn.hasObject(paper)){
-				setValue(paper.format)
-				height = paper.height
-				$paper.style.width =  paper.width
+		let paperWidth = paperParam.width
+		let paperHeight = paperParam.height
+		let paperFormat = paperParam.format
+		let paperName = paperParam.name
+		const paper = $fn.local('paper')
+		if($fn.hasObject(paper)){
+			paperWidth = paper.width
+			paperHeight = paper.height
+			paperFormat = paper.format
+			if(paper.name){
+				paperName = paper.name
 			}
-			
-			height = $fn.local('myHeight')
-			
-			if(height){
-				$paper.style.height = height
-			}
-			
-			onChange && onChange()
-			
-			heightRef.current.setValue($paper.clientHeight)
 		}
-	},[ onChange ])
+		
+		const myHeight = $fn.local('myHeight')
+		const myWidth = $fn.local('myWidth')
+		if(myHeight){ paperHeight = myHeight }
+		if(myWidth) { paperWidth = myWidth}
+		
+		heightRef.current.setValue(parseInt(paperHeight))
+		widthRef.current.setValue(parseInt(paperWidth))
+		
+		nameRef.current.setValue(paperName)
+		setValue(paperFormat)
+	},[ paperParam ])
+	
 	const selectPaper = React.useCallback(v=>{
 		const $paper = document.querySelector('#paper')
 		const arr = v.split('*')
@@ -41,8 +49,10 @@ export default ({ onSelectPaper, onChange }) => {
 			
 			$paper.style.width = value.width
 			$paper.style.height = value.height
+			$fn.remove('myWidth',value)
 			$fn.remove('myHeight',value)
-			heightRef.current.setValue(value.height)
+			widthRef.current.setValue(parseInt(value.width))
+			heightRef.current.setValue(parseInt(value.height))
 			
 			$fn.local('paper',value)
 			onChange && onChange()
@@ -57,6 +67,7 @@ export default ({ onSelectPaper, onChange }) => {
 				$paper.style.height =  paper.height
 			}
 			heightRef.current.setValue(paper.height)
+			$fn.remove('myWidth')
 			$fn.remove('myHeight')
 		}else{
 			const h = v + 'px'
@@ -65,6 +76,30 @@ export default ({ onSelectPaper, onChange }) => {
 		}
 		onChange && onChange()
 	}, [ onChange ])
+	
+	const selectWidth = React.useCallback(v=>{
+		const $paper = document.querySelector('#paper')
+		if(isNaN(+v) || +v === 0){
+			const paper = $fn.local('paper')
+			if($fn.hasObject(paper)){
+				$paper.style.width =  paper.width
+			}
+			widthRef.current.setValue(paper.width)
+			$fn.remove('myWidth')
+			$fn.remove('myHeight')
+		}else{
+			const h = v + 'px'
+			$paper.style.width = h
+			$fn.local('myWidth', h)
+		}
+		onChange && onChange()
+	}, [ onChange ])
+	
+	const onChangName = React.useCallback(v=>{
+		const paper = $fn.local('paper') || {}
+		paper.name = v
+		$fn.local('paper',paper)
+	}, [ ])
 	
 	return (
 		<div className='abs_lt wh scroll'>
@@ -75,7 +110,11 @@ export default ({ onSelectPaper, onChange }) => {
 						<List.Select value={value} label='纸张' data={Paper} p='选择纸张' onChange={selectPaper} />
 					</div>
 					<div>
-						<List.Input ref={heightRef} label='高度' p='选择纸张' onChange={selectHeight} />
+						<List.Input ref={widthRef} label='宽度' onChange={selectWidth} />
+						<List.Input ref={heightRef} label='高度' onChange={selectHeight} />
+					</div>
+					<div>
+						<List.Input ref={nameRef} label='名称' p='报表名称' onChange={onChangName} />
 					</div>
 				</Panel>
 			</Collapse>

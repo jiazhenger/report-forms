@@ -4,8 +4,8 @@ const send = require('koa-send')
 const path = require('path')
 const router = new Router()
 // 生成 pdf
-async function create(html) {
-	await fs.writeFile(path.join(__dirname, '../pdf/report.html'), html, { 'flag': 'w' }, function(err) {
+async function create({html,name}) {
+	await fs.writeFile(path.join(__dirname, `../pdf/${name||'report'}.html`), html, { 'flag': 'w' }, function(err) {
 	    if (err) {
 	        throw err;
 	    }else{
@@ -15,7 +15,7 @@ async function create(html) {
 }
 
 router.post('/html',async ctx => {
-	await create(ctx.request.body.html)
+	await create(ctx.request.body)
 	ctx.body = {
 		code: 200,
 		msg: 'ok',
@@ -24,7 +24,7 @@ router.post('/html',async ctx => {
 })
 // 下载 pdf
 router.get('/downloadHtml', async ctx => {
-	let src = './api/pdf/report.html'
+	const src = `./api/pdf/${ctx.query.name||'report'}.html`
     ctx.attachment(src)
     await send(ctx, src)
 })

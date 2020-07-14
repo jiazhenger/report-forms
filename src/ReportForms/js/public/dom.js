@@ -90,18 +90,17 @@ export default {
 		 return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
 	},
 	// 获取能够添加样式类型的节点的节点
-	getStyleTypeNode(node,opt){
+	getComStyleNode(node,opt){
 		if(node){
-			const styleNode = this.parentAttr(node,'style-type')
-			const styleType = styleNode.getAttribute('style-type')
-			const style = this.getStyle(styleNode)
-			if(styleType === 'all' ){
+			const styleNode = node.querySelector('.x-com-style')
+			if(styleNode){
+				const style = this.getStyle(styleNode)
 				opt.onAll && opt.onAll(styleNode, style)
 			}
 		}
 	},
 	// 获取节点信息
-	getNode(node, callback){
+	getNode(node, callback, noToast){
 		return new Promise(resolve=>{
 			if(node){
 				let model = {}
@@ -124,7 +123,7 @@ export default {
 				
 				resolve(model)
 			}else{
-				window.$fn.toast('未选中目标')
+				noToast === false && window.$fn.toast('未选中目标')
 			}
 		})
 	},

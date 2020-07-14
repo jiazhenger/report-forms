@@ -15,7 +15,7 @@ router.post('/pdf',async ctx => {
 })
 // 下载 pdf
 router.get('/downloadPdf', async ctx => {
-	let src = './api/pdf/report.pdf'
+	const src = `./api/pdf/${ctx.query.name||'report'}.pdf`
     ctx.attachment(src)
 	ctx.body = {
 		code: 200,
