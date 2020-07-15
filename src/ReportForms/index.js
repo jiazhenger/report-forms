@@ -67,7 +67,8 @@ export default class extends React.Component {
 		tempStyle:{},
 		paperParam:{},
 		key:0,
-		activeKey: $fn.local('activeKey') || 0
+		activeKey: $fn.local('activeKey') || 0,
+		refreshKey:0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域
@@ -94,6 +95,28 @@ export default class extends React.Component {
 			}
 		},3000)
 		
+		// 读取文件
+		this.refs.importFileRef.onchange = e => {
+			const file = e.target.files[0]
+			if(file.type !== 'text/plain'){ return $fn.toast('数据必须是 .txt 格式文件')}
+			var reader = new FileReader()
+			reader.readAsText(file)
+			reader.onload = () => {
+				const importNode = document.createElement('div')
+				importNode.innerHTML = reader.result
+				const sourceNode = importNode.children[0]
+				const info = sourceNode ?  JSON.parse(sourceNode.getAttribute('data')) : null
+				if(info){
+					$fn.local('paper',info)
+					info.myWidth && $fn.local('myWidth',info.myWidth)
+					info.myHeight && $fn.local('myHeight',info.myHeight)
+					this.setPaper()
+					this.$drag.innerHTML = sourceNode.innerHTML
+					$fn.local('html',sourceNode.innerHTML)
+					window.location.reload()
+				}
+			}
+		}
 	}
 	// 纸张设置
 	setPaper = () =>{
@@ -196,7 +219,7 @@ export default class extends React.Component {
 		return node.innerHTML
 	}
 	// 获取生成 html 的内容
-	getHtml = () => {
+	getHtml = title => {
 		let $header = this.$drag.querySelector('.header')
 		let $footer = this.$drag.querySelector('.footer')
 		let $main = this.$drag.querySelector('.main')
@@ -234,7 +257,7 @@ export default class extends React.Component {
 				<meta charset='utf-8' />
 				<meta name='renderer' content='webkit' />
 				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
-				<title>报表</title>
+				<title>${title}</title>
 				<style>
 					html,body{font:13px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
 					*{margin:0;padding:0;box-sizing:border-box}
@@ -272,17 +295,39 @@ export default class extends React.Component {
 				footer: this.formatHtml($footer, true),
 				footerHeight: $footer ? parseInt($footer.style.height) : 0,
 				format: paper.format,
-				name: paper.name
+				name: paper.name,
+				source: this.getSource(paper)
 			}
 		}).then(data=>{
 			$fn.toast('生成 pdf 成功')
 		})
 	}
+	getSource = paper => {
+		const myWidth = $fn.local('myWidth')
+		const myHeight = $fn.local('myHeight')
+		const html = this.formatHtml(this.$drag)
+		const infoNode = document.createElement('section')
+		const node = document.createElement('div')
+		const json = {
+			format : paper.format,
+			width : paper.width,
+			height : paper.height,
+			name : paper.name,
+			myWidth,
+			myHeight
+		}
+		infoNode.setAttribute('data',JSON.stringify(json))
+		infoNode.innerHTML = html
+		node.appendChild(infoNode)
+		return node.innerHTML
+	}
 	// 创建 html
 	createHtml = () => {
 		if(this.$drag.innerHTML === '') return $fn.toast('无内容')
-		const html = this.getHtml()
-		$http.submit(null,'html',{ param:{ html, name: this.reportName } }).then(data=>{
+		const paper = $fn.local('paper') || paperParam
+		const html = this.getHtml( paper.name )
+		
+		$http.submit(null,'html',{ param:{ html, name: paper.name, source:this.getSource(paper) } }).then(data=>{
 			$fn.toast('生成 html 成功')
 		})
 	}
@@ -292,8 +337,12 @@ export default class extends React.Component {
 	downloadHtml = () => {
 		window.open(window.$config.api + 'downloadHtml?name' + this.reportName)
 	}
+	// 导入 html
+	importHtml = () => {
+		this.refs.importFileRef.click()
+	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, node, activeKey } = this.state
+		const { hasNode, dragStyle, tempStyle, node, activeKey, refreshKey } = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -306,6 +355,7 @@ export default class extends React.Component {
 							<IconButton label='生成 pdf' onClick={ this.createPdf } hasNode={true}/>
 							<IconButton label='下载 pdf' onClick={ this.downloadPdf } hasNode={true}/>
 							<IconButton label='下载 html' onClick={ this.downloadHtml } hasNode={true}/>
+							<IconButton label='导入' onClick={ this.importHtml } hasNode={true}/>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
 							<IconButton label='删除全部' id='delAll' hasNode={true} />
 						</ul>
@@ -345,7 +395,7 @@ export default class extends React.Component {
 						</div>
 					</section>
 					{/*  控制面版 */}
-					<div className='bcf nosel' style={{width:rightWidth}} id='control'>
+					<div className='bcf nosel' style={{width:rightWidth}} id='control' key={refreshKey}>
 						<Tabs defaultActiveKey={activeKey} onChange={this.onTabChange}>
 							<TabPane tab='样式' key={0}>
 								{
@@ -380,6 +430,7 @@ export default class extends React.Component {
 						</Tabs>
 					</div>
 				</section>
+				<input type='file' ref='importFileRef'/>
 			</div>
 		)
 	}

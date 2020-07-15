@@ -51,6 +51,7 @@ export default class extends React.Component {
 	onChange = v => {
 		if(v === ''){
 			this.refs.file.value = ''
+			this.newData = null
 		}else{
 			this.setState({ model : {...this.state.model,...v} })
 		}
@@ -61,24 +62,29 @@ export default class extends React.Component {
 	}
 	// 添加数据
 	addNewData = () => {
-		if(this.refs.url.getValue() && ! this.newData) return $fn.toast('上传数据格式不正确，请检查')
-		if(this.newData){
-			const data = $fn.local('dataSource')
-			const { name } = this.state.model
-			
-			if(data.hasOwnProperty(name)){
-				return $fn.toast('数据源已存在')
+		const url = this.refs.url.getValue()
+		
+		if(url){
+			if(this.newData){
+				const data = $fn.local('dataSource')
+				const { name } = this.state.model
+				
+				if(data.hasOwnProperty(name)){
+					return $fn.toast('数据源已存在')
+				}
+				
+				const dataSource = {...data, [name]: this.newData}
+				
+				$fn.local('dataSource', dataSource)
+				this.setState({ data: dataSource}, ()=>{
+					this.refs.modal.close()
+					this.onCancel()
+				})
+			}else{
+				$fn.toast('api 接口添加数据')
 			}
-			
-			const dataSource = {...data, [name]: this.newData}
-			
-			$fn.local('dataSource', dataSource)
-			this.setState({ data: dataSource}, ()=>{
-				this.refs.modal.close()
-				this.onCancel()
-			})
 		}else{
-			$fn.toast('请先添加数据')
+			$fn.toast('请先添加数据源')
 		}
 	}
 	onCancel = () => {
@@ -161,7 +167,6 @@ export default class extends React.Component {
 				this.cancelNode()
 				node.removeAttribute('rootUrl')
 				$temp.removeAttribute('url')
-				
 				Dom.reset($temp,type)
 			}
 		})
@@ -318,8 +323,8 @@ export default class extends React.Component {
 					</Collapse>
 				</div>
 				<Modal ref='modal' title='新建数据源' width='40%' okText='添加数据' onOk={this.addNewData} onCancel={this.onCancel}>
-					<List.Input label='数据名称' ref='name' value={model.name} labelWidth='100px' size='middle' name='name' onChange={this.onChange} />
-					<List.Input label='外部文件或URI' ref='url' value={model.url} labelWidth='100px' size='middle' onChange={this.onChange} suffix={<Button size='middle' label='打开文件' onClick={this.openFile} />} />
+					<List.Input label='数据源名称' ref='name' value={model.name} labelWidth='100px' size='middle' name='name' onChange={this.onChange} />
+					<List.Input label='数据源地址' p='请选择json文件或输入接口地址' ref='url' value={model.url} labelWidth='100px' size='middle' onChange={this.onChange} suffix={<Button size='middle' label='打开文件' onClick={this.openFile} />} />
 				</Modal>
 				<Confirm ref='comfirm' msg='确认删除此数据源?' onOk = {this.onOk} />
 				<input type='file' ref='file'/>

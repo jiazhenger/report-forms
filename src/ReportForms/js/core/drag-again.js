@@ -257,6 +257,7 @@ export default {
 			const t = Dom.parents(target,'drag')
 			
 			if(t){
+				if(t.getAttribute('rooturl')){ return }
 				_this.stop = true
 				Dom.addClass(t,'hide')
 				let $editor = t.querySelector('.template')

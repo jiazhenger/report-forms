@@ -43,5 +43,9 @@ export default {
 		// _this.setState({hasNode:null, node:null})
 		_this.$drag.innerHTML = ''
 		window.$fn.remove('html')
+		window.$fn.remove('myHeight')
+		window.$fn.remove('myWidth')
+		window.$fn.remove('paper')
+		window.location.reload()
 	}
 }

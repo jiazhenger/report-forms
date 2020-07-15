@@ -43,7 +43,7 @@ export default ({ paperParam, onChange }) => {
 	
 	const selectPaper = React.useCallback(v=>{
 		const $paper = document.querySelector('#paper')
-		const arr = v.split('*')
+		const arr = v ? v.split('*') : null
 		if($fn.hasArray(arr)){
 			const value = {format:arr[0], width: arr[1], height:arr[2]}
 			

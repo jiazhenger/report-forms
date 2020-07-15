@@ -78,7 +78,7 @@ module.exports = {
 		await browser.close();
 	},
 	make(param){
-		const p = path.join(__dirname, `../pdf/${param.name||'report'}.pdf`)
+		const p = path.join(__dirname, `../files/${param.name||'report'}.pdf`)
 		fs.exists(p, exists => {
 			if(exists){
 				console.log('文件存在')
