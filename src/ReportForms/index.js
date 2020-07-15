@@ -29,6 +29,8 @@ const Checkbox = Async(()=>import('./style.component/checkbox'))
 const Barcode = Async(()=>import('./style.component/barcode'))
 const Qrcode = Async(()=>import('./style.component/qrcode'))
 const Header = Async(()=>import('./style.component/header'))
+const Main = Async(()=>import('./style.component/main'))
+const Footer = Async(()=>import('./style.component/footer'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -358,6 +360,8 @@ export default class extends React.Component {
 											{ type === 'barcode' &&  <Barcode node={node} dragStyle={dragStyle}/> }
 											{ type === 'qrcode' &&  <Qrcode node={node} dragStyle={dragStyle}/> }
 											{ type === 'header' &&  <Header node={node}/> }
+											{ type === 'main' &&  <Main node={node}/> }
+											{ type === 'footer' &&  <Footer node={node}/> }
 										</>
 									)
 								}

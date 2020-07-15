@@ -86,15 +86,16 @@ export default {
 	isElement(node){ return node instanceof HTMLElement },
 	isNodeList(node){ return node instanceof NodeList },
 	// 获取样式
-	getStyle(el){
-		 return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
+	getStyle(el,deep){
+		if(deep) return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
+		else return el.style
 	},
 	// 获取能够添加样式类型的节点的节点
 	getComStyleNode(node,opt){
 		if(node){
 			const styleNode = node.querySelector('.x-com-style')
 			if(styleNode){
-				const style = this.getStyle(styleNode)
+				const style = this.getStyle(styleNode, true)
 				opt.onAll && opt.onAll(styleNode, style)
 			}
 		}

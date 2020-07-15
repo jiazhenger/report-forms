@@ -119,6 +119,10 @@ export default {
 			const { target } = e
 			const { x, y } = Drag.getMouse(e)
 			const t = Dom.parents(target,'drag')
+			if(t){
+				const lock = Boolean(+t.getAttribute('lock'))
+				if(lock) return
+			}
 			// 获取拖动尺寸的元素
 			const name = target.className
 			if( name.indexOf('dir') >= 0 ){
@@ -213,6 +217,11 @@ export default {
 							$mark.style.zIndex = '0'
 							$mark.style.removeProperty('background')
 						}
+					}
+					if(Boolean(+t.getAttribute('lock'))){
+						Dom.addClass($mark,'lock')
+					}else{
+						Dom.removeClass($mark,'lock')
 					}
 				}
 				

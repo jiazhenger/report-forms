@@ -37,7 +37,7 @@ export default ({ node }) => {
 				borderWidthRef.current.setValue($fn.toNum(borderWidth))
 				borderStyleRef.current.setValue($fn.isValid(borderStyle) ? borderStyle : 'none')
 				borderColorRef.current.setValue(borderColor)
-				borderRadius.current.setValue($fn.toNum(style.borderRadius))
+				borderRadius.current.setValue(style.borderRadius)
 				
 				let borderSide = 'none'
 				if(parseInt(style.borderTopWidth) > 0){
@@ -82,7 +82,7 @@ export default ({ node }) => {
 	const onRaiuus = React.useCallback(v => {
 		Dom.getComStyleNode(node,{
 			onAll(el){
-				el.style.borderRadius = v
+				el.style.borderRadius = isNaN(v) ? v : (v+'px')
 			}
 		})
 	}, [ node ])
@@ -97,8 +97,8 @@ export default ({ node }) => {
 				<List.Select label='边' ref={borderSideRef} name='borderSide' data={BorderSide} p='选择边' isHalf onChange={onChange} />
 				<List.Input label='颜色' ref={borderColorRef} name='borderColor' onChange={onChange} p='边框颜色' isHalf />
 			</div>
-			<div className='fx'>
-				<List.Input ref={borderRadius} label='圆角' onChange={onRaiuus}  isHalf />
+			<div>
+				<List.Input ref={borderRadius} label='圆角' onChange={onRaiuus}/>
 			</div>
 			
 		</>

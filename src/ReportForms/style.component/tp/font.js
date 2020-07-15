@@ -55,7 +55,7 @@ const TextAlign = [
 	{ label:'两端对齐', value:'justify'},
 ]
 // ===================================================================== page component
-export default ({ node,  tempStyle }) => {
+export default ({ node }) => {
 	// select
 	const fontFamily = React.useRef()
 	const fontSize = React.useRef()
@@ -70,36 +70,35 @@ export default ({ node,  tempStyle }) => {
 	const textIndent = React.useRef()
 	
 	React.useEffect(()=>{
-		const style = tempStyle || {}
-		// select
-		fontFamily.current.setValue(style.fontFamily)
-		fontSize.current.setValue(style.fontSize)
-		lineHeight.current.setValue(style.lineHeight)
-		letterSpacing.current.setValue(style.letterSpacing)
-		textAlign.current.setValue(style.textAlign)
-		color.current.setValue(style.color)
-		// switch
-		fontWeight.current.setValue(style.fontWeight === 'bold')
-		fontStyle.current.setValue(style.fontStyle === 'italic')
-		textDecoration.current.setValue(style.textDecoration === 'underline')
-		textIndent.current.setValue(style.textIndent === '2em')
-	},[ tempStyle ])
+		Dom.getNode(node).then(( { $temp } ) => {
+			const style = Dom.getStyle($temp)
+			// select
+			fontFamily.current.setValue(style.fontFamily)
+			fontSize.current.setValue(style.fontSize)
+			lineHeight.current.setValue(style.lineHeight)
+			letterSpacing.current.setValue(style.letterSpacing)
+			textAlign.current.setValue(style.textAlign)
+			color.current.setValue(style.color)
+			// switch
+			fontWeight.current.setValue(style.fontWeight === 'bold')
+			fontStyle.current.setValue(style.fontStyle === 'italic')
+			textDecoration.current.setValue(style.textDecoration === 'underline')
+			textIndent.current.setValue(style.textIndent === '2em')
+		}, false)
+	},[ node ])
 	const onChange = React.useCallback( (name,value,none) => {
-		if(node){
+		Dom.getNode(node).then(( { $temp } ) => {
 			const obj = {}
 			for(var i in name){
 				obj.label = i
 				obj.value = name[i]
 			}
-			const $template = Dom.getStyleNode(node)
 			if({}.toString.call(obj.value) === '[object Boolean]'){
-				$template.style[obj.label] = obj.value ? value : (none ? none : 'normal')
+				$temp.style[obj.label] = obj.value ? value : (none ? none : 'normal')
 			}else{
-				$template.style[obj.label] = obj.value === undefined ? value : obj.value
+				$temp.style[obj.label] = obj.value === undefined ? value : obj.value
 			}
-		}else{
-			window.$fn.toast('未选中目标')
-		}
+		})
 	}, [ node ])
 	
 	return (

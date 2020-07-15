@@ -8,6 +8,7 @@ import List from '../public.component/list'
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Devider  =  Async(()=>import('./tp/devider'))
+const Lock  =  Async(()=>import('./tp/lock'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -18,6 +19,7 @@ export default ({ node, dragStyle, tempStyle }) => (
 			<Panel header='常规选项'>
 				<List.Input label='名称' value='列表' />
 				<List.Input label='数据' />
+				<Lock node={node} />
 			</Panel>
 			<Panel header='分割线'><Devider node={node} /></Panel>
 			<Panel header='页面布局'><Layout node={node} tempStyle={tempStyle}/></Panel>

@@ -8,6 +8,7 @@ import List from '../public.component/list'
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Barcode  =  Async(()=>import('./tp/barcode'))
+const Lock  =  Async(()=>import('./tp/lock'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -18,6 +19,7 @@ export default ({ node, dragStyle, tempStyle, tempAttr }) => (
 			<Panel header='常规选项'>
 				<List.Input label='名称' value='条形码' />
 				<List.Input label='数据' />
+				<Lock node={node} />
 			</Panel>
 			<Panel header='条形码'><Barcode node={node}/></Panel>
 			<Panel header='位置 && 大小'><Position node={node} dragStyle={dragStyle} /></Panel>

@@ -9,7 +9,7 @@ const Table  =  Async(()=>import('./tp/table'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Font  =  Async(()=>import('./tp/font'))
-// const Img  =  Async(()=>import('./tp/img'))
+const Lock  =  Async(()=>import('./tp/lock'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -20,6 +20,7 @@ export default ({ node, dragStyle, tempStyle }) => (
 			<Panel header='常规选项'>
 				<List.Input label='名称' value='表格' />
 				<List.Input label='数据' />
+				<Lock node={node} />
 			</Panel>
 			<Panel header='生成表格'><Table node={node} /></Panel>
 			<Panel header='文本字体'><Font node={node} tempStyle={tempStyle} /></Panel>
