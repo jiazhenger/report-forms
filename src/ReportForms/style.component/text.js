@@ -3,23 +3,21 @@ import Async from '@com/async'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 // ===================================================================== template
-import List from '../public.component/list'
-
 const Font  =  Async(()=>import('./tp/font'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Lock  =  Async(()=>import('./tp/lock'))
 const Border  =  Async(()=>import('./tp/border'))
+const Data  =  Async(()=>import('./tp/data'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
 export default ({ node, tempStyle }) => (
 	<div className='abs_lt wh scroll'>
-		<h5 className='control-title'>文本</h5>
+		<h5 className='control-title'>文本框</h5>
 		<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
 			<Panel header='常规选项'>
-				<List.Input label='名称' value='文本框' />
-				<List.Input label='数据' />
+				<Data node={node} />
 				<Lock node={node} />
 			</Panel>
 			<Panel header='文本字体'><Font node={node} /></Panel>

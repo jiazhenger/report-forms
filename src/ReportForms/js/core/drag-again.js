@@ -1,13 +1,14 @@
 import Drag from '../public/drag'
 import Dom from '../public/dom'
+import _ from '../public/jzer'
 import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from '../public/config'
 const { $fn } = window
 
 // 清除 mark
 const clearMark = node => {
-	for(let $mark of node.querySelectorAll('.point-mark')){
-		if($mark){ $mark.style.display = 'none' }
-	}
+	_(node).finds('.point-mark').each(v=>{
+		_(v).hide()
+	})
 }
 
 const dropInFixed = ($drag,node) =>{
@@ -232,7 +233,7 @@ export default {
 						if(t2){
 							Dom.removeClass(nodes,'activeLoop') // 移除背景
 							t2.className += ' activeLoop'  // 添加背景
-							_this.setState({ node:t2, key: _this.state.key+1 }, ()=>{
+							_this.setState({ node:t2 }, ()=>{
 								_this.runNode()
 							})
 						}else{
@@ -240,7 +241,7 @@ export default {
 						}
 					}
 				}else{
-					_this.setState({ node:t, key: _this.state.key+1 },()=>{
+					_this.setState({ node:t },()=>{
 						_this.runNode()
 					})
 				}
@@ -257,15 +258,20 @@ export default {
 			const t = Dom.parents(target,'drag')
 			
 			if(t){
-				if(t.getAttribute('rooturl')){ return }
+				let type = t.getAttribute('type')
+				const isGroup = t.getAttribute('group')
+				const hasUrl = t.getAttribute('rooturl')
+				
+				if(!isGroup && hasUrl){ return } 	// 有绑定数据时，内容不可编辑
+				
 				_this.stop = true
 				Dom.addClass(t,'hide')
-				let $editor = t.querySelector('.template')
-				let type = t.getAttribute('type')
 				
+				let $editor = t.querySelector('.template')
 				if(type !== 'text'){
 					$editor = Dom.parentAttr(target,'type')
 					type =  $editor.getAttribute('type')
+					if(hasUrl) return
 				}
 				
 				if(type === 'text'){
@@ -311,21 +317,7 @@ export default {
 			
 			// 获取样式
 			if(t || m){
-				const d = t || m
-				const t2 = Dom.parents(target,'loopNode')
-				const $temp = t2 ? t2 : d.querySelector('.template')
-				const $img = $temp ? $temp.querySelector('img') : null
 				
-				$fn.leak(()=>{
-					_this.setState({
-						// index: _this.state.index + 1,
-						dragStyle: d.style,
-						tempStyle: $temp ? $temp.style : {},
-						tempAttr:{
-							src: $img ? $img.src : ''
-						}
-					})
-				})()
 			}else{
 				// 清除选中 node
 				let drag = $drag.querySelectorAll('.drag')
@@ -336,14 +328,9 @@ export default {
 				
 				if(!hasDrag){
 					$fn.leak(()=>{
-						_this.setState({
-							dragStyle:{},
-							tempStyle:{},
-							tempAttr:{},
-							node:null,
-							key: _this.state.key - 1
+						_this.setState({ node:null }, ()=>{
+							_this.cancelNode()
 						})
-						_this.cancelNode()
 					})()
 				}
 			}

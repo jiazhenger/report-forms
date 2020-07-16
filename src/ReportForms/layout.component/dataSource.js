@@ -1,6 +1,7 @@
 import React from 'react'
 import Async from '@com/async'
 // ===================================================================== public js
+import _ from '../js/public/jzer'
 import Dom from '../js/public/dom'
 import Format from '../js/public/format'
 // ===================================================================== antd
@@ -157,9 +158,9 @@ export default class extends React.Component {
 				})
 				
 				if(type === 'table'){
-					Dom.createTable($temp, Format.parse(this.state.data, field))
+					// Dom.createTable($temp, Format.parse(this.state.data, field))
 				}else if( type === 'ul' ){
-					Dom.createList($temp, Format.parse(this.state.data, field))
+					// Dom.createList($temp, Format.parse(this.state.data, field))
 				}else if( type === 'checkbox' ){
 					Dom.createCheckbox($temp, Format.parse(this.state.data, field))
 				}
@@ -173,7 +174,7 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
-		Dom.getNode(this.props.node).then(({ node, $temp, $drag, dragType, type, group, loop, isLoopNode })=>{
+		Dom.getNode(this.props.node).then(({ node, $temp, $bindText, $drag, dragType, type, group, loop, isLoopNode })=>{
 			if(type === 'table' && !isLoopNode &&　!v.isArray){
 				return $fn.toast('数据必须是数组')
 			}
@@ -183,16 +184,18 @@ export default class extends React.Component {
 			}
 			
 			v.checked = !v.checked
-			const { checked, url, value, isArray, isObject, root } = v
+			
+			const { checked, url, value, isArray, isObject, root, name } = v
 			let myData = this.state.myData
 			if(checked){
 				myData = Format.formatCheckedData(myData,v)
 				if(group && (isObject || isArray)){
-					node.setAttribute('rootUrl',url)
-					node.setAttribute('loop',1)
+					_( node ).attr({ rootUrl:url, loop:1  })
 				}else{
-					$temp.setAttribute('url',url)
+					_( $temp ).attr('url',url)
 				}
+				
+				$bindText.text('=' + name)
 				
 				if(type === 'text'){
 					if(dragType === 'table'){
@@ -200,50 +203,17 @@ export default class extends React.Component {
 							const field = Format.getUrlField(url)
 							const arrUrl = Format.getParentUrl(url)
 							const data = Format.parse(this.state.data, arrUrl) // 获取数组
-							if($fn.hasArray(data)){
-								([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
-									if(Dom.hasClass(v,'activeLoop')){
-										const trLen = $drag.querySelectorAll('tbody tr').length
-										const tdLen = $drag.querySelectorAll('tr td').length
-										const dataLen = data.length
-										const len = dataLen - trLen
-										if(len > 0){
-											const trFragment = document.createDocumentFragment()
-											for(let i=0; i<len; i++ ){
-												const tr = document.createElement('tr')
-												const tdFragment = document.createDocumentFragment()
-												for(let j=0; j<tdLen; j++){
-													const td = document.createElement('td')
-													td.className = 'loopNode'
-													td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
-													td.setAttribute('type','text')
-													tdFragment.appendChild(td)
-												}
-												tr.appendChild(tdFragment)
-												trFragment.appendChild(tr)
-											}
-											$drag.querySelector('tbody').appendChild(trFragment)
-										}
-										( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
-											p.children[index].textContent = data[k][field]
-										})
-									}
-								})
-							}else{
-								$fn.toast('必须是数组子元素')
-							}
+							
 						}else{
-							$temp.textContent = value
+							
 						}
-					}else{
-						$temp.textContent = value
 					}
 				}else if( type === 'img' ){
 					$temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
 				}else if( type === 'table' ){
 					Dom.createTable($temp, Format.parse(this.state.data, url))
 				}else if( type === 'ul' ){
-					Dom.createList($temp, Format.parse(this.state.data, url))
+					// Dom.createList($temp, Format.parse(this.state.data, url))
 				}else if( type === 'checkbox' ){
 					Dom.createCheckbox($temp, Format.parse(this.state.data, url))
 				}else if( type === 'barcode' ){

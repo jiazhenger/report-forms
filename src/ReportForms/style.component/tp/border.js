@@ -38,17 +38,19 @@ export default ({ node }) => {
 				borderStyleRef.current.setValue($fn.isValid(borderStyle) ? borderStyle : 'none')
 				borderColorRef.current.setValue(borderColor)
 				borderRadius.current.setValue(style.borderRadius)
-				
+				// 判断是哪一边
 				let borderSide = 'none'
-				if(parseInt(style.borderTopWidth) > 0){
-					borderSide = 'borderTop'
-				}else if(parseInt(style.borderLeft) > 0){
-					borderSide = 'borderLeft'
-				}else if(parseInt(style.borderRight) > 0){
-					borderSide = 'borderRight'
-				}else if(parseInt(style.borderBottom) > 0){
-					borderSide = 'borderBottom'
-				}else{
+				const arr = BorderSide.map(v=>v.value)
+				let index = 0
+				arr.forEach(v=>{
+					if(v !== 'none' && v !== 'border'){
+						if(parseInt(style[v+'Width']) > 0){
+							index ++
+							borderSide = v
+						}
+					}
+				})
+				if(index === 4){
 					borderSide = 'border'
 				}
 				

@@ -7,30 +7,24 @@ import List from '../../public.component/list'
 
 // ===================================================================== page component
 export default ({ node }) => {
-	const lockRef = React.useRef() 
+	const dataRef = React.useRef() 
 	
 	React.useEffect(()=>{
 		Dom.getNode(node).then(( { node } ) => {
-			lockRef.current.setValue( Boolean(+node.getAttribute('lock')) )
+			
 		}, false)
 	},[ node ])
 	
 	const onChange = React.useCallback( v => {
 		Dom.getNode(node).then(( { node } ) => {
-			node.setAttribute('lock',v ? 1 : 0)
-			const $mark = Dom.children(node,'point-mark')
-			if(v){
-				Dom.addClass($mark,'lock')
-			}else{
-				Dom.removeClass($mark,'lock')
-			}
+			
 		})
 	}, [ node ])
 	
 	return (
 		<>
 			<div>
-				<List.Switch label='锁定' ref={lockRef}  onChange={onChange}/>
+				<List.Input ref={dataRef} label='数据' onChange={onChange} />
 			</div>
 		</>
 	)

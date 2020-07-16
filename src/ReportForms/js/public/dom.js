@@ -2,6 +2,7 @@ import JsBarcode from 'jsbarcode'
 import QRCode from 'qrcode'
 
 import Html from './html'
+import _ from './jzer'
 import { barcode, qrcode } from '../../js/public/config'
 
 import CheckboxImage from '@img/icon/checkbox.png'
@@ -87,8 +88,11 @@ export default {
 	isNodeList(node){ return node instanceof NodeList },
 	// 获取样式
 	getStyle(el,deep){
-		if(deep) return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
-		else return el.style
+		if(deep) {
+			return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
+		}else{
+			return el.style
+		}
 	},
 	// 获取能够添加样式类型的节点的节点
 	getComStyleNode(node,opt){
@@ -106,22 +110,24 @@ export default {
 			if(node){
 				let model = {}
 				const $temp = this.getStyleNode(node)
-				const $drag = this.parents($temp,'drag')
-				const type = node.getAttribute('type')
-				model = { node, $temp, $drag, type }
+				const $drag = _( $temp ).parents('drag')
+				const $bindText = _( node ).find('.x-bind-text')
+				
+				const type = _( node ).attr('type')
+				model = { node, $temp, $drag, type, $bindText }
 				if($drag){
-					const dragType = $drag.getAttribute('type')
-					const rootUrl = $drag.getAttribute('rootUrl')
-					const loop = Boolean($drag.getAttribute('loop'))
-					const group = Boolean($drag.getAttribute('group'))
+					const dragType = _( $drag ).attr('type')
+					const rootUrl = _( $drag ).attr('rootUrl')
+					
+					const loop = Boolean(_($drag).attr('loop'))
+					const group = Boolean(_($drag).attr('group'))
 					model = { ...model, dragType, rootUrl, loop, group,  }
 				}
 				if($temp){
-					const url = $temp.getAttribute('url')
-					const isLoopNode = this.parents($temp,'loopNode')
+					const url = _( $temp ).attr('url')
+					const isLoopNode =  _( $temp ).parents('loopNode')
 					model = { ...model, url,  isLoopNode }
 				}
-				
 				resolve(model)
 			}else{
 				noToast === false && window.$fn.toast('未选中目标')
@@ -129,7 +135,7 @@ export default {
 		})
 	},
 	// 获取模板 node
-	getStyleNode(node){ return this.hasClass(node,'loopNode') ? node : node.querySelector('.template') },
+	getStyleNode(node){ return _(node).hasClass('loopNode') ? node : node.querySelector('.template') },
 	// 判断 node 是否有 template
 	isTemplate(node){ return node.querySelector('.template') },
 	// 创建表格
@@ -202,12 +208,12 @@ export default {
 	// 创建列表
 	createList($temp, data){
 		if(typeof data !== 'object') return
-		const $drag = this.parents($temp,'drag')
+		// const $drag = this.parents($temp,'drag')
 		$temp.innerHTML = ''
 		const ul = document.createElement('ul')
 		ul.style.cssText = `width:100%;padding-left:2em;list-style:outside decimal`
 		const fragment = document.createDocumentFragment()
-		this.addClass($drag,'more')
+		
 		for(let i in data){
 			let li =  null
 			const value = data[i]
@@ -222,7 +228,7 @@ export default {
 			}
 			
 			if(li){
-				li.className = 'loopNode'
+				// li.className = 'loopNode'
 				li.style.cssText = 'padding:5px 0;border-bottom:1px dashed #eee;'
 				li.setAttribute('type','text')
 				fragment.appendChild(li)
@@ -243,15 +249,15 @@ export default {
 		$temp.innerHTML = Html[type]
 	},
 	hasMark(node){
-		return ( [].slice.call(node.children).some( v => this.hasClass(v,'point-mark')) )
+		return ( [].slice.call(node.children).some( v => _(v).hasClass('point-mark')) )
 	},
 	// 创建拖动标尺
 	createPointMark(node){
 		if(node){
 			if(!this.hasMark(node)){
 				const point = document.createElement('div')
-				point.className = 'point-mark'
-				point.innerHTML = `
+				const _point = _(point)
+				_point.addClass('point-mark').html(`
 					<p class='dir lt-wh'><s></s></p>
 					<p class='dir rt-wh'><s></s></p>
 					<p class='dir rb-wh'><s></s></p>
@@ -260,10 +266,11 @@ export default {
 					<p class='dir rc-w'><s></s></p>
 					<p class='dir bc-h'><s></s></p>
 					<p class='dir lc-w'><s></s></p>
-				`
-				point.style.background = 'rgba(0,0,0,0.05)'
-				point.addEventListener('click',e=> e.stopPropagation())
-				node.appendChild(point)
+				`).style('background','rgba(0,0,0,0.05)').bind('click',e=>{
+					e.stopPropagation()
+				})
+				
+				_point.appendTo(node)
 			}
 		}
 	},

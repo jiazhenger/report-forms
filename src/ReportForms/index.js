@@ -68,7 +68,6 @@ export default class extends React.Component {
 		paperParam:{},
 		key:0,
 		activeKey: $fn.local('activeKey') || 0,
-		refreshKey:0
 	}
 	componentDidMount(){
 		this.$drag = document.querySelector('#dragContent') 		// HTML元素放置区域

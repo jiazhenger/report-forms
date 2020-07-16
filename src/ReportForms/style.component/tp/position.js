@@ -14,13 +14,16 @@ export default ({ node }) => {
 	const indexRef = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNode(node).then(( { node } ) => {
-			const style = Dom.getStyle(node)
-			leftRef.current.setValue($fn.toNum(style.left))
-			topRef.current.setValue($fn.toNum(style.top))
-			widthRef.current.setValue($fn.toNum(style.width))
-			heightRef.current.setValue($fn.toNum(style.height))
-			indexRef.current.setValue($fn.toNum(style.zIndex))
+		Dom.getNode(node).then(( { $drag } ) => {
+			if( $drag ){
+				const style = Dom.getStyle($drag,true)
+				leftRef.current.setValue($fn.toNum(style.left))
+				topRef.current.setValue($fn.toNum(style.top))
+				widthRef.current.setValue($fn.toNum(style.width))
+				heightRef.current.setValue($fn.toNum(style.height))
+				indexRef.current.setValue($fn.toNum(style.zIndex))
+			}
+			
 		}, false)
 	},[ node ])
 	
