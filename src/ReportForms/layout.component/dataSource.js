@@ -132,7 +132,33 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择根数据 ================================================== */
 	selectRoot(data, field){
-		Dom.getNode(this.props.node).then(({ loop, type, node, $temp, isLoopNode }) => {
+		Dom.getNodeInfo(this.props._node).then( model => {
+			const { _drag, _temp, _bindText, type, rootUrl } = model
+			// 分隔线不绑定数据
+			if(type==='devider'){ return $fn.toast('此元素无法绑定数据') }
+			// 当切换数据源时还原 dom 结构
+			if(field !== rootUrl){ Dom.reset(model) }
+			
+			const rootData = data[field]
+			if(this.state.rootField !== field){
+				// 添加根 url，并移出当前 url
+				_drag.attr('rootUrl',field)
+				// 递归重组数据
+				const myData = Format.formatData(rootData, field, field, type)
+				this.setState({
+					rootField: field,
+					rootData,
+					myData,
+					key: this.state.key + 1
+				})
+				
+			}else{
+				this.cancelNode()
+				Dom.reset(model)
+			}
+		})
+		/*
+		Dom.getNode(this.props.node).then(({ loop, type, node, _node, $temp, isLoopNode }) => {
 			if(type==='devider'){
 				return $fn.toast('此元素无法绑定数据')
 			}
@@ -171,9 +197,46 @@ export default class extends React.Component {
 				Dom.reset($temp,type)
 			}
 		})
+		*/
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
+		Dom.getNodeInfo(this.props._node).then( model => {
+			const { _drag, _temp, _bindText, _bindSrc, type, rootUrl } = model
+			
+			if((type === 'text' || type === 'img') && !v.isString){
+				return $fn.toast('数据必须是字符串')
+			}
+			
+			v.checked = !v.checked
+			const { checked, url, value, isArray, isObject, root, name } = v
+			let myData = this.state.myData
+			if(checked){
+				myData = Format.formatCheckedData(myData,v)
+				// 绑定数据
+				_drag.attr('rootUrl', Format.getRootUrl(url) ) 			// 在父级绑定数据
+				// 图片绑定
+				if(['img','barcode','qrcode'].includes(type)){
+					_bindSrc.attr({ url })
+				}
+				// 个性绑定
+				if( type === 'text'){
+					// _bindText.html('<s>=</s>' + name).attr({ url }) 		 // 在子级绑定数据
+					_bindText.text(value).attr({ url }) 		 // 在子级绑定数据
+				}else if( type === 'img'){
+					_( _bindSrc.el ).find('img').attr({temp:1}).src(value)
+				}else if( type === 'barcode' ){
+					_drag.height('auto')
+					Dom.createBarcode(_bindSrc, Format.parse(this.state.data, url))
+				}else if( type === 'qrcode' ){
+					Dom.createQrcode(_bindSrc, Format.parse(this.state.data, url))
+				}
+			}else{
+				Dom.reset(model)
+			}
+			this.setState({ myData })
+		})
+		/*
 		Dom.getNode(this.props.node).then(({ node, $temp, $bindText, $drag, dragType, type, group, loop, isLoopNode })=>{
 			if(type === 'table' && !isLoopNode &&　!v.isArray){
 				return $fn.toast('数据必须是数组')
@@ -198,29 +261,20 @@ export default class extends React.Component {
 				$bindText.text('=' + name)
 				
 				if(type === 'text'){
-					if(dragType === 'table'){
-						if(Format.isArrayChild(url)){
-							const field = Format.getUrlField(url)
-							const arrUrl = Format.getParentUrl(url)
-							const data = Format.parse(this.state.data, arrUrl) // 获取数组
-							
-						}else{
-							
-						}
-					}
+					
 				}else if( type === 'img' ){
-					$temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
+					// $temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
 				}else if( type === 'table' ){
-					Dom.createTable($temp, Format.parse(this.state.data, url))
+					// Dom.createTable($temp, Format.parse(this.state.data, url))
 				}else if( type === 'ul' ){
 					// Dom.createList($temp, Format.parse(this.state.data, url))
 				}else if( type === 'checkbox' ){
-					Dom.createCheckbox($temp, Format.parse(this.state.data, url))
+					// Dom.createCheckbox($temp, Format.parse(this.state.data, url))
 				}else if( type === 'barcode' ){
 					$drag.style.height = 'auto'
-					Dom.createBarcode($temp, Format.parse(this.state.data, url))
+					// Dom.createBarcode($temp, Format.parse(this.state.data, url))
 				}else if( type === 'qrcode' ){
-					Dom.createQrcode($temp, Format.parse(this.state.data, url))
+					// Dom.createQrcode($temp, Format.parse(this.state.data, url))
 				}
 				
 			}else{
@@ -240,12 +294,13 @@ export default class extends React.Component {
 						}
 					})
 				}else{
-					Dom.reset($temp,type)
+					// Dom.reset($temp,type)
 				}
 			}
 			
 			this.setState({ myData })
 		})
+		*/
 	}
 	
 	render(){

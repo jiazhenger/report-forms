@@ -12,18 +12,18 @@ const Data  =  Async(()=>import('./tp/data'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
-export default ({ node, tempStyle }) => (
+export default ({ node,  _node }) => (
 	<div className='abs_lt wh scroll'>
 		<h5 className='control-title'>文本框</h5>
 		<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
 			<Panel header='常规选项'>
-				<Data node={node} />
-				<Lock node={node} />
+				<Data node={node} _node={_node}/>
+				<Lock _node={_node}/>
 			</Panel>
-			<Panel header='文本字体'><Font node={node} /></Panel>
-			<Panel header='边框'><Border node={node} /></Panel>
-			<Panel header='位置 && 大小'><Position node={node} /></Panel>
-			<Panel header='页面布局'><Layout node={node}  /></Panel>
+			<Panel header='文本字体'><Font node={node} _node={_node}/></Panel>
+			<Panel header='边框'><Border node={node} _node={_node}/></Panel>
+			<Panel header='位置 && 大小'><Position node={node} _node={_node}/></Panel>
+			<Panel header='页面布局'><Layout node={node} _node={_node}/></Panel>
 		</Collapse>
 	</div>
 )

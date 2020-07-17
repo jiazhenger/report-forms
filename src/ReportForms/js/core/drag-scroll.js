@@ -1,5 +1,5 @@
-import Dom from '../public/dom'
 import Drag from '../public/drag'
+import _ from '../public/jzer'
 import { scrollSpace } from '../public/config'
 
 let prevX = 0
@@ -28,8 +28,9 @@ const getDir = (e, opt) => {
 export default {
 	// 默认执行
 	init({ $scroll }){
+		const _scroll = _( $scroll )
 		const mousemove = function(e){
-			const { scrollTop, scrollLeft } = Drag.getInfo($scroll)
+			const { scrollTop, scrollLeft } = _scroll.getInfo()
 			getDir(e,{
 				left: ()=>{
 					this.scrollLeft = scrollLeft + scrollSpace
@@ -48,21 +49,19 @@ export default {
 		
 		$scroll.addEventListener('mousedown',function(e){
 			const { target } = e
-			const t = Dom.parents(target,'paper')
-			if(!t){
-				this.style.cursor = 'move'
-				$scroll.addEventListener('mousemove',mousemove)
+			const _t = _( target ).parents('.paper')
+			if(!_t.el){
+				_t.style('cursor','move')
+				_scroll.bind('mousemove', mousemove)
 			}
 		})
 		
 		document.addEventListener('mouseup',function(e){
-			$scroll.style.cursor = ''
-			$scroll.removeEventListener('mousemove',mousemove)
+			_scroll.removeStyle('cursor').unbind('mousemove', mousemove)
 		})
 		
 		document.addEventListener('mouseleave',function(e){
-			$scroll.style.cursor = ''
-			$scroll.removeEventListener('mousemove',mousemove)
+			_scroll.removeStyle('cursor').unbind('mousemove', mousemove)
 		})
 	},
 	

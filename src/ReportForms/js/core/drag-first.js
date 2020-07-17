@@ -89,18 +89,15 @@ export default {
 					document.body.removeEventListener('mouseup',this.setNewPosition)
 					
 					_node.addClass('drag',true)
+					
 					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
 					
 					// left = left - (left % axesSpace) + 1
 					// top = top - (top % (axesSpace/2)) + 1
-					left = left - (left % axesSpace) + 'px'
-					top = top - (top % axesSpace) + 'px'
-					_node.style({
-						left,
-						top,
-						border: '1px dashed ' + stopBorderColor
-					})
+					left = left - (left % axesSpace)
+					top = top - (top % axesSpace)
+					_node.left(left).top(top).style('border','1px dashed ' + stopBorderColor)
 					// 显示标框
 					_( _this.node.querySelector('.point-mark') ).show()
 					// 放置元素到不同的框
@@ -161,8 +158,7 @@ export default {
 							left: 0,
 							width: $drag.clientWidth + 'px',
 							border: '1px dashed blue'
-						})
-						_node.addClass(type)
+						}).addClass(type).addClass('x-layout')
 						
 						if($drag.querySelector('.' + type)){
 							let txt = null
@@ -232,15 +228,17 @@ export default {
 				if(  ['text'].includes(type) ){ _temp.addClass('x-bind-text')}
 				// 图片绑定数组
 				if( ['img','barcode','qrcode'].includes(type) ){ _temp.addClass('x-bind-src')}
+				// 循环绑定
+				if( ['table','ul','checkbox'].includes(type) ){ _temp.addClass('x-bind-loop')}
 			}else{
 				_node.style({ width:'99px', height:'99px'}).attr('fixed', 1)
 			}
 			
-			Dom.createPointMark(node) // 拖动标点
+			Dom.createPointMark(_node) // 创建拖动标点
 			
 			_this.node = node
 			
-			_this.setState({hasNode:true, node, type})
+			_this.setState({hasNode:true, node, _node })
 			
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)

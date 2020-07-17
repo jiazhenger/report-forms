@@ -1,31 +1,32 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
 
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const lockRef = React.useRef() 
 	
 	React.useEffect(()=>{
-		Dom.getNode(node).then(( { node } ) => {
-			lockRef.current.setValue( Boolean(+node.getAttribute('lock')) )
+		Dom.getNodeInfo(_node).then(( { _drag } ) => {
+			lockRef.current.setValue( Boolean(+_drag.attr('lock')) )
 		}, false)
-	},[ node ])
+	},[ _node ])
 	
 	const onChange = React.useCallback( v => {
-		Dom.getNode(node).then(( { node } ) => {
-			node.setAttribute('lock',v ? 1 : 0)
-			const $mark = Dom.children(node,'point-mark')
+		Dom.getNodeInfo(_node).then(( { _drag } ) => {
+			_drag.attr('lock', v ? 1 : 0)
+			const _mark = _(_drag.el).children('.point-mark')
 			if(v){
-				Dom.addClass($mark,'lock')
+				_mark.addClass('lock')
 			}else{
-				Dom.removeClass($mark,'lock')
+				_mark.removeClass('lock')
 			}
 		})
-	}, [ node ])
+	}, [ _node ])
 	
 	return (
 		<>

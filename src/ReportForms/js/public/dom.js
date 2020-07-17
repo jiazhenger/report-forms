@@ -1,7 +1,8 @@
 import JsBarcode from 'jsbarcode'
 import QRCode from 'qrcode'
 
-import Html from './html'
+// import Html from './html'
+
 import _ from './jzer'
 import { barcode, qrcode } from '../../js/public/config'
 
@@ -11,81 +12,6 @@ import checkedImage from '@img/icon/checked.png'
 const { $fn } = window
 
 export default {
-	// 判断元素是否有 className
-	hasClass(el,className){
-		if(el){
-			const c = el.className
-			if($fn.isString(c)){
-				return c.indexOf(className) !== -1 
-			}else{
-				return false
-			}
-		}else{
-			return false
-		}
-	},
-	addClass(el,className){
-		if(!this.hasClass(el,className)){
-			el.className += ' ' + className
-		}
-	},
-	// 移除 calssName
-	removeClass(el,className){
-		if(el instanceof NodeList){
-			for(let v of el){
-				const c = v.className.replace(' ' + className,'')
-				v.className = c
-			}
-		}else{
-			if(this.hasClass(el,className)){
-				const c = el.className.replace(' ' + className,'')
-				el.className = c
-			}
-		}
-	},
-	// 查找有指定样式的父级元素
-	parents(el,className){
-		if(this.hasClass(el,className)){
-			return el
-		}
-		if(el){
-			var parent = el.parentElement
-			while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
-				parent = parent.parentElement
-			}
-		}
-		return parent === document.body ? null : parent
-	},
-	parent(el,className){
-		var parent = el.parentElement
-		while ( !this.hasClass(parent,className) && parent !== document.body && parent !== null) {
-			parent = parent.parentElement
-		}
-		return parent === document.body ? null : parent
-	},
-	// 判断是否有某个属性
-	hasAttr(el,attr){
-		if(el){
-			return el.hasAttribute(attr)
-		}else{
-			return false
-		}
-	},
-	// 查找有指定属性的父级元素
-	parentAttr(el,attr){
-		if(this.hasAttr(el,attr)){
-			return el
-		}
-		if(el){
-			var parent = el.parentElement
-			while ( !this.hasAttr(parent,attr) && parent !== document.body && parent !== null) {
-				parent = parent.parentElement
-			}
-		}
-		return parent === document.body ? null : parent
-	},
-	isElement(node){ return node instanceof HTMLElement },
-	isNodeList(node){ return node instanceof NodeList },
 	// 获取样式
 	getStyle(el,deep){
 		if(deep) {
@@ -105,22 +31,22 @@ export default {
 		}
 	},
 	// 获取节点信息
-	getNode(node, callback, noToast){
+	getNode(node, noToast){
 		return new Promise(resolve=>{
 			if(node){
 				let model = {}
 				const $temp = this.getStyleNode(node)
-				const $drag = _( $temp ).parents('drag')
+				const _drag = _( $temp ).parents('drag')
 				const $bindText = _( node ).find('.x-bind-text')
 				
 				const type = _( node ).attr('type')
-				model = { node, $temp, $drag, type, $bindText }
-				if($drag){
-					const dragType = _( $drag ).attr('type')
-					const rootUrl = _( $drag ).attr('rootUrl')
+				model = { node, $temp, $drag:_drag.el, type, $bindText }
+				if(_drag.el){
+					const dragType = _drag.attr('type')
+					const rootUrl = _drag.attr('rootUrl')
 					
-					const loop = Boolean(_($drag).attr('loop'))
-					const group = Boolean(_($drag).attr('group'))
+					const loop = Boolean(_drag.attr('loop'))
+					const group = Boolean(_drag.attr('group'))
 					model = { ...model, dragType, rootUrl, loop, group,  }
 				}
 				if($temp){
@@ -134,10 +60,46 @@ export default {
 			}
 		})
 	},
+	// 获取节点信息
+	getNodeInfo(_node, noToast){
+		return new Promise(resolve=>{
+			if(_node){
+				let model = {}
+				const _drag = _( _node.el ).parents('.drag')
+				const _temp = _( _drag.el ).children('.template')
+				const _bindText = _( _node.el ).find('.x-bind-text')
+				const _bindSrc = _( _node.el ).find('.x-bind-src')
+				const _bindLoop = _( _node.el ).find('.x-bind-loop')
+				const type = _node.attr('type')
+				const rootUrl = _drag.attr('rooturl')
+				
+				model = { _drag, _temp, _bindText, _bindSrc, _bindLoop, type, rootUrl }
+				
+				resolve(model)
+			}else{
+				noToast === false && window.$fn.toast('未选中目标')
+			}
+		})
+	},
 	// 获取模板 node
 	getStyleNode(node){ return _(node).hasClass('loopNode') ? node : node.querySelector('.template') },
 	// 判断 node 是否有 template
 	isTemplate(node){ return node.querySelector('.template') },
+	// 清空数据
+	reset({ _drag, _temp, _bindText, type, _bindSrc }){
+		_drag.removeAttr('rootUrl')
+		_temp.removeAttr('url')
+		
+		if(['img','barcode','qrcode'].includes(type)){
+			_( _temp.el ).find('img').src(`${window.location.origin}/assets/images/img.png`)
+		}
+		
+		if(type === 'text'){
+			_bindText.text('').removeAttr('url')
+		}else if( type === 'barcode'){
+			_(_drag.el).find('img').width(40).height(40)
+		}
+	},
 	// 创建表格
 	createTable($temp, data){
 		if(!$fn.hasArray(data)) return
@@ -238,23 +200,13 @@ export default {
 		// last
 		$temp.appendChild(ul)
 	},
-	// 清空数据
-	reset($temp,type){
-		if(type === 'devider'){ return }
-		if(type === 'table' || type === 'ul'){
-			const $drag = this.parents($temp,'drag')
-			$drag.style.height = 'auto'
-			this.removeClass($drag,'more')
-		}
-		$temp.innerHTML = Html[type]
-	},
 	hasMark(node){
 		return ( [].slice.call(node.children).some( v => _(v).hasClass('point-mark')) )
 	},
 	// 创建拖动标尺
-	createPointMark(node){
-		if(node){
-			if(!this.hasMark(node)){
+	createPointMark(_node){
+		if(_node.el){
+			if(!this.hasMark(_node.el)){
 				const point = document.createElement('div')
 				const _point = _(point)
 				_point.addClass('point-mark').html(`
@@ -269,20 +221,9 @@ export default {
 				`).style('background','rgba(0,0,0,0.05)').bind('click',e=>{
 					e.stopPropagation()
 				})
-				
-				_point.appendTo(node)
+				_node.append(point)
 			}
 		}
-	},
-	// 查找字元素
-	children(node,className){
-		let rs = null
-		for(let v of node.children){
-			if(this.hasClass(v,className)){
-				rs = v
-			}
-		}
-		return rs
 	},
 	// 创建 checkbox
 	createCheckbox($temp, data){
@@ -319,29 +260,30 @@ export default {
 			$temp.appendChild(fragment)
 		}
 	},
-	createBarcode($temp,data){
-		const $img = $temp.querySelector('img')
-		$img.style.width = '100%'
-		$img.style.height = '100%'
-		$img.setAttribute('temp',1)
-		$img.setAttribute('code',data)
-		$img.setAttribute('lineColor',barcode.lineColor)
-		$img.setAttribute('codeWidth',barcode.width)
-		$img.setAttribute('codeHeight',barcode.height)
-		$img.setAttribute('displayValue',barcode.displayValue)
-		$img.setAttribute('fontSize',barcode.fontSize)
-		JsBarcode($temp.querySelector('img'),data, barcode)
+	createBarcode(_bindSrc,data){
+		const _img = _bindSrc.find('img')
+		_img.width('100%').height('100%').attr({
+			temp:1,
+			code:data,
+			lineColor: barcode.lineColor,
+			codeWidth: barcode.width,
+			codeHeight: barcode.height,
+			displayValue: barcode.displayValue,
+			fontSize: barcode.fontSize
+		})
+		JsBarcode(_img.el,data, barcode)
 	},
-	createQrcode($temp,data){
-		const $img = $temp.querySelector('img')
-		$img.setAttribute('temp',1)
-		$img.setAttribute('text',data)
-		$img.setAttribute('colorDark',qrcode.colorDark)
-		$img.setAttribute('colorLight',qrcode.colorLight)
-		$img.setAttribute('margin',qrcode.margin)
-		
+	createQrcode(_bindSrc,data){
+		const _img = _bindSrc.find('img')
+		_img.width('100%').height('100%').attr({
+			temp:1,
+			text:data,
+			colorDark: barcode.colorDark,
+			colorLight: barcode.colorLight,
+			margin: barcode.margin,
+		})
 		QRCode.toDataURL(data, qrcode).then(url=>{
-			$img.src = url
+			_img.src(url)
 		})
 	}
 }

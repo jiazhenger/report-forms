@@ -63,6 +63,7 @@ const IconButton2 = ({ icon, label, onDragStart}) => (
 export default class extends React.Component {
 	state = {
 		node:null,
+		_node:null,
 		dragStyle:{},
 		tempStyle:{},
 		paperParam:{},
@@ -341,7 +342,7 @@ export default class extends React.Component {
 		this.refs.importFileRef.click()
 	}
 	render( ) {
-		const { hasNode, dragStyle, tempStyle, node, activeKey, refreshKey } = this.state
+		const { hasNode, node, _node, activeKey, refreshKey } = this.state
 		const type = node ? node.getAttribute('type') : null
 		return (
 			<div className='wh fv'>
@@ -400,23 +401,23 @@ export default class extends React.Component {
 								{
 									+activeKey === 0 && (
 										<>
-											{ (type === 'text' || type === 'pages') &&  <Text node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
-											{ type === 'img' &&  <Image node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
-											{ type === 'table' &&  <Table node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
-											{ type === 'ul' &&  <List node={node} dragStyle={dragStyle} tempStyle={tempStyle} /> }
-											{ type === 'devider' &&  <Devider node={node} dragStyle={dragStyle} tempStyle={tempStyle}/> }
-											{ type === 'checkbox' &&  <Checkbox node={node} dragStyle={dragStyle}/> }
-											{ type === 'barcode' &&  <Barcode node={node} dragStyle={dragStyle}/> }
-											{ type === 'qrcode' &&  <Qrcode node={node} dragStyle={dragStyle}/> }
-											{ type === 'header' &&  <Header node={node}/> }
-											{ type === 'main' &&  <Main node={node}/> }
-											{ type === 'footer' &&  <Footer node={node}/> }
+											{ (type === 'text' || type === 'pages') &&  <Text node={node} _node={_node} /> }
+											{ type === 'img' &&  <Image node={node} _node={_node}/> }
+											{ type === 'table' &&  <Table node={node} _node={_node}/> }
+											{ type === 'ul' &&  <List node={node} _node={_node}/> }
+											{ type === 'devider' &&  <Devider node={node} _node={_node}/> }
+											{ type === 'checkbox' &&  <Checkbox node={node}  _node={_node}/> }
+											{ type === 'barcode' &&  <Barcode node={node}  _node={_node}/> }
+											{ type === 'qrcode' &&  <Qrcode node={node}  _node={_node}/> }
+											{ type === 'header' &&  <Header node={node}  _node={_node}/> }
+											{ type === 'main' &&  <Main node={node}  _node={_node}/> }
+											{ type === 'footer' &&  <Footer node={node}  _node={_node}/> }
 										</>
 									)
 								}
 							</TabPane>
 							<TabPane tab='数据' key={1}>
-								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} />}
+								{ +activeKey === 1 && <DataSourceComponent ref='dataSource' node={node} _node={_node} />}
 							</TabPane>
 							<TabPane tab='报表' key={2}>
 								{ 

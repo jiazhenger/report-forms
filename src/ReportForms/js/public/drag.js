@@ -4,7 +4,7 @@ export default {
 	getMouse(e){
 		return {
 			x: e.pageX || e.x || e.screenX || e.clientX,
-			y:  e.pageY || e.y || e.screenY || e.clientY
+			y: e.pageY || e.y || e.screenY || e.clientY
 		}
 	},
 	//  获取元素各种信息
