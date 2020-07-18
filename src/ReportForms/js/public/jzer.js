@@ -1,12 +1,27 @@
 function $(selector,all){
 	return new Init(selector,all)
 }
+// 动态改变 this 的指向
+function __(el){
+	const f =  $( el )
+	f.el = el
+	return f
+}
 // 容错处理
 $.listener = function(el,callback){
 	if(el){
 		return callback(el)
 	}else{
 		return Init.prototype
+	}
+}
+// 鼠标
+$.mouse = {
+	getCoord(e){
+		return {
+			x: e.pageX || e.x || e.screenX || e.clientX,
+			y: e.pageY || e.y || e.screenY || e.clientY
+		}
 	}
 }
 // 数据判断
@@ -92,16 +107,24 @@ const styleExtend = {
 			if(arguments.length === 0){
 				return el.style
 			}else if( arguments.length === 1 ){
-				if(name.constructor === String){
+				if($.isString(name)){
 					return el.style[name]
-				}else if(name.constructor === Object){
-					for(let i in name){
-						el.style[i] = name[i]
+				}else if($.isObject(name)){
+					if( el instanceof HTMLCollection || el instanceof NodeList ){
+						$(el).each( (v,i,n) => {
+							for(let i in name){ n.style[i] = name[i] }
+						})
+					}else{
+						for(let i in name){ el.style[i] = name[i] }
 					}
 					return this
 				}
 			}else if( arguments.length === 2 ){
-				el.style[name] = value
+				if( el instanceof HTMLCollection || el instanceof NodeList ){
+					$(el).each( (v,i,n) => n.style[name]=value )
+				}else{
+					el.style[name] = value
+				}
 				return this
 			}
 		})
@@ -119,7 +142,11 @@ const styleExtend = {
 	removeStyle(name){
 		return $.listener(this.el, el => {
 			if(name.indexOf(',') === -1){
-				el.style.removeProperty(name)
+				if( el instanceof HTMLCollection || el instanceof NodeList ){
+					$(el).each( (v,i,n) => n.style.removeProperty(name) )
+				}else{
+					el.style.removeProperty(name)
+				}
 			}else{
 				const arr = name.split(',')
 				arr.forEach(v=>{
@@ -130,7 +157,7 @@ const styleExtend = {
 		})
 	}
 };
-(['width','height','left','top']).forEach(function(v){
+(['width','height','lineHeight','left','top']).forEach(function(v){
 	styleExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -139,8 +166,20 @@ const styleExtend = {
 			}else if(arguments.length === 1){
 				if($.isNumber( parseInt(value) )){
 					value = isNaN(+value) ? value : value + 'px'
-					this.style(v,value)
+					this.style(v, value)
 				}
+				return this
+			}
+		})
+	}
+});
+(['background', 'border', 'borderColor', 'color']).forEach(function(v){
+	styleExtend[v] = function(value){
+		return $.listener(this.el, el => {
+			if(arguments.length === 0){
+				return this.style(v)
+			}else if(arguments.length === 1){
+				this.style(v, value)
 				return this
 			}
 		})
@@ -223,7 +262,7 @@ const parentExtend = {
 			if(str.indexOf('.') !== -1){ str = str.replace('.','') }
 			
 			if($(el).hasClass(str) && isSelf){ 
-				this.el = el
+				// this.el = el
 				return this
 			}
 			
@@ -231,9 +270,7 @@ const parentExtend = {
 			while ( !$(parent).hasClass(str) && parent !== document.body && parent !== null) {
 				parent = parent.parentElement
 			}
-			
-			this.el = parent === document.body ? null : parent
-			return this
+			return __( parent === document.body ? null : parent )
 		})
 	},
 	parents(str){
@@ -241,30 +278,40 @@ const parentExtend = {
 	},
 	find(s, all){
 		return $.listener(this.el, el => {
-			this.el =  all ? el.querySelectorAll(s) : el.querySelector(s)
-			return this
+			return __(all ? el.querySelectorAll(s) : el.querySelector(s))
 		})
 	},
 	finds(s){ return this.find(s, true)},
 	each(callback){
 		return $.listener(this.el, el => {
 			if(el instanceof HTMLCollection || el instanceof NodeList){
-				for(let v of el){
-					callback(v)
-				}
+				Array.prototype.slice.call(el).forEach((v,i)=>{
+					const _v = __(v)
+					callback(_v, i, _v.el)
+				})
 			}
 			return this
 		})
 	},
 	children(name){
 		return $.listener(this.el, el => {
-			name = name.replace('.', '')
-			$(el.children).each( v => {
-				if($( v ).hasClass(name)){
-					this.el = v
+			if(arguments.length === 0){
+				return __(el.children)
+			}else if(arguments.length === 1){
+				if($.isString(name)){
+					name = name.replace('.', '')
+					let n = null
+					$(el.children).each( v => {
+						if(v.hasClass(name)){
+							n = v
+						}
+					})
+					return n ? n : __( )
+				}else if($.isNumber(name)){
+					return __( el.children[name] )
 				}
-			})
-			return this
+			}
+			
 		})
 	},
 }

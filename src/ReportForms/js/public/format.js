@@ -4,10 +4,16 @@
 const { $fn } = window
 export default {
 	// 重新格式化数组源
-	formatData(data, field, currentUrl, type, isLoopNode){
+	formatData(data, field, currentUrl, type){
+		let index = 0
 		const recursion = (data, arr, url) => {
 			url = url ? url : field
-			const root = $fn.hasArray(data) ? '/0' : false
+			let root = false
+			if(index === 0){
+				root = $fn.hasArray(data) ? '/0' : false
+				index ++
+			}
+		
 			data = $fn.hasArray(data) ? data[0] : data
 			if($fn.hasObject(data)){
 				Object.keys(data).forEach((v,i)=>{
@@ -21,7 +27,7 @@ export default {
 					// 获取最后结果
 					arr[i] = ( typeof data[v] === 'object' ) ? {...obj, children:[] } :  { ...obj, value: data[v], isString:1 }
 					// 禁用
-					if( type === 'table' && !isLoopNode){
+					if( type === 'table'){
 						// if(!$fn.hasArray(data[v])){ arr[i].disabled = true }  // 组合节点禁用非数组
 					}else if(type === 'ul'){
 						if(typeof data[v] !== 'object'){ arr[i].disabled = true } // 对象节点禁用

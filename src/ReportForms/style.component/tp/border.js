@@ -20,7 +20,7 @@ const BorderSide = [
 	{ label:'四边', 			value:'border' },
 ]
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ node, _node }) => {
 	const borderWidthRef = React.useRef()
 	const borderStyleRef = React.useRef()
 	const borderColorRef = React.useRef()
@@ -28,7 +28,7 @@ export default ({ node }) => {
 	const borderRadius = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getComStyleNode(node,{
+		Dom.getNodeStyle(_node,{
 			onAll(el,style){
 				const borderWidth = style.borderWidth.replace(/0px/g,'').trim()
 				const borderStyle = style.borderStyle.replace(/none/g,'').trim()
@@ -56,30 +56,33 @@ export default ({ node }) => {
 				
 				borderSideRef.current.setValue(borderSide)
 			}
-		})
-	}, [node])
+		}, true)
+	}, [_node])
 	// 选择粗细
 	const onChange = React.useCallback(v => {
-		Dom.getComStyleNode(node,{
-			onAll(el){
+		Dom.getNodeStyle(_node,{
+			onAll(_el){
+				console.log(_el)
 				const width = borderWidthRef.current.getValue()
 				const style = borderStyleRef.current.getValue()
 				const color = borderColorRef.current.getValue() || '#000'
 				const border = borderSideRef.current.getValue()
-				
+				console.log(_el)
 				if(border === 'border'){
-					el.style.border = width + 'px ' +   style + ' ' + color
+					_el.style('border', width + 'px ' +   style + ' ' + color)
 				}else if(border === 'none'){
-					el.style.removeProperty('border')
+					_el.removeStyle('border')
 				}else{
-					el.style.removeProperty('border')
-					el.style[border+'Width'] = width + 'px'
-					el.style[border+'Style'] = style
-					el.style[border+'Color'] = color
+					_el.removeStyle('border')
+					_el.style({
+						[border+'Width']: width + 'px',
+						[border+'Style']: style,
+						[border+'Color']: color
+					})
 				}
 			}
 		})
-	}, [ node ])
+	}, [ _node ])
 	
 	const onRaiuus = React.useCallback(v => {
 		Dom.getComStyleNode(node,{

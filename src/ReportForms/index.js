@@ -1,5 +1,6 @@
 import React from 'react'
 import Async from '@com/async'
+import _ from './js/public/jzer'
 // ===================================================================== image
 import TableImage from '@img/icon/table.png'
 import ImgImage from '@img/icon/img.png'
@@ -196,9 +197,7 @@ export default class extends React.Component {
 		const $drag = node.querySelectorAll('.drag')
 		const $loop = node.querySelectorAll('.loopNode')
 		if($loop){
-			for(let v of $loop){
-				v.className = 'loopNode'
-			}
+			_( $loop ).each(v=> v.removeClass('activeLoop'))
 		}
 		if($drag){
 			for(let v of $drag){

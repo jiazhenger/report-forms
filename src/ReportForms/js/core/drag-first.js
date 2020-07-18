@@ -1,4 +1,3 @@
-import Drag from '../public/drag'
 import Dom from '../public/dom'
 import Html from '../public/html'
 import _ from '../public/jzer'
@@ -13,8 +12,8 @@ const removeHtml = () => {
 // 查找鼠标经过的放置HTML元素的范围
 const dragRange = (e,_this, opt) => {
 	const { $drag, $scroll, $paper} = _this
-	const { x, y } = Drag.getMouse(e)
-	const scrollInfo = Drag.getInfo($scroll)
+	const { x, y } = _.mouse.getCoord(e)
+	const scrollInfo = _( $scroll ).getInfo()
 	const scrollTop = scrollInfo.scrollTop
 	const scrollLeft = scrollInfo.scrollLeft
 	const scrollWidth = scrollInfo.scrollWidth
@@ -27,7 +26,7 @@ const dragRange = (e,_this, opt) => {
 	const dragPadding = parseInt($paper.style.padding)
 	const padding = scrollPadding + dragPadding
 	// 确定目标元素放置范围
-	const dragInfo = Drag.getInfo($drag)
+	const dragInfo = _( $drag ).getInfo()
 	const { offsetLeft, offsetTop, clientWidth, height } = dragInfo
 	
 	const spaceX = scrollWidth - scrollLeft - scrollClientWidth
@@ -59,7 +58,7 @@ export default {
 	init(_this){
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
-			const { x, y } = Drag.getMouse(e)
+			const { x, y } = _.mouse.getCoord(e)
 			if(_this.node){
 				_(_this.node).style({
 					left: (x - differ) + 'px',
@@ -70,8 +69,8 @@ export default {
 				onDrag:({$drag,dragInfo,$scroll,scrollInfo}) => {
 					let left = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft) - differ
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
-					Drag.mark(_this,'.axesY', left)
-					Drag.mark(_this,'.axesX', top)
+					Dom.setMark(_this,'.axesY', left)
+					Dom.setMark(_this,'.axesX', top)
 				},
 				onFail:()=>{
 					
@@ -82,7 +81,7 @@ export default {
 		this.setNewPosition = e => {
 			if(!_this.node) return;
 			const _node = _(_this.node)
-			const { x, y } = Drag.getMouse(e)
+			const { x, y } = _.mouse.getCoord(e)
 			dragRange(e,_this,{
 				onDrag:({$drag,dragInfo,$scroll,scrollInfo}) => {
 					document.body.removeEventListener('mousemove',this.setHtmlPosition)
@@ -98,25 +97,22 @@ export default {
 					left = left - (left % axesSpace)
 					top = top - (top % axesSpace)
 					_node.left(left).top(top).style('border','1px dashed ' + stopBorderColor)
-					// 显示标框
-					_( _this.node.querySelector('.point-mark') ).show()
+					_node.find('.point-mark').show()
+					
 					// 放置元素到不同的框
 					const type = _node.attr('type')
 					
 					let minusTop = 0
 					let isFixed = false
-					const $header = $drag.querySelector('.header')
-					const $main = $drag.querySelector('.main')
-					const $footer = $drag.querySelector('.footer')
 					
-					const _top = Drag.getPos(_this.node).top
+					const _top = _node.top()
 					const dropInFixed = $f => {
 						if($f){
-							const f = Drag.getInfo($f)
+							const f = _( $f ).getInfo()
 							const s = f.top + f.clientHeight
 							if(_top >= f.top && _top < s){
-								if(type === 'header' || type === 'main' || type === 'footer'){
-									_this.node.remove()
+								if(['header','footer','main'].includes(type)){
+									_node.remove()
 									isFixed = true
 									return window.$fn.toast('无法放置')
 								}else{
@@ -129,9 +125,9 @@ export default {
 							}
 						}
 					}
-					dropInFixed($header)
-					dropInFixed($main)
-					dropInFixed($footer)
+					dropInFixed($drag.querySelector('.header'))
+					dropInFixed($drag.querySelector('.main'))
+					dropInFixed($drag.querySelector('.footer'))
 					if( type === 'table' ){
 						_node.style({ left:0, width: $drag.clientWidth + 'px'})
 					}else if( type === 'ul' ){
@@ -139,16 +135,14 @@ export default {
 						// _this.node.style.width = '200px'
 					}else if( type === 'devider' ){
 						_node.style({ left:0, width: $drag.clientWidth + 'px', height:'10px'})
-						const devider = _(_this.node).find('.template')
-						devider.html('<div></div>')
-						_(devider.el.children[0]).cssText('width:100%;height:1px; border-top:1px solid #ddd')
+						_node.find('.template').html('<div></div>').children(0).cssText('width:100%;height:1px; border-top:1px solid #ddd')
 					}else if( type === 'checkbox' ){
 						_node.style({ width: '18px', height:'18px'})
 					}else if( type === 'barcode' ){
 						_node.style({ width: '200px', height:'auto'})
 					}else if( type === 'qrcode' ){
 						_node.style({ width: '80px', height:'80px'})
-					}else if( type === 'header' || type === 'main' || type === 'footer'){
+					}else if( ['header','footer','main'].includes(type) ){
 						if(type === 'header'){ 
 							_node.style('top',0)
 						}else if( type === 'main'){
@@ -186,7 +180,7 @@ export default {
 		}
 	},
 	DragStart(e, _this,type){
-		const { x, y } = Drag.getMouse(e)
+		const { x, y } = _.mouse.getCoord(e)
 		if(!type) return;
 		if(document.querySelector('.move')){
 			
@@ -194,44 +188,44 @@ export default {
 			const node = document.createElement('div')
 			const _node = _( node )
 			node.setAttribute('type',type)
-			_node.attr('type', type).addClass('move').style({
+			_node.attr('type', type).addClass('move').left(x-10).top(y-10).width(50).style({
 				position:'absolute',
-				left: (x-10) + 'px',
-				top: (y-10) + 'px',
-				width: '50px',
 				zIndex:1
 			})
 			
 			if( Html[type] ){
-				_node.html(Html[type])
-				_(node.children[0]).addClass('template')
+				_node.html(Html[type]).children(0).addClass('template')
+				
 				const $temp = node.querySelector('.template')
 				const _temp = _( $temp )
-				_temp.cssText('width:100%;height:100%;background:#fff;')
+				_temp.cssText('width:100%;height:100%;background:#fff;overflow:hidden')
 				if(type === 'text'){
-					_node.style({ width:'100px', height:'20px'})
+					_node.width(100).height(20).lineHeight(20)
+					_temp.style('overflow','hidden')
 				}else if(type === 'img'){
-					_node.style('height','50px')
-				}else if(type === 'table' || type === 'ul'){
+					_node.height(50)
+				}else if(type === 'table'){
+					_node.attr('group',1)
+				}else if(type === 'ul'){
 					_node.attr('group',1)
 				}else if(type === 'devider'){
-					_node.style({ width:'50px', height:'10px'})
+					_node.width(50).height(10)
 					_( $temp ).removeStyle('background')
 				}else if(type === 'checkbox'){
-					_node.style('width','20px')
+					_node.width(20)
 				}else if(type === 'pages'){
-					_node.style({ width:'50px', height:'20px', lineHeight:'20px', textAlign:'center' })
+					_node.width(50).height(20).lineHeight(20).style('textAlign','center')
 				}
 				// 添加通用样式
 				if(  ['text','img','qrcode','barcode','ul'].includes(type) ){ _temp.addClass('x-com-style') }
+				// 添加通用数据绑定
+				if(  ['text','img','qrcode','barcode'].includes(type) ){ _temp.addClass('x-bind-url') }
 				// 直接绑定数据
 				if(  ['text'].includes(type) ){ _temp.addClass('x-bind-text')}
 				// 图片绑定数组
 				if( ['img','barcode','qrcode'].includes(type) ){ _temp.addClass('x-bind-src')}
-				// 循环绑定
-				if( ['table','ul','checkbox'].includes(type) ){ _temp.addClass('x-bind-loop')}
 			}else{
-				_node.style({ width:'99px', height:'99px'}).attr('fixed', 1)
+				_node.width(99).height(99).attr('fixed', 1)
 			}
 			
 			Dom.createPointMark(_node) // 创建拖动标点

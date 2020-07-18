@@ -1,4 +1,3 @@
-import Drag from '../public/drag'
 import _ from '../public/jzer'
 import { scrollSpace } from '../public/config'
 
@@ -8,7 +7,7 @@ let curX = 0
 let curY = 0
 
 const getDir = (e, opt) => {
-	const { x, y } = Drag.getMouse(e)
+	const { x, y } = _.mouse.getCoord(e)
 	prevX = curX
 	prevY = curY
 	curX = x

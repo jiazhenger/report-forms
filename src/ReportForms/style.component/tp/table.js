@@ -1,6 +1,8 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import Table from '../../js/public/table'
+import { tableConfig } from '../../js/public/config'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -15,28 +17,12 @@ const BorderFrame = [
 	{ label:'两侧无边框', 	value:'hsides' },
 	{ label:'四边无边框', 	value:'box' },
 ]
-const myBorder = (node, borderStyle, color) => {
-	for(let v of node){
-		if(borderStyle === 'none' ){
-			v.style.border = borderStyle
-		}else{
-			v.style.removeProperty('border')
-			v.style.borderBottom = '1px '+ borderStyle + (color || ' #ddd')
-		}
-	}
-}
-const myBorderColor = (node, color) => {
-	for(let v of node){
-		console.log(v)
-		v.style.borderColor = color
-	}
-}
 // ===================================================================== page component
-export default ({ node, dragStyle }) => {
+export default ({ node, _node }) => {
 	const [ col, setCol] = React.useState(3)
 	const [ row, setRow] = React.useState(1)
 	const [ checked, setChecked] = React.useState(true)
-	const [ border, setBorder] = React.useState(true)
+	const [ border ] = React.useState(true)
 	
 	const rowRef = React.useRef()
 	const colRef = React.useRef()
@@ -69,32 +55,36 @@ export default ({ node, dragStyle }) => {
 		}
 	},[ node ])
 	
-	// 表头
+	// 是否显示表头
 	const onHeadChange = React.useCallback(v=>{
-		Dom.getNode(node).then(({ $drag } ) => {
-			const $table = $drag.querySelector('table')
-			if($table){
-				const $thead = $table.querySelector('thead')
-				if($thead){
-					$thead.parentNode.removeChild($thead)
-				}
-				if(v){ 
-					Dom.createThead($table)
-					for(let v of $table.querySelectorAll('th')){
-						v.style.border = '1px solid ' + colorRef.current.getValue()
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			const _table = _drag.find('table')
+			if(v){
+				const thead = Table.createThead({
+					col: _table.find('tr').children().el.length,
+					th:{
+						style:{
+							...tableConfig.style,
+							border: '1px solid ' + colorRef.current.getValue(),
+							background:'#f5f5f5',
+						},
+						attr:{ type:'text' },
+						className:'loopNode',
 					}
-				 }
+				})
+				_table.append(thead)
 			}else{
-				setChecked(v)
+				_table.find('thead').remove()
 			}
 		})
-	}, [ node ])
+	}, [ _node ])
+	// 是否显示边框
 	const onBorderChange = React.useCallback(v=>{
-		Dom.getNode(node).then(({ $drag } ) => {
-			Dom.setTableBorder($drag.querySelector('table'), v)
-			setBorder(v)
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			const _table = _drag.find('table')
+			Table.showHideBorder(_table, v, colorRef.current.getValue())
 		})
-	}, [ node ])
+	}, [ _node ])
 	// frame
 	const onSelectFrame = React.useCallback(v=>{
 		Dom.getNode(node).then(({ $drag } ) => {
@@ -123,63 +113,53 @@ export default ({ node, dragStyle }) => {
 			}
 		})
 	}, [ node, border, checked ])
-	// 设置边框
+	// 设置下边框
 	const onSelectStyle = React.useCallback(v => {
-		Dom.getNode(node).then(({ $drag } ) => {
-			const $table = $drag.querySelector('table')
-			$table.setAttribute('xborder', v)
-			myBorder($drag.querySelectorAll('td'), v)
-			myBorder($drag.querySelectorAll('th'), v)
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			const _table = _drag.find('table').attr('xborder', v)
+			const color = colorRef.current.getValue()
+			Table.setBottomBorder(_table, borderRef.current.getValue(), color)
 		})
-	}, [ node ])
+	}, [ _node ])
 	// 边框颜色
 	const onColor = React.useCallback(v => {
-		Dom.getNode(node).then(({ $drag } ) => {
-			myBorderColor($drag.querySelectorAll('td'), v)
-			myBorderColor($drag.querySelectorAll('th'), v)
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			Table.setBorderColor(_drag.find('table'), v)
 		})
-	}, [ node ])
+	}, [ _node ])
 	// 动态创建表格
 	const ceateTable = React.useCallback(()=>{
 		if(row <= 0){ return $fn.toast('行数必须大于 0')}
 		if(col <= 0){ return $fn.toast('列数必须大于 0')}
-		Dom.getNode(node).then(({ node })=>{
-			node.style.height = 'auto'
-			const $temp = node.querySelector('.template')
-			const table = document.createElement('table')
-			table.style.cssText = 'width:100%;border-collapse:collapse;border-spacing:0'
-			// tbody
-			const tbody = document.createElement('tbody')
-			const trFragment = document.createDocumentFragment()
-			for(let i=0; i< row; i++){
-				const tr = document.createElement('tr')
-				const tdFragment = document.createDocumentFragment()
-				for(let j=0; j<col; j++){
-					const td = document.createElement('td')
-					td.className = 'loopNode'
-					td.style.cssText = 'padding:2px 5px;'
-					// td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
-					td.setAttribute('type','text')
-					td.textContent = '输入内容'
-					tdFragment.appendChild(td)
+		Dom.getNodeInfo(_node).then(({ _drag, _temp })=>{
+			_drag.removeStyle('height')
+			const style = tableConfig.style
+			const table = Table.create({
+				row,
+				col,
+				thead: checkedRef.current.getValue() ? {
+					th: {
+						style:{
+							background:'#f5f5f5',
+							...style
+						},
+						className:'loopNode',
+						attr:{ type:'text' }
+					}
+				} : null,
+				tbody:{
+					td:{
+						style,
+						className:'loopNode x-bind-table',
+						attr:{ type:'text', }
+					}
 				}
-				tr.appendChild(tdFragment)
-				trFragment.appendChild(tr)
-			}
-			tbody.appendChild(trFragment)
-			table.appendChild(tbody)
-			
-			// thead
-			if(checked){ Dom.createThead(table) }
+			})
 			Dom.setTableBorder(table, border, colorRef.current.getValue())
 			// last
-			$temp.innerHTML = ''
-			$temp.appendChild(table)
-			
-			// Dom.editorNode(table.querySelectorAll('td'))
-			// Dom.editorNode(table.querySelectorAll('th'))
+			_temp.html('').append(table)
 		})
-	}, [node, col, row, checked, border])
+	}, [_node, col, row, border])
 	return (
 		<>
 			<div className='fx'>

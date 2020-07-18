@@ -115,12 +115,13 @@ export default class extends React.Component {
 			if(url){
 				const rootField = Format.getRootUrl(url)
 				const rootData = this.state.data[rootField]
-				let myData = Format.formatData(rootData, rootField, url, type, isLoopNode)
+				let myData = Format.formatData(rootData, rootField, url, type)
+				console.log(myData)
 				this.setState({ rootField, rootData, myData })
 			}else if(rootUrl){  // 如果有根 url
 				const rootField = Format.getRootUrl(rootUrl)
 				const rootData = this.state.data[rootField]
-				const myData = Format.formatData(rootData,rootField, rootUrl, type, isLoopNode)
+				const myData = Format.formatData(rootData,rootField, rootUrl, type)
 				this.setState({ rootField, rootData, myData })
 			}else{
 				this.cancelNode()
@@ -133,11 +134,10 @@ export default class extends React.Component {
 	/* ================================================== 选择根数据 ================================================== */
 	selectRoot(data, field){
 		Dom.getNodeInfo(this.props._node).then( model => {
-			const { _drag, _temp, _bindText, type, rootUrl } = model
+			const { _drag, type, rootUrl } = model
 			// 分隔线不绑定数据
 			if(type==='devider'){ return $fn.toast('此元素无法绑定数据') }
 			// 当切换数据源时还原 dom 结构
-			if(field !== rootUrl){ Dom.reset(model) }
 			
 			const rootData = data[field]
 			if(this.state.rootField !== field){
@@ -157,52 +157,15 @@ export default class extends React.Component {
 				Dom.reset(model)
 			}
 		})
-		/*
-		Dom.getNode(this.props.node).then(({ loop, type, node, _node, $temp, isLoopNode }) => {
-			if(type==='devider'){
-				return $fn.toast('此元素无法绑定数据')
-			}
-			
-			const rootData = data[field]
-			
-			if(isLoopNode && (typeof rootData === 'object')){
-				return $fn.toast('此元素无法绑定复杂数据')
-			}
-			
-			if(this.state.rootField !== field){
-				// 添加根 url，并移出当前 url
-				node.setAttribute('rootUrl',field)
-				$temp.removeAttribute('url')
-				// 递归重组数据
-				const myData = Format.formatData(rootData, field, field, type)
-				this.setState({
-					rootField: field,
-					rootData,
-					myData,
-					key: this.state.key + 1,
-					loop
-				})
-				
-				if(type === 'table'){
-					// Dom.createTable($temp, Format.parse(this.state.data, field))
-				}else if( type === 'ul' ){
-					// Dom.createList($temp, Format.parse(this.state.data, field))
-				}else if( type === 'checkbox' ){
-					Dom.createCheckbox($temp, Format.parse(this.state.data, field))
-				}
-			}else{
-				this.cancelNode()
-				node.removeAttribute('rootUrl')
-				$temp.removeAttribute('url')
-				Dom.reset($temp,type)
-			}
-		})
-		*/
+		// node 不存在时
+		if(!this.props._node){
+			console.log('node 不存在')
+		}
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
 		Dom.getNodeInfo(this.props._node).then( model => {
-			const { _drag, _temp, _bindText, _bindSrc, type, rootUrl } = model
+			const { _drag, _temp, _bindText, _bindSrc, _bindUrl, type, rootUrl, _bindTable } = model
 			
 			if((type === 'text' || type === 'img') && !v.isString){
 				return $fn.toast('数据必须是字符串')
@@ -213,12 +176,21 @@ export default class extends React.Component {
 			let myData = this.state.myData
 			if(checked){
 				myData = Format.formatCheckedData(myData,v)
+				const rootUrl_ = Format.getRootUrl(url)
 				// 绑定数据
-				_drag.attr('rootUrl', Format.getRootUrl(url) ) 			// 在父级绑定数据
+				if( rootUrl !== rootUrl_){
+					_drag.attr('rootUrl', Format.getRootUrl(url) ) 			// 在父级绑定数据
+				}
 				// 图片绑定
-				if(['img','barcode','qrcode'].includes(type)){
+				if( ['text','img','qrcode','barcode'].includes(type) ){
 					_bindSrc.attr({ url })
 				}
+				// 表格绑定
+				if(_drag.attr('type') === 'table' && _bindTable.hasClass('x-bind-table')){
+					_bindTable.attr({ url }).text(value)
+					return
+				}
+				
 				// 个性绑定
 				if( type === 'text'){
 					// _bindText.html('<s>=</s>' + name).attr({ url }) 		 // 在子级绑定数据
@@ -230,7 +202,10 @@ export default class extends React.Component {
 					Dom.createBarcode(_bindSrc, Format.parse(this.state.data, url))
 				}else if( type === 'qrcode' ){
 					Dom.createQrcode(_bindSrc, Format.parse(this.state.data, url))
+				}else if( type === 'table'){
+					
 				}
+				
 			}else{
 				Dom.reset(model)
 			}

@@ -4,7 +4,7 @@ import QRCode from 'qrcode'
 // import Html from './html'
 
 import _ from './jzer'
-import { barcode, qrcode } from '../../js/public/config'
+import { barcode, qrcode, axesColor, axesActiveColor, axesSpace } from '../../js/public/config'
 
 import CheckboxImage from '@img/icon/checkbox.png'
 import checkedImage from '@img/icon/checked.png'
@@ -12,6 +12,16 @@ import checkedImage from '@img/icon/checked.png'
 const { $fn } = window
 
 export default {
+	setMark(_this, $axes, left){
+		const n = parseInt(left / axesSpace)
+		_(_this.$axes).find($axes).children().each((v,i)=>{
+			if(n === i){
+				v.background(axesActiveColor)
+			}else{
+				v.background(axesColor)
+			}
+		})
+	},
 	// 获取样式
 	getStyle(el,deep){
 		if(deep) {
@@ -21,12 +31,11 @@ export default {
 		}
 	},
 	// 获取能够添加样式类型的节点的节点
-	getComStyleNode(node,opt){
-		if(node){
-			const styleNode = node.querySelector('.x-com-style')
-			if(styleNode){
-				const style = this.getStyle(styleNode, true)
-				opt.onAll && opt.onAll(styleNode, style)
+	getNodeStyle(_node,opt, deep){
+		if(_node.el){
+			const _styleNode = _node.find('.x-com-style')
+			if(_styleNode.el){
+				opt.onAll && opt.onAll(_styleNode, _styleNode.getStyle(deep))
 			}
 		}
 	},
@@ -65,15 +74,17 @@ export default {
 		return new Promise(resolve=>{
 			if(_node){
 				let model = {}
-				const _drag = _( _node.el ).parents('.drag')
-				const _temp = _( _drag.el ).children('.template')
-				const _bindText = _( _node.el ).find('.x-bind-text')
-				const _bindSrc = _( _node.el ).find('.x-bind-src')
-				const _bindLoop = _( _node.el ).find('.x-bind-loop')
+				const _drag = _node.parents('.drag')
+				const _temp = _node.children('.template')
+				const _bindText = _node.find('.x-bind-text')
+				const _bindUrl = _node.find('.x-bind-url')
+				const _bindSrc = _node.find('.x-bind-src')
+				const _bindTable = _node
 				const type = _node.attr('type')
 				const rootUrl = _drag.attr('rooturl')
+				const bindUrl = _bindUrl.attr('url')
 				
-				model = { _drag, _temp, _bindText, _bindSrc, _bindLoop, type, rootUrl }
+				model = { _drag, _temp, _bindText, _bindSrc, _bindUrl, _bindTable, type, rootUrl, bindUrl }
 				
 				resolve(model)
 			}else{
@@ -86,16 +97,18 @@ export default {
 	// 判断 node 是否有 template
 	isTemplate(node){ return node.querySelector('.template') },
 	// 清空数据
-	reset({ _drag, _temp, _bindText, type, _bindSrc }){
-		_drag.removeAttr('rootUrl')
-		_temp.removeAttr('url')
+	reset({ _drag, _temp, _bindText, type, _bindSrc, _bindUrl}){
+		
+		if(_bindUrl.el){ _drag.removeAttr('rootUrl') }
+		
+		_bindUrl.removeAttr('url')
 		
 		if(['img','barcode','qrcode'].includes(type)){
 			_( _temp.el ).find('img').src(`${window.location.origin}/assets/images/img.png`)
 		}
 		
 		if(type === 'text'){
-			_bindText.text('').removeAttr('url')
+			_bindText.text('')
 		}else if( type === 'barcode'){
 			_(_drag.el).find('img').width(40).height(40)
 		}
@@ -128,24 +141,7 @@ export default {
 		table.appendChild(tbody)
 		$temp.appendChild(table)
 	},
-	// 创建 thead
-	createThead(table){
-		const col = table.querySelector('tr').querySelectorAll('td').length
-		const thead = document.createElement('thead') 			// thead
-		const trThead = document.createElement('tr')			// tr
-		const thFragment = document.createDocumentFragment()	// th
-		for(let i=0; i<col; i++){
-			const th = document.createElement('th')
-			th.className = 'loopNode'
-			th.style.cssText = 'padding:2px 5px;background-color:#f5f5f5'
-			th.setAttribute('type','text')
-			th.textContent = '标题'
-			thFragment.appendChild(th)
-		}
-		trThead.appendChild(thFragment)
-		thead.appendChild(trThead)
-		table.insertBefore(thead, table.querySelector('tbody'))
-	},
+	
 	// 设置表格边框
 	setTableBorder($table, checked, color){
 		let c = color || '#ddd'

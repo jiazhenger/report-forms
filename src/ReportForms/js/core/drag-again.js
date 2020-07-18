@@ -1,13 +1,12 @@
-import Drag from '../public/drag'
 import Dom from '../public/dom'
 import _ from '../public/jzer'
 import { axesSpace, axesColor, moveBorderColor, stopBorderColor } from '../public/config'
 const { $fn } = window
 
 // 清除 mark
-const clearMark = node => {
-	_(node).finds('.point-mark').each(v=>{
-		_(v).hide()
+const clearMark = _node => {
+	_node.finds('.point-mark').each(v=>{
+		v.hide()
 	})
 }
 
@@ -46,9 +45,9 @@ export default {
 		const findSize = name => _(this.sizeNode).hasClass(name)
 		// 拖动改变尺寸
 		const DragSizeMove = e => {
-			const { x, y } = Drag.getMouse(e)
-			const { offsetLeft, offsetTop } = Drag.getInfo($drag)
-			const { scrollTop, scrollLeft }  = Drag.getInfo($scroll)
+			const { x, y } = _.mouse.getCoord(e)
+			const { offsetLeft, offsetTop } = _( $drag ).getInfo()
+			const { scrollTop, scrollLeft }  = _( $scroll ).getInfo()
 			if(_this.dragNode){
 				const _drag = _( _this.dragNode )
 				const size = _drag.getInfo()
@@ -86,8 +85,8 @@ export default {
 		} 
 		// 拖动中
 		const DragMove = e => {
-			const { x, y } = Drag.getMouse(e)
-			const { offsetLeft, offsetTop, width, height } = Drag.getInfo($drag)
+			const { x, y } = _.mouse.getCoord(e)
+			const { offsetLeft, offsetTop, width, height } = _( $drag ).getInfo()
 			const _node = _( _this.node )
 			const targetInfo = _node.getInfo()
 			const targetWidth = targetInfo.width
@@ -110,15 +109,15 @@ export default {
 				_node.style('border', 0)
 				_node.style('border', '1px solid ' + moveBorderColor)
 				
-				Drag.mark(_this,'.axesY', left)
-				Drag.mark(_this,'.axesX', top)
+				Dom.setMark(_this,'.axesY', left)
+				Dom.setMark(_this,'.axesX', top)
 			}
 		}
 		// 开始拖动
 		$drag.addEventListener('mousedown',e => {
 			if(_this.stop) return
 			const { target } = e
-			const { x, y } = Drag.getMouse(e)
+			const { x, y } = _.mouse.getCoord(e)
 			const _t = _( target ).parents('.drag')
 			const t = _t.el
 			if(t){
@@ -197,9 +196,8 @@ export default {
 			e.stopPropagation()
 			if(t){
 				Dom.createPointMark(_t) // 拖动标点
-				_($drag).finds('.drag').each(v=>{
-					const _v = _(v)
-					clearMark(v) // 清除 mark
+				_($drag).finds('.drag').each(_v=>{
+					clearMark(_v) // 清除 mark
 					// 给固定布局加不同颜色
 					if(_v.attr('fixed')){
 						_v.style('border', '1px dashed blue')
@@ -207,10 +205,8 @@ export default {
 						_v.style('border', '1px dashed ' + stopBorderColor)
 					}
 				})
-				
 				if(Dom.hasMark(t)){
-					const _mark = _( _t.el ).children('.point-mark')
-					_mark.show()
+					const _mark = _t.children('.point-mark').show()
 					if(_t.attr('fixed')){
 						_mark.style('zIndex',0).removeStyle('background')
 					}
@@ -252,17 +248,19 @@ export default {
 				const isGroup = _t.attr('group')
 				const hasUrl = _t.attr('rooturl')
 				
-				if(!isGroup && hasUrl){ return } 	// 有绑定数据时，内容不可编辑
+				if(!isGroup && hasUrl){ return}
 				
 				_this.stop = true
 				_t.addClass('hide')
 				
-				let _editor = _( _t.el ).find('.template')
+				let _editor = _t.find('.template')
 				
 				if(type !== 'text'){
 					_editor = _( target ).parents('.loopNode')
 					type =  _editor.attr('type')
-					if(hasUrl) return
+					if(isGroup && _editor.hasClass('x-bind-table')){
+						return
+					}
 				}
 				
 				if(type === 'text'){
@@ -294,9 +292,9 @@ export default {
 					
 				}else{
 					_this.stop = false
-					_( $drag ).finds('.drag').each(v => {
-						_(v).removeClass('hide')
-						clearMark(v) // 清除 mark
+					_( $drag ).finds('.drag').each(_v => {
+						_v.removeClass('hide')
+						clearMark(_v) // 清除 mark
 					})
 				}
 			}

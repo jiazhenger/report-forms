@@ -1,0 +1,30 @@
+{
+  "short_name": "Flutter",
+  "name": "Flutter App",
+  "icons": [
+    {
+      "src": "font.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "some.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "sun.png",
+      "type": "image/jpg",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "爱不释手",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "test":{
+      "src": "your.png",
+      "type": "image/svg",
+      "sizes": "1000*1000"
+    }
+}

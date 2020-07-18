@@ -15,24 +15,26 @@ const createAxes = (dom,width,height,space,isY) => {
 	dom.appendChild(node)
 }
 
-export default ( ) => {
-	const el = document.querySelector('#axes')
-	const $x = el.querySelector('.axesX')
-	const $y = el.querySelector('.axesY')
-	if($x){ $x.remove() }
-	if($y){ $y.remove() }
-	
-	const resize = () => {
-		const width = el.clientWidth
-		const height = el.clientHeight
-		// 创建坐标系
-		createAxes(el,width,height,axesSpace,true)
-		createAxes(el,width,height,axesSpace)
-	}
-	resize()
-	window.addEventListener('resize',e=>{
-		el.querySelector('.axesX').remove()
-		el.querySelector('.axesY').remove()
+export default {
+	init(){
+		const el = document.querySelector('#axes')
+		const $x = el.querySelector('.axesX')
+		const $y = el.querySelector('.axesY')
+		if($x){ $x.remove() }
+		if($y){ $y.remove() }
+		
+		const resize = () => {
+			const width = el.clientWidth
+			const height = el.clientHeight
+			// 创建坐标系
+			createAxes(el,width,height,axesSpace,true)
+			createAxes(el,width,height,axesSpace)
+		}
 		resize()
-	})
+		window.addEventListener('resize',e=>{
+			el.querySelector('.axesX').remove()
+			el.querySelector('.axesY').remove()
+			resize()
+		})
+	}
 }

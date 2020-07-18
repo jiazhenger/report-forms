@@ -26,5 +26,8 @@ module.exports =  {
 		errorCorrectionLevel:'H',
 		// version: 2,
 		margin:1
+	},
+	tableConfig:{
+		style:{ padding:'2px 5px', height:'20px', boxSizing:'content-box'}
 	}
 }
