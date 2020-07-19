@@ -2,6 +2,7 @@ import React from 'react'
 import Async from '@com/async'
 // ===================================================================== public js
 import _ from '../js/public/jzer'
+import Table from '../js/public/table'
 import Dom from '../js/public/dom'
 import Format from '../js/public/format'
 // ===================================================================== antd
@@ -77,6 +78,7 @@ export default class extends React.Component {
 				const dataSource = {...data, [name]: this.newData}
 				
 				$fn.local('dataSource', dataSource)
+				
 				this.setState({ data: dataSource}, ()=>{
 					this.refs.modal.close()
 					this.onCancel()
@@ -111,12 +113,11 @@ export default class extends React.Component {
 	}
 	/* ================================================== 获取 node 上的数据 ================================================== */
 	getNode = () => {
-		Dom.getNode(this.props.node).then(({ url, type, node, rootUrl, loop, isLoopNode }) => {
+		Dom.getNodeInfo(this.props._node).then(( { url, type, rootUrl } ) =>{
 			if(url){
 				const rootField = Format.getRootUrl(url)
 				const rootData = this.state.data[rootField]
 				let myData = Format.formatData(rootData, rootField, url, type)
-				console.log(myData)
 				this.setState({ rootField, rootData, myData })
 			}else if(rootUrl){  // 如果有根 url
 				const rootField = Format.getRootUrl(rootUrl)
@@ -177,20 +178,18 @@ export default class extends React.Component {
 			if(checked){
 				myData = Format.formatCheckedData(myData,v)
 				const rootUrl_ = Format.getRootUrl(url)
-				// 绑定数据
-				if( rootUrl !== rootUrl_){
-					_drag.attr('rootUrl', Format.getRootUrl(url) ) 			// 在父级绑定数据
-				}
+				// 在父级绑定数据
+				if( rootUrl !== rootUrl_){ _drag.attr('rootUrl', Format.getRootUrl(url) ) }
 				// 图片绑定
-				if( ['text','img','qrcode','barcode'].includes(type) ){
-					_bindSrc.attr({ url })
-				}
+				if( ['text','img','qrcode','barcode'].includes(type) ){ _bindSrc.attr({ url }) }
 				// 表格绑定
 				if(_drag.attr('type') === 'table' && _bindTable.hasClass('x-bind-table')){
-					_bindTable.attr({ url }).text(value)
-					return
+					if(Format.isArrayChild(url)){
+						Table.bindData(_bindTable, Format.parse(this.state.data, Format.getParentUrl(url)), name, url)
+					}else{
+						_bindTable.attr({ url }).text(value)
+					}
 				}
-				
 				// 个性绑定
 				if( type === 'text'){
 					// _bindText.html('<s>=</s>' + name).attr({ url }) 		 // 在子级绑定数据
@@ -205,9 +204,8 @@ export default class extends React.Component {
 				}else if( type === 'table'){
 					
 				}
-				
 			}else{
-				Dom.reset(model)
+				Dom.reset({...model,isArrayUrl:Format.isArrayChild(url)})
 			}
 			this.setState({ myData })
 		})

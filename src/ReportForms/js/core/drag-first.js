@@ -201,7 +201,6 @@ export default {
 				_temp.cssText('width:100%;height:100%;background:#fff;overflow:hidden')
 				if(type === 'text'){
 					_node.width(100).height(20).lineHeight(20)
-					_temp.style('overflow','hidden')
 				}else if(type === 'img'){
 					_node.height(50)
 				}else if(type === 'table'){
@@ -216,8 +215,6 @@ export default {
 				}else if(type === 'pages'){
 					_node.width(50).height(20).lineHeight(20).style('textAlign','center')
 				}
-				// 添加通用样式
-				if(  ['text','img','qrcode','barcode','ul'].includes(type) ){ _temp.addClass('x-com-style') }
 				// 添加通用数据绑定
 				if(  ['text','img','qrcode','barcode'].includes(type) ){ _temp.addClass('x-bind-url') }
 				// 直接绑定数据

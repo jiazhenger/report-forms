@@ -107,6 +107,7 @@ export default {
 	},
 	// 解析 dataSoruce/icons/0/src 为 root['icons']['src']
 	parseParent(root,url){
+		console.log(url)
 		if((typeof url) === 'string'){
 			let arr = url.split('/')
 			arr = arr.filter( v => isNaN(+v))

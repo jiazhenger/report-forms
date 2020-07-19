@@ -28,6 +28,6 @@ module.exports =  {
 		margin:1
 	},
 	tableConfig:{
-		style:{ padding:'2px 5px', height:'20px', boxSizing:'content-box'}
+		style:{ padding:'2px 5px', height:'20px', boxSizing:'content-box', border:'1px solid #ddd'}
 	}
 }

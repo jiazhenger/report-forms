@@ -2,6 +2,7 @@ import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
 import Table from '../../js/public/table'
+import _ from '../../js/public/jzer'
 import { tableConfig } from '../../js/public/config'
 // ===================================================================== template
 import List from '../../public.component/list'
@@ -18,7 +19,7 @@ const BorderFrame = [
 	{ label:'四边无边框', 	value:'box' },
 ]
 // ===================================================================== page component
-export default ({ node, _node }) => {
+export default ({ _node }) => {
 	const [ col, setCol] = React.useState(3)
 	const [ row, setRow] = React.useState(1)
 	const [ checked, setChecked] = React.useState(true)
@@ -32,20 +33,26 @@ export default ({ node, _node }) => {
 	const checkedRef = React.useRef()
 	
 	React.useEffect(()=>{
-		if(node){
-			const $table = node.querySelector('table')
-			if($table){
-				const $tbody = $table.querySelector('tbody')
-				const $tr = $tbody.querySelector('tr')
-				const trLen = $tbody.querySelectorAll('tr').length
-				const tdLen = $tr.querySelectorAll('td').length
-				const color = $tr.querySelector('td').style.borderColor
-				const hasHead = Boolean($table.querySelector('thead'))
+		if(_node){
+			const _table = _node.find('table')
+			if(_table.el){
+				
+				const $tbody = _table.find('tbody')
+				const $tr = $tbody.find('tr')
+				const trLen = $tbody.finds('tr').el.length
+				const tdLen = $tr.finds('td').el.length
+				const $td = $tr.find('td')
+				let color = $td.style('borderColor')
+				if(!color){
+					color = $td.style('borderBottomColor')
+				}
+			
+				const hasHead = Boolean(_table.find('thead').el)
 				rowRef.current.setValue(trLen)
 				colRef.current.setValue(tdLen)
 				colorRef.current.setValue(color)
-				frameRef.current.setValue($table.getAttribute('xframe'))
-				borderRef.current.setValue($table.getAttribute('xborder'))
+				frameRef.current.setValue(_table.attr('xframe'))
+				borderRef.current.setValue(_table.attr('xborder'))
 				checkedRef.current.setValue(hasHead)
 				
 				setRow(trLen)
@@ -53,7 +60,7 @@ export default ({ node, _node }) => {
 				setChecked(hasHead)
 			}
 		}
-	},[ node ])
+	},[ _node ])
 	
 	// 是否显示表头
 	const onHeadChange = React.useCallback(v=>{
@@ -87,32 +94,23 @@ export default ({ node, _node }) => {
 	}, [ _node ])
 	// frame
 	const onSelectFrame = React.useCallback(v=>{
-		Dom.getNode(node).then(({ $drag } ) => {
-			const $table = $drag.querySelector('table')
-			$table.setAttribute('xframe', v)
-			Dom.setTableBorder($table, border, colorRef.current.getValue())
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			const _table = _drag.find('table').attr('xframe', v)
+			Table.showHideBorder(_table, borderRef.current.getValue(), colorRef.current.getValue())
 			if(v === 'hsides' || v === 'box'){
-				for(let v of $table.querySelectorAll('tr')){
-					if(v.firstElementChild) v.firstElementChild.style.borderLeft = 0
-					if(v.lastElementChild) v.lastElementChild.style.borderRight = 0
-				}
+				_table.find('tr').first().style('borderleft', 0)
+				_table.find('tr').last().style('borderRight', 0)
 			}
 			if(v === 'vsides' || v === 'box'){
 				if(checked){
-					for(let v of $table.querySelector('thead').querySelectorAll('th')){
-						v.style.borderTop = 0
-					}
+					_table.find('thead').finds('th').style('borderTop', 0)
 				}else{
-					for(let v of $table.querySelector('tbody').firstElementChild.querySelectorAll('td')){
-						v.style.borderTop = 0
-					}
+					_table.first().finds('td').style('borderTop', 0)
 				}
-				for(let v of $table.querySelector('tbody').lastElementChild.querySelectorAll('td')){
-					v.style.borderBottom = 0
-				}
+				_table.find('tbody').last().finds('td').style('borderBottom', 0)
 			}
 		})
-	}, [ node, border, checked ])
+	}, [ _node, checked ])
 	// 设置下边框
 	const onSelectStyle = React.useCallback(v => {
 		Dom.getNodeInfo(_node).then(({ _drag } ) => {
@@ -155,9 +153,9 @@ export default ({ node, _node }) => {
 					}
 				}
 			})
-			Dom.setTableBorder(table, border, colorRef.current.getValue())
 			// last
 			_temp.html('').append(table)
+			Table.showHideBorder(_(table), border, colorRef.current.getValue())
 		})
 	}, [_node, col, row, border])
 	return (

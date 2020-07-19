@@ -20,7 +20,7 @@ const BorderSide = [
 	{ label:'四边', 			value:'border' },
 ]
 // ===================================================================== page component
-export default ({ node, _node }) => {
+export default ({ _node }) => {
 	const borderWidthRef = React.useRef()
 	const borderStyleRef = React.useRef()
 	const borderColorRef = React.useRef()
@@ -28,69 +28,63 @@ export default ({ node, _node }) => {
 	const borderRadius = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNodeStyle(_node,{
-			onAll(el,style){
-				const borderWidth = style.borderWidth.replace(/0px/g,'').trim()
-				const borderStyle = style.borderStyle.replace(/none/g,'').trim()
-				const borderColor = style.borderColor.replace(/rgb\(34, 34, 34\)/g,'').trim()
-				
-				borderWidthRef.current.setValue($fn.toNum(borderWidth))
-				borderStyleRef.current.setValue($fn.isValid(borderStyle) ? borderStyle : 'none')
-				borderColorRef.current.setValue(borderColor)
-				borderRadius.current.setValue(style.borderRadius)
-				// 判断是哪一边
-				let borderSide = 'none'
-				const arr = BorderSide.map(v=>v.value)
-				let index = 0
-				arr.forEach(v=>{
-					if(v !== 'none' && v !== 'border'){
-						if(parseInt(style[v+'Width']) > 0){
-							index ++
-							borderSide = v
-						}
+		Dom.getNodeInfo(_node, false).then(({ _temp })=>{
+			const style = _temp.getStyle(true)
+			const borderWidth = style.borderWidth.replace(/0px/g,'').trim()
+			const borderStyle = style.borderStyle.replace(/none/g,'').trim()
+			const borderColor = style.borderColor.replace(/rgb\(34, 34, 34\)/g,'').trim()
+			
+			borderWidthRef.current.setValue($fn.toNum(borderWidth))
+			borderStyleRef.current.setValue($fn.isValid(borderStyle) ? borderStyle : 'none')
+			borderColorRef.current.setValue(borderColor)
+			borderRadius.current.setValue(style.borderRadius)
+			// 判断是哪一边
+			let borderSide = 'none'
+			const arr = BorderSide.map(v=>v.value)
+			let index = 0
+			arr.forEach(v=>{
+				if(v !== 'none' && v !== 'border'){
+					if(parseInt(style[v+'Width']) > 0){
+						index ++
+						borderSide = v
 					}
-				})
-				if(index === 4){
-					borderSide = 'border'
 				}
-				
-				borderSideRef.current.setValue(borderSide)
+			})
+			if(index === 4){
+				borderSide = 'border'
 			}
-		}, true)
+			
+			borderSideRef.current.setValue(borderSide)
+		})
 	}, [_node])
 	// 选择粗细
-	const onChange = React.useCallback(v => {
-		Dom.getNodeStyle(_node,{
-			onAll(_el){
-				console.log(_el)
-				const width = borderWidthRef.current.getValue()
-				const style = borderStyleRef.current.getValue()
-				const color = borderColorRef.current.getValue() || '#000'
-				const border = borderSideRef.current.getValue()
-				console.log(_el)
-				if(border === 'border'){
-					_el.style('border', width + 'px ' +   style + ' ' + color)
-				}else if(border === 'none'){
-					_el.removeStyle('border')
-				}else{
-					_el.removeStyle('border')
-					_el.style({
-						[border+'Width']: width + 'px',
-						[border+'Style']: style,
-						[border+'Color']: color
-					})
-				}
+	const onChange = React.useCallback( v => {
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			const width = borderWidthRef.current.getValue()
+			const style = borderStyleRef.current.getValue()
+			const color = borderColorRef.current.getValue() || '#000'
+			const border = borderSideRef.current.getValue()
+			
+			if(border === 'border'){
+				_temp.style('border', width + 'px ' +   style + ' ' + color)
+			}else if(border === 'none'){
+				_temp.removeStyle('border')
+			}else{
+				_temp.removeStyle('border')
+				_temp.style({
+					[border+'Width']: width + 'px',
+					[border+'Style']: style,
+					[border+'Color']: color
+				})
 			}
 		})
 	}, [ _node ])
 	
 	const onRaiuus = React.useCallback(v => {
-		Dom.getComStyleNode(node,{
-			onAll(el){
-				el.style.borderRadius = isNaN(v) ? v : (v+'px')
-			}
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			_temp.style('borderRadius', isNaN(v) ? v : (v+'px'))
 		})
-	}, [ node ])
+	}, [ _node ])
 	
 	return (
 		<>

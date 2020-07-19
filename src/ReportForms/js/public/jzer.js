@@ -15,6 +15,18 @@ $.listener = function(el,callback){
 		return Init.prototype
 	}
 }
+// 将 { a: 0 } 转换为 { key: 'a', value: 0}
+$.getKeyValue = function(obj){
+	let stack = {}
+	for(let i in obj){
+		stack = { key: i, value: obj[i] }
+	}
+	return stack
+}
+// 将横杠线转换驼峰
+// $.toHump = name => ( name.replace(/\-(\w)/g, (all, letter) => letter.toUpperCase() ) )
+// 驼峰转换横杠线
+$.toLine = name => ( name.replace(/([A-Z])/g, '-$1').toLowerCase() );
 // 鼠标
 $.mouse = {
 	getCoord(e){
@@ -23,14 +35,10 @@ $.mouse = {
 			y: e.pageY || e.y || e.screenY || e.clientY
 		}
 	}
-}
+};
 // 数据判断
-const dataType = ['String', 'Number', 'Array', 'Object']
-
-dataType.forEach(v => {
-	$['is' + v] = function(obj){
-		return {}.toString.call(obj) === '[object '+ v +']'
-	} 
+(['String', 'Number', 'Array', 'Object', 'Boolean', 'Undefined']).forEach(v => {
+	$['is' + v] = obj => ( {}.toString.call(obj) === '[object '+ v +']' )
 })
 
 function Init(selector,all){
@@ -157,7 +165,7 @@ const styleExtend = {
 		})
 	}
 };
-(['width','height','lineHeight','left','top']).forEach(function(v){
+(['width','height','lineHeight','left','top','letterSpacing','fontSize']).forEach(function(v){
 	styleExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -256,21 +264,43 @@ const attrExtend = {
 })
 // 查找父级元素
 const parentExtend = {
+	tag(tag){
+		return $.listener(this.el, el => {
+			if(arguments.length === 0){
+				return el.tagName.toLowerCase()
+			}else{
+				return el.tagName.toLowerCase() === tag
+			}
+		})
+	},
 	// 查找父级，包含本身
 	parent(str, isSelf){
 		return $.listener(this.el, el => {
-			if(str.indexOf('.') !== -1){ str = str.replace('.','') }
-			
-			if($(el).hasClass(str) && isSelf){ 
-				// this.el = el
-				return this
+			if(arguments.length === 0){
+				return __( el.parentElement )
+			}else{
+				let parent = el.parentElement
+				if(str.indexOf('.') !== -1){ 
+					str = str.replace('.','') 
+					if($(el).hasClass(str) && isSelf){
+						// this.el = el
+						return this
+					}
+					
+					while ( !$(parent).hasClass(str) && parent !== document.body && parent !== null) {
+						parent = parent.parentElement
+					}
+				}else{
+					if($(el).tag(str)  && isSelf){
+						return this
+					}
+					
+					while ( !$(parent).tag(str) && parent !== document.body && parent !== null) {
+						parent = parent.parentElement
+					}
+				}
+				return __( parent === document.body ? null : parent )
 			}
-			
-			let parent = el.parentElement
-			while ( !$(parent).hasClass(str) && parent !== document.body && parent !== null) {
-				parent = parent.parentElement
-			}
-			return __( parent === document.body ? null : parent )
 		})
 	},
 	parents(str){
@@ -314,6 +344,36 @@ const parentExtend = {
 			
 		})
 	},
+	first(){
+		return $.listener(this.el, el => {
+			return __( el.firstElementChild )
+		})
+	},
+	last(){
+		return $.listener(this.el, el => {
+			return __( el.lastElementChild )
+		})
+	},
+	index(){
+		return $.listener(this.el, el => {
+			if(arguments.length === 0){
+				let index = 0
+				$(el).parent().children().each((v,i,n)=>{
+					if(n.isSameNode(this.el)){
+						index = i
+					}
+				})
+				return index
+			}else{
+				return __(el.children)
+			}
+		})
+	},
+	length(){
+		return $.listener(this.el, el => {
+			return el.length
+		})
+	}
 }
 // 设置值
 const valueExtend = {

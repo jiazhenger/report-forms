@@ -1,6 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -54,8 +55,14 @@ const TextAlign = [
 	{ label:'居右对齐', value:'right'},
 	{ label:'两端对齐', value:'justify'},
 ]
+const style = {
+	fontWeight:{ value:'bold' },
+	fontStyle:{ value: 'italic'},
+	textDecoration:{ value:'underline' },
+	textIndent: { value: '2em' }
+}
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ node, _node }) => {
 	// select
 	const fontFamily = React.useRef()
 	const fontSize = React.useRef()
@@ -63,6 +70,7 @@ export default ({ node }) => {
 	const letterSpacing = React.useRef()
 	const textAlign = React.useRef()
 	const color = React.useRef()
+	const width = React.useRef()
 	// switch
 	const fontWeight = React.useRef()
 	const fontStyle = React.useRef()
@@ -70,8 +78,8 @@ export default ({ node }) => {
 	const textIndent = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNode(node).then(( { $temp } ) => {
-			const style = Dom.getStyle($temp)
+		Dom.getNodeInfo(_node).then(( { _temp } ) => {
+			const style = _temp.style()
 			// select
 			fontFamily.current.setValue(style.fontFamily)
 			fontSize.current.setValue(style.fontSize)
@@ -79,49 +87,57 @@ export default ({ node }) => {
 			letterSpacing.current.setValue(style.letterSpacing)
 			textAlign.current.setValue(style.textAlign)
 			color.current.setValue(style.color)
+			width.current.setValue(_temp.getInfo().clientWidth)
 			// switch
 			fontWeight.current.setValue(style.fontWeight === 'bold')
 			fontStyle.current.setValue(style.fontStyle === 'italic')
 			textDecoration.current.setValue(style.textDecoration === 'underline')
 			textIndent.current.setValue(style.textIndent === '2em')
 		}, false)
-	},[ node ])
-	const onChange = React.useCallback( (name,value,none) => {
-		Dom.getNode(node).then(( { $temp } ) => {
-			const obj = {}
-			for(var i in name){
-				obj.label = i
-				obj.value = name[i]
+	},[ _node ])
+	const onChange = React.useCallback( v => {
+		Dom.getNodeInfo(_node).then(( { _temp } ) => {
+			const { key, value} = _.getKeyValue(v); // 转换成{key:,value: }
+			// 布尔值
+			if( _.isUndefined(value) || (_.isBoolean(value) && !value)){
+				return _temp.removeStyle(_.toLine(key))
 			}
-			if({}.toString.call(obj.value) === '[object Boolean]'){
-				$temp.style[obj.label] = obj.value ? value : (none ? none : 'normal')
-			}else{
-				$temp.style[obj.label] = obj.value === undefined ? value : obj.value
+			
+			if(['width','letterSpacing','fontSize'].includes(key)){
+				_temp[key]( value )
+			}else if(['fontFamily','textAlign','lineHeight','color'].includes(key)){
+				_temp.style([key], value)
+			}else if(['fontWeight','fontStyle','textDecoration','textIndent'].includes(key)){
+				_temp.style([key], style[key].value)
 			}
+			
 		})
-	}, [ node ])
+	}, [ _node ])
 	
 	return (
 		<>
 			<div className='fx'>
 				<List.Select label='字体' ref={fontFamily} data={FontFamily} p='选择字体' isHalf name='fontFamily' onChange={onChange} />
-				<List.Select label='尺寸' ref={fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={v=>onChange(v,'100%')}/>
+				<List.Select label='尺寸' ref={fontSize} data={FontSize}  p='选择尺寸' isHalf  name='fontSize' onChange={onChange}/>
 			</div>
 			<div className='fx'>
-				<List.Select label='行高' ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={v=>onChange(v,'none')} />
-				<List.Select label='间距' ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={v=>onChange(v,'0')} />
+				<List.Select label='行高' ref={lineHeight} data={LineHeight} p='选择字体' isHalf name='lineHeight' onChange={onChange} />
+				<List.Select label='间距' ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={onChange} />
 			</div>
 			<div className='fx'>
-				<List.Select label='对齐' ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={v=>onChange(v,'left')} />
-				<List.Input label='颜色' ref={color} p='颜色' isHalf name='color' onChange={v=>onChange(v)} />
+				<List.Select label='对齐' ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={onChange} />
+				<List.Input label='颜色' ref={color} p='颜色' isHalf name='color' onChange={onChange} />
+			</div>
+			<div className='fx'>
+				<List.Input label='宽度' ref={width} p='宽度' isHalf name='width' onChange={onChange} />
 			</div>
 			<div className='fxj'>
-				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={v=>onChange(v,'bold')}/>
-				<List.Switch label='倾斜' ref={fontStyle}  name='fontStyle' onChange={v=>onChange(v,'italic')}/>
-				<List.Switch label='下划线' ref={textDecoration}  name='textDecoration' onChange={v=>onChange(v,'underline','none')}/>
+				<List.Switch label='加粗' ref={fontWeight} name='fontWeight' onChange={onChange}/>
+				<List.Switch label='倾斜' ref={fontStyle}  name='fontStyle' onChange={onChange}/>
+				<List.Switch label='下划线' ref={textDecoration}  name='textDecoration' onChange={onChange}/>
 			</div>
 			<div className='fxj'>
-				<List.Switch label='缩进' ref={textIndent}  name='textIndent' onChange={v=>onChange(v,'2em','0')}/>
+				<List.Switch label='缩进' ref={textIndent}  name='textIndent' onChange={onChange}/>
 			</div>
 		</>
 	)

@@ -1,4 +1,5 @@
 import _ from './jzer'
+import { tableConfig } from '../../js/public/config'
 // 绑定属性
 const addAttr = ( el, { className, style, attr } ) => {
 	// 添加 class
@@ -229,11 +230,14 @@ export default {
 		_node.finds('td').borderColor( color )
 		return this
 	},
+	// 设置下边框
 	setBottomBorder(_table, borderStyle, color, checked){
-		_table.finds('td').style({
+		const style = {
 			border: 0,
 			borderBottom: '1px '+ borderStyle + ' ' + (color || '#ddd')
-		})
+		}
+		_table.finds('th').style(style)
+		_table.finds('td').style(style)
 		return this
 	},
 	// 设置表格边框
@@ -248,5 +252,28 @@ export default {
 				_table.finds('td').border(0)
 			}
 		}
+	},
+	bindData(td, data, name, url){
+		const row = data.length
+		const index = td.index()
+		const _tbody = td.parent('tbody')
+		const trLen = _tbody.children().length()
+		const col = _tbody.find('tr').children().length()
+		if(row !== trLen){
+			const tbody = Tbody({
+				row,
+				col,
+				td:{
+					style:tableConfig.style,
+					className:'loopNode x-bind-table',
+					attr:{ type:'text' }
+				}
+			})
+			_tbody.html(tbody.innerHTML)
+		}
+		data.forEach((v,i) => {
+			_tbody.children(i).children(index).text(v[name])
+			_tbody.children(0).children(index).attr({url})
+		})
 	}
 }

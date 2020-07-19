@@ -75,16 +75,18 @@ export default {
 			if(_node){
 				let model = {}
 				const _drag = _node.parents('.drag')
-				const _temp = _node.children('.template')
+				const _temp = _node.hasClass('loopNode') ? _node : _node.children('.template')
 				const _bindText = _node.find('.x-bind-text')
 				const _bindUrl = _node.find('.x-bind-url')
 				const _bindSrc = _node.find('.x-bind-src')
 				const _bindTable = _node
 				const type = _node.attr('type')
+				const dragType = _drag.attr('type')
 				const rootUrl = _drag.attr('rooturl')
 				const bindUrl = _bindUrl.attr('url')
+				let url = _temp.attr('url')
 				
-				model = { _drag, _temp, _bindText, _bindSrc, _bindUrl, _bindTable, type, rootUrl, bindUrl }
+				model = { _drag, _temp, _bindText, _bindSrc, _bindUrl, _bindTable, type, dragType, url, rootUrl, bindUrl }
 				
 				resolve(model)
 			}else{
@@ -94,72 +96,26 @@ export default {
 	},
 	// 获取模板 node
 	getStyleNode(node){ return _(node).hasClass('loopNode') ? node : node.querySelector('.template') },
-	// 判断 node 是否有 template
-	isTemplate(node){ return node.querySelector('.template') },
 	// 清空数据
-	reset({ _drag, _temp, _bindText, type, _bindSrc, _bindUrl}){
+	reset({ _drag, _temp, _bindText, dragType, _bindSrc, _bindUrl, _bindTable, isArrayUrl}){
 		
 		if(_bindUrl.el){ _drag.removeAttr('rootUrl') }
 		
 		_bindUrl.removeAttr('url')
 		
-		if(['img','barcode','qrcode'].includes(type)){
+		if(['img','barcode','qrcode'].includes(dragType)){
 			_( _temp.el ).find('img').src(`${window.location.origin}/assets/images/img.png`)
 		}
 		
-		if(type === 'text'){
+		if(dragType === 'text'){
 			_bindText.text('')
-		}else if( type === 'barcode'){
+		}else if( dragType === 'barcode'){
 			_(_drag.el).find('img').width(40).height(40)
-		}
-	},
-	// 创建表格
-	createTable($temp, data){
-		if(!$fn.hasArray(data)) return
-		$temp.innerHTML = ''
-		const table = document.createElement('table')
-		table.style.cssText = 'width:100%;border-collapse:collapse;border-spacing:0'
-		const tbody = document.createElement('tbody')
-		const trFragment = document.createDocumentFragment()
-		data.forEach( v => {
-			const tr = document.createElement('tr')
-			const tdFragment = document.createDocumentFragment()
-			for(let i in v){
-				const td = document.createElement('td')
-				td.className = 'loopNode'
-				td.style.cssText = 'border:1px solid #ddd;padding:2px 5px;'
-				td.setAttribute('type','text')
-				td.textContent = v[i]
-				tdFragment.appendChild(td)
-			}
-			tr.appendChild(tdFragment)
-			trFragment.appendChild(tr)
-			
-			this.addClass(this.parents($temp,'drag'),'more')
-		})
-		tbody.appendChild(trFragment)
-		table.appendChild(tbody)
-		$temp.appendChild(table)
-	},
-	
-	// 设置表格边框
-	setTableBorder($table, checked, color){
-		let c = color || '#ddd'
-		if($table){
-			if(checked){
-				for(let v of $table.querySelectorAll('th')){
-					v.style.border = '1px solid ' + c
-				}
-				for(let v of $table.querySelectorAll('td')){
-					v.style.border = '1px solid ' + c
-				}
+		}else if( dragType === 'table'){
+			if(isArrayUrl){
+				
 			}else{
-				for(let v of $table.querySelectorAll('th')){
-					v.style.border = 0
-				}
-				for(let v of $table.querySelectorAll('td')){
-					v.style.border = 0
-				}
+				_bindTable.removeAttr('url').text('')
 			}
 		}
 	},
