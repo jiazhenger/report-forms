@@ -198,6 +198,7 @@ export default {
 		colgroup.appendChild(colFragment)
 		return colgroup
 	},
+	// 添加行
 	addRow(table,option){
 		const opt = {
 			tr:{ },
@@ -216,7 +217,6 @@ export default {
 				addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr})
 				// td 添加内容
 				if(opt.td.text){ td.textContent = opt.td.text }
-				
 				tdFragment.appendChild(td)
 			}
 			tr.appendChild(tdFragment)
