@@ -169,8 +169,9 @@ const styleExtend = {
 	styleExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
-				const r = this.style(v)
-				return r ? parseInt(r) : 0
+				let r = this.style(v)
+				r = isNaN(+r) ? r : parseInt(r)
+				return r
 			}else if(arguments.length === 1){
 				if($.isNumber( parseInt(value) )){
 					value = isNaN(+value) ? value : value + 'px'
@@ -245,12 +246,19 @@ const attrExtend = {
 	},
 	removeAttr(attr){
 		return $.listener(this.el, el => {
-			el.removeAttribute(attr)
+			if(attr.indexOf(',') === -1){
+				el.removeAttribute(attr)
+			}else{ // 获取多个属性
+				attr = attr.split(',')
+				attr.forEach(v=>{
+					el.removeAttribute(v)
+				})
+			}
 			return this
 		})
 	}
 };
-(['src','href','contentEditable']).forEach(function(v){
+(['src','href','contentEditable','draggable']).forEach(function(v){
 	attrExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -465,7 +473,16 @@ const infoExtend = {
 			}
 		})
 	},
-	
+	clientWidth(){
+		return $.listener(this.el, el => {
+			return el.clientWidth
+		})
+	},
+	clientHeight(){
+		return $.listener(this.el, el => {
+			return el.clientHeight
+		})
+	}
 }
 // 添加元素
 const appendExtend = {

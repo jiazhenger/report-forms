@@ -1,10 +1,10 @@
 import React from 'react'
 import Async from '@com/async'
 // ===================================================================== public js
-import _ from '../js/public/jzer'
 import Table from '../js/public/table'
 import Dom from '../js/public/dom'
 import Format from '../js/public/format'
+import _ from '../js/public/jzer'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -16,6 +16,7 @@ import List from '../public.component/list'
 const { Panel } = Collapse
 const Button  =  Async(()=>import('@antd/button'))
 const Tree  =  Async(()=>import('../public.component/tree'))
+const Data  =  Async(()=>import('../style.component/tp/data'))
 const { $fn } = window
 // ===================================================================== page component
 const model = { name:'dataSoruce1', url:'' }
@@ -43,6 +44,8 @@ export default class extends React.Component {
 			}
 		}
 		// 获取文件
+		const way = $fn.local('bindWay')
+		this.refs.bindWayRef.setValue( way ? true : false)
 		if(!this.props.node) return
 	}
 	/* ================================================== 弹窗 ================================================== */
@@ -134,13 +137,14 @@ export default class extends React.Component {
 	}
 	/* ================================================== 选择根数据 ================================================== */
 	selectRoot(data, field){
-		Dom.getNodeInfo(this.props._node).then( model => {
-			const { _drag, type, rootUrl } = model
+		const rootData = data[field]
+		const isContent = $fn.local('bindWay')
+		Dom.getNodeInfo(this.props._node, false).then( model => {
+			const { _drag, type } = model
 			// 分隔线不绑定数据
 			if(type==='devider'){ return $fn.toast('此元素无法绑定数据') }
 			// 当切换数据源时还原 dom 结构
 			
-			const rootData = data[field]
 			if(this.state.rootField !== field){
 				// 添加根 url，并移出当前 url
 				_drag.attr('rootUrl',field)
@@ -160,122 +164,70 @@ export default class extends React.Component {
 		})
 		// node 不存在时
 		if(!this.props._node){
-			console.log('node 不存在')
+			const myData = Format.formatData(rootData, field, field, null)
+			this.setState({
+				rootField: field,
+				rootData,
+				myData,
+				key: this.state.key + 1
+			})
+			Format.renderData(rootData, field, _('#dragContent'), isContent)
 		}
 	}
 	/* ================================================== 选择树上的数据 ================================================== */
 	onTreeSelect = v => {
 		Dom.getNodeInfo(this.props._node).then( model => {
-			const { _drag, _temp, _bindText, _bindSrc, _bindUrl, type, rootUrl, _bindTable } = model
-			
+			const { _drag, _temp, type, rootUrl,dragType } = model
+			const isContent = $fn.local('bindWay')
 			if((type === 'text' || type === 'img') && !v.isString){
 				return $fn.toast('数据必须是字符串')
 			}
 			
 			v.checked = !v.checked
-			const { checked, url, value, isArray, isObject, root, name } = v
+			const { checked, url, value, name } = v
 			let myData = this.state.myData
 			if(checked){
 				myData = Format.formatCheckedData(myData,v)
 				const rootUrl_ = Format.getRootUrl(url)
 				// 在父级绑定数据
 				if( rootUrl !== rootUrl_){ _drag.attr('rootUrl', Format.getRootUrl(url) ) }
-				// 图片绑定
-				if( ['text','img','qrcode','barcode'].includes(type) ){ _bindSrc.attr({ url }) }
+				
 				// 表格绑定
-				if(_drag.attr('type') === 'table' && _bindTable.hasClass('x-bind-table')){
+				if(dragType === 'table'){
 					if(Format.isArrayChild(url)){
-						Table.bindData(_bindTable, Format.parse(this.state.data, Format.getParentUrl(url)), name, url)
+						Table.bindData(_temp, _drag, Format.parse(this.state.data, Format.getParentUrl(url)), name, url, isContent)
 					}else{
-						_bindTable.attr({ url }).text(value)
+						_temp.attr({ url }).addClass('x-bind-url')
+						isContent ? _temp.text(value) : _temp.html(Dom.bindField(name))
 					}
-				}
-				// 个性绑定
-				if( type === 'text'){
-					// _bindText.html('<s>=</s>' + name).attr({ url }) 		 // 在子级绑定数据
-					_bindText.text(value).attr({ url }) 		 // 在子级绑定数据
-				}else if( type === 'img'){
-					_( _bindSrc.el ).find('img').attr({temp:1}).src(value)
-				}else if( type === 'barcode' ){
-					_drag.height('auto')
-					Dom.createBarcode(_bindSrc, Format.parse(this.state.data, url))
-				}else if( type === 'qrcode' ){
-					Dom.createQrcode(_bindSrc, Format.parse(this.state.data, url))
-				}else if( type === 'table'){
-					
+				}else{
+					if( !_temp.hasClass('loopNode')){
+						_temp.attr({ type })
+					}
+					_temp.attr({ url }).addClass('x-bind-url')
+					// 个性绑定
+					if( type === 'text'){
+						isContent ? _temp.text(value) : _temp.html(Dom.bindField(name))
+					}else if( type === 'img'){
+						_temp.find('img').attr({temp:1}).src(value)
+					}else if( type === 'barcode' ){
+						_drag.height('auto')
+						Dom.createBarcode(_temp, Format.parse(this.state.data, url))
+					}else if( type === 'qrcode' ){
+						Dom.createQrcode(_temp, Format.parse(this.state.data, url))
+					}else if( type === 'checkbox'){
+						Dom.createCheckbox(_temp, Format.parse(this.state.data, url))
+					}
 				}
 			}else{
 				Dom.reset({...model,isArrayUrl:Format.isArrayChild(url)})
 			}
 			this.setState({ myData })
 		})
-		/*
-		Dom.getNode(this.props.node).then(({ node, $temp, $bindText, $drag, dragType, type, group, loop, isLoopNode })=>{
-			if(type === 'table' && !isLoopNode &&　!v.isArray){
-				return $fn.toast('数据必须是数组')
-			}
-			
-			if((type === 'text' || type === 'img') && !v.isString){
-				return $fn.toast('数据必须是字符串')
-			}
-			
-			v.checked = !v.checked
-			
-			const { checked, url, value, isArray, isObject, root, name } = v
-			let myData = this.state.myData
-			if(checked){
-				myData = Format.formatCheckedData(myData,v)
-				if(group && (isObject || isArray)){
-					_( node ).attr({ rootUrl:url, loop:1  })
-				}else{
-					_( $temp ).attr('url',url)
-				}
-				
-				$bindText.text('=' + name)
-				
-				if(type === 'text'){
-					
-				}else if( type === 'img' ){
-					// $temp.querySelector('img').src =  $fn.isString(value) ? value : window.location.origin +'/assets/images/img.png'
-				}else if( type === 'table' ){
-					// Dom.createTable($temp, Format.parse(this.state.data, url))
-				}else if( type === 'ul' ){
-					// Dom.createList($temp, Format.parse(this.state.data, url))
-				}else if( type === 'checkbox' ){
-					// Dom.createCheckbox($temp, Format.parse(this.state.data, url))
-				}else if( type === 'barcode' ){
-					$drag.style.height = 'auto'
-					// Dom.createBarcode($temp, Format.parse(this.state.data, url))
-				}else if( type === 'qrcode' ){
-					// Dom.createQrcode($temp, Format.parse(this.state.data, url))
-				}
-				
-			}else{
-				if(group && (isObject || isArray)){
-					node.setAttribute('rootUrl',root)
-					node.removeAttribute('loop')
-				}else{
-					$temp.removeAttribute('url')
-				}
-				// 重置数据
-				if(isLoopNode && Format.isArrayChild(url) && type === 'table'){
-					([].slice.call($temp.parentNode.children)).forEach((v,index)=>{
-						if(Dom.hasClass(v,'activeLoop')){
-							( [].slice.call($drag.querySelectorAll('tbody tr')) ).forEach( (p,k) =>{
-								p.children[index].textContent = ''
-							})
-						}
-					})
-				}else{
-					// Dom.reset($temp,type)
-				}
-			}
-			
-			this.setState({ myData })
-		})
-		*/
 	}
-	
+	onBindChange = v => {
+		v ? $fn.local('bindWay',1) : $fn.remove('bindWay') 
+	}
 	render(){
 		const { model, data, myData, rootField, rootData, key } = this.state
 		const TypeComponent = e => {
@@ -290,7 +242,11 @@ export default class extends React.Component {
 		return (
 			<>
 				<div className='abs_lt wh scroll'>
-					<Collapse bordered={false} defaultActiveKey={['0','1']}>
+					<Collapse bordered={false} defaultActiveKey={['0','1','2']}>
+					<Panel header='常规选项'>
+						<Data _node={this.props._node} />
+						<List.Switch label='内容' ref='bindWayRef'  onChange={this.onBindChange}/>
+					</Panel>
 						<Panel header='数据源' key={0} extra={<Button size='small' label='添加' onClick={this.onAdd} />}>
 							{
 								$fn.hasObject(data) ? (

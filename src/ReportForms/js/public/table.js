@@ -1,4 +1,5 @@
 import _ from './jzer'
+import Dom from './dom'
 import { tableConfig } from '../../js/public/config'
 // 绑定属性
 const addAttr = ( el, { className, style, attr } ) => {
@@ -253,10 +254,10 @@ export default {
 			}
 		}
 	},
-	bindData(td, data, name, url){
-		const row = data.length
-		const index = td.index()
-		const _tbody = td.parent('tbody')
+	bindData(_td, _drag, data, name, url, isContent){
+		const row = isContent ? data.length : 1
+		const index = _td.index()
+		const _tbody = _td.parent('tbody')
 		const trLen = _tbody.children().length()
 		const col = _tbody.find('tr').children().length()
 		if(row !== trLen){
@@ -271,9 +272,23 @@ export default {
 			})
 			_tbody.html(tbody.innerHTML)
 		}
-		data.forEach((v,i) => {
-			_tbody.children(i).children(index).text(v[name])
-			_tbody.children(0).children(index).attr({url})
+		if(isContent){
+			data.forEach((v,i) => {
+				_tbody.children(i).children(index).text(v[name])
+				_tbody.children(i).children(index).attr({url})
+			})
+		}else{
+			_drag.removeStyle('height')
+			_tbody.find('tr').children(index).html(Dom.bindField(name))
+			_tbody.find('tr').children(index).attr({url})
+		}
+	},
+	
+	resetData(td){
+		const index = td.index()
+		const _tbody = td.parent('tbody')
+		_tbody.finds('tr').each(v=>{
+			v.children(index).html('')
 		})
 	}
 }

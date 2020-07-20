@@ -8,7 +8,7 @@ import List from '../../public.component/list'
 // ===================================================================== upload
 const { $fn } = window
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const [ model, setModel ] = React.useState({ })
 	const textRef = React.useRef()
 	const lineColorRef = React.useRef()
@@ -18,15 +18,15 @@ export default ({ node }) => {
 	const fontSizeRef = React.useRef()
 	
 	React.useEffect(()=>{
-		if(node){
-			const $img = node.querySelector('img')
-			const code = $img.getAttribute('code')
+		Dom.getNodeInfo(_node,false).then( ({ _drag }) => {
+			const _img = _node.find('img')
+			const code = _img.attr('code')
 			if(code){
-				const lineColor = $img.getAttribute('lineColor') || barcode.lineColor
-				const width = $img.getAttribute('codeWidth') || barcode.codeWidth
-				const height = $img.getAttribute('codeHeight') || barcode.codeHeight
-				const fontSize = $img.getAttribute('fontSize') || barcode.fontSize
-				let displayValue = Boolean($img.getAttribute('displayValue'))
+				const lineColor = _img.attr('lineColor') || barcode.lineColor
+				const width = _img.attr('codeWidth') || barcode.codeWidth
+				const height = _img.attr('codeHeight') || barcode.codeHeight
+				const fontSize = _img.attr('fontSize') || barcode.fontSize
+				let displayValue = Boolean(_img.attr('displayValue'))
 					displayValue = displayValue ? barcode.displayValue : false
 				
 				textRef.current.setValue(code)
@@ -38,8 +38,8 @@ export default ({ node }) => {
 				
 				setModel({ code, lineColor, width, height, displayValue })
 			}
-		}
-	},[ node ])
+		})
+	},[ _node ])
 	
 	
 	const onChange = React.useCallback( v => {
@@ -47,32 +47,29 @@ export default ({ node }) => {
 	}, [ model ])
 	
 	const onCreateBarcode  = React.useCallback( (name,value,none) => {
-		Dom.getNode(node).then(({ node, $drag } ) => {
-			console.log(model.code)
+		Dom.getNodeInfo(_node).then( ({ _drag }) => {
 			if(!$fn.isValid(model.code)){
 				return $fn.toast('条形码内容不能为空')
 			}
+			const _img = _drag.find('img').width('100%').height('100%').attr('temp',1)
+			_drag.height('auto')
 			
-			const $img = node.querySelector('img')
-			$img.style.width = '100%'
-			$img.style.height = '100%'
-			$drag.style.height = 'auto'
+			const code = _img.attr('code')
 			
-			$img.setAttribute('temp',1)
-			
-			const code = $img.getAttribute('code')
 			if(code){
-				model.lineColor ? $img.setAttribute('lineColor',model.lineColor) : $img.removeAttribute('lineColor')
-				model.width ? $img.setAttribute('codeWidth',model.width) : $img.removeAttribute('codeWidth')
-				model.height ? $img.setAttribute('codeHeight',model.height) : $img.removeAttribute('codeHeight')
-				model.displayValue ? $img.setAttribute('displayValue',model.displayValue) : $img.removeAttribute('displayValue')
-				model.fontSize ? $img.setAttribute('fontSize',model.fontSize) : $img.removeAttribute('fontSize')
+				model.lineColor ? _img.attr('lineColor',model.lineColor) : _img.removeAttr('lineColor')
+				model.width ? _img.attr('codeWidth',model.width) : _img.removeAttr('codeWidth')
+				model.height ? _img.attr('codeHeight',model.height) : _img.removeAttr('codeHeight')
+				model.displayValue ? _img.attr('displayValue',model.displayValue) : _img.removeAttr('displayValue')
+				model.fontSize ? _img.attr('fontSize',model.fontSize) : _img.removeAttr('fontSize')
 			}else{
-				$img.setAttribute('lineColor',barcode.lineColor)
-				$img.setAttribute('codeWidth',barcode.width)
-				$img.setAttribute('codeHeight',barcode.height)
-				$img.setAttribute('displayValue',barcode.displayValue)
-				$img.setAttribute('fontSize',barcode.fontSize)
+				_img.attr({
+					lineColor: barcode.lineColor,
+					codeWidth: barcode.width,
+					codeHeight: barcode.height,
+					displayValue: barcode.displayValue,
+					fontSize: barcode.fontSize,
+				})
 				
 				lineColorRef.current.setValue(barcode.lineColor)
 				widthRef.current.setValue(barcode.width)
@@ -93,9 +90,9 @@ export default ({ node }) => {
 					delete option[i]
 				}
 			}
-			model.code ? $img.setAttribute('code',model.code) : $img.removeAttribute('code')
+			model.code ? _img.attr('code',model.code) : _img.removeAttr('code')
 			try{
-				JsBarcode($img,model.code,option)
+				JsBarcode(_img.el,model.code,option)
 			}catch(e){
 				$fn.toast('条形码内容不合法')
 			}
@@ -103,7 +100,7 @@ export default ({ node }) => {
 			// .blank(20)
 			// .render()
 		})
-	}, [ node, model ]) 
+	}, [ model, _node ]) 
 	return (
 		<>
 			<div>

@@ -1,6 +1,9 @@
 /**
  * 格式化数据
  * */
+import Dom from './dom'
+import _ from './jzer'
+import Table from './table'
 const { $fn } = window
 export default {
 	// 重新格式化数组源
@@ -90,14 +93,14 @@ export default {
 	parse(root,url){
 		if((typeof url) === 'string'){
 			let arr = url.split('/')
-			if(!isNaN(+arr[arr.length-1])){
-				arr.pop()
-			}
+			if(!isNaN(+arr[arr.length-1])){ arr.pop() }  // 删除最后一个元素
 			let index = 0
 			while(index < arr.length){
 				let n = arr[index]
 					n = isNaN(+n) ? n : +n
-				root = root[n]	
+					if(typeof root === 'object'){
+						root = root[n]
+					}
 				index ++
 			}
 			return root
@@ -107,7 +110,6 @@ export default {
 	},
 	// 解析 dataSoruce/icons/0/src 为 root['icons']['src']
 	parseParent(root,url){
-		console.log(url)
 		if((typeof url) === 'string'){
 			let arr = url.split('/')
 			arr = arr.filter( v => isNaN(+v))
@@ -138,22 +140,101 @@ export default {
 	},
 	// 根据数组元素 url 推出父组数组的 url
 	getParentUrl(url){
-		let arr = url.split('/')
-		if(this.isArray(url)){
-			arr = arr.filter( v => isNaN(+v))
-			arr.pop()
+		if(_.isString(url)){
+			let arr = url.split('/')
+			if(this.isArray(url)){
+				arr = arr.filter( v => isNaN(+v))
+				arr.pop()
+			}else{
+				arr.pop()
+			}
+			return arr.join('/')
 		}else{
-			arr.pop()
+			return ''
 		}
-		return arr.join('/')
 	},
 	// 获取字段名
 	getUrlField(url){
-		let arr = url.split('/')
-		return arr[arr.length - 1]
+		if(_.isString(url)){
+			let arr = url.split('/')
+			return arr[arr.length - 1]
+		}else{
+			return ''
+		}
 	},
 	// 获取根数据 url
 	getRootUrl(url){
-		return url.split('/')[0]
+		if(_.isString(url)){
+			return url.split('/')[0]
+		}else{
+			return ''
+		}
+	},
+	// 数据渲染
+	renderData(data, rootUrl, $drag, isContent){
+		if(isContent){
+			$drag.finds('.x-bind-url').each(v=>{
+				let url = v.attr('url')
+				const type = v.attr('type')
+				
+				if(_.isString(url)){
+					const arr = url.split('/')
+					arr[0] = rootUrl
+					url = arr.join('/')
+					v.attr({ url })
+					
+					const rs = this.parse({ [rootUrl]: data },url)
+						
+					if( type === 'text' ){
+						v.text(rs)
+					}else if( type === 'img'){
+						v.find('img').src(rs)
+					}else if( type === 'barcode'){
+						Dom.createBarcode(v,rs)
+					}else if( type === 'qrcode'){
+						Dom.createQrcode(v,rs)
+					}else if( type === 'checkbox'){
+						Dom.createCheckbox(v,rs)
+					}
+				}
+			})
+			
+			$drag.finds('table').each(_table =>{
+				const _drag = _table.parent('.drag').removeStyle('height')
+				_table.find('tbody').find('tr').children().each(v=>{
+					// 表格
+					if(v.hasClass('x-bind-table')){
+						let url = v.attr('url')
+						
+						if(_.isString(url)){
+							const arr = url.split('/')
+							arr[0] = rootUrl
+							url = arr.join('/')
+							
+							const parentUrl = this.getParentUrl(url)
+							const rs = this.parse({ [rootUrl]: data }, parentUrl)
+							
+							if(_.isArray(rs)){
+								Table.bindData(v, _drag, rs, this.getUrlField(url), url, isContent)
+							}
+						}
+					}
+				})
+				
+			})
+		}
+		$drag.finds('.x-bind-url').each(v=>{
+			const url = v.attr('url')
+			if(_.isString(url)){
+				const arr = url.split('/')
+				arr[0] = rootUrl
+				v.attr('url', arr.join('/'))
+			}
+		})
+		$drag.finds('.drag').each(v=>{
+			if(v.attr('rootUrl')){
+				v.attr({rootUrl})
+			}
+		})
 	}
 }

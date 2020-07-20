@@ -133,7 +133,6 @@ export default {
 			}
 			
 			if(t){
-				// t.style.cursor = 'default'
 				_this.node = t
 				_this.setState({hasNode:true,node:t, _node: _t, target})
 				const targetInfo = _t.getInfo()

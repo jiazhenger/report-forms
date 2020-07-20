@@ -3,8 +3,6 @@ import Async from '@com/async'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 // ===================================================================== template
-import List from '../public.component/list'
-
 const UL  =  Async(()=>import('./tp/ul'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
@@ -18,8 +16,6 @@ export default ({ node, _node }) => (
 		<h5 className='control-title'>列表</h5>
 		<Collapse bordered={false} defaultActiveKey={['0','1','2','3','4']}>
 			<Panel header='常规选项'>
-				<List.Input label='名称' value='列表' />
-				<List.Input label='数据' />
 				<Lock _node={_node}/>
 			</Panel>
 			<Panel header='生成列表'><UL node={node} _node={_node}/></Panel>

@@ -13,7 +13,7 @@ const Button  =  Async(()=>import('@antd/button'))
 // const StaticSwitch = ({ label, value, name, onChange, disabled }) => <Li label={label}><Switch size='small' name={name} value={value} onChange={onChange} disabled={disabled}/></Li>
 // const StaticInput = ({ label, value, name, onChange, disabled, isHalf }) =>  <Li isHalf={isHalf} label={label}><Input size='small' name={name} value={value} onChange={onChange}  disabled={disabled}/></Li>
 // const StaticSelet = ({ label, value, name, onChange, data, p, isHalf, disabled }) =>  <Li isHalf={isHalf} label={label}><Select data={data} p={p} size='small' name={name} value={value} onChange={onChange}  disabled={disabled}/></Li>
-const StaticButton = ({ label, name, onClick, isHalf, text, disabled }) =>  <Li isHalf={isHalf} label={label}><Button size='small' name={name} label={text} onClick={onClick}  disabled={disabled}/></Li>
+const StaticButton = ({ label, name, onClick, isHalf, text, disabled, width }) =>  <Li isHalf={isHalf} label={label}><Button size='small' width={width} name={name} label={text} onClick={onClick}  disabled={disabled}/></Li>
 
 class StaticSwitch extends React.Component{
 	setValue = v => this.refs.switch.setValue(v)
@@ -37,8 +37,8 @@ class StaticInput extends React.Component{
 	setValue = v => this.refs.input.setValue(v)
 	getValue = () => this.refs.input.state.value
 	render(){
-		const { label, value, name, onChange, disabled, isHalf, labelWidth, size, suffix, p } = this.props
-		return  <Li isHalf={isHalf} label={label} labelWidth={labelWidth} suffix={suffix}><Input ref='input' p={p} size={size||'small'} name={name} value={value} onChange={onChange}  disabled={disabled}/></Li>
+		const { label, value, name, onChange, disabled, readOnly, isHalf, labelWidth, size, suffix, p } = this.props
+		return  <Li isHalf={isHalf} label={label} labelWidth={labelWidth} suffix={suffix}><Input ref='input' p={p} size={size||'small'} name={name} value={value} onChange={onChange} disabled={disabled} readOnly={readOnly}/></Li>
 	}
 }
 

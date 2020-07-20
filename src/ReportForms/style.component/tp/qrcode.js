@@ -2,13 +2,14 @@ import React from 'react'
 import QRCode from 'qrcode'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 import { qrcode } from '../../js/public/config'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== upload
 const { $fn } = window
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const [ model, setModel ] = React.useState({ })
 	const textRef = React.useRef()
 	const colorDarkRef = React.useRef()
@@ -16,13 +17,13 @@ export default ({ node }) => {
 	const colorLightRef = React.useRef()
 	
 	React.useEffect(()=>{
-		if(node){
-			const $img = node.querySelector('img')
-			const text = $img.getAttribute('text')
+		Dom.getNodeInfo(_node,false).then( ({ _drag }) => {
+			const _img = _drag.find('img')
+			const text = _img.attr('text')
 			if(text){
-				const colorDark = $img.getAttribute('colorDark') || qrcode.colorDark
-				const colorLight = $img.getAttribute('colorLight') || qrcode.colorLight
-				const margin = $img.getAttribute('margin') || qrcode.margin
+				const colorDark = _img.attr('colorDark') || qrcode.colorDark
+				const colorLight = _img.attr('colorLight') || qrcode.colorLight
+				const margin = _img.attr('margin') || qrcode.margin
 				
 				textRef.current.setValue(text)
 				colorDarkRef.current.setValue(colorDark)
@@ -31,8 +32,8 @@ export default ({ node }) => {
 				
 				setModel({ text, colorDark, colorLight, margin })
 			}
-		}
-	},[ node ])
+		})
+	},[ _node ])
 	
 	
 	const onChange = React.useCallback( v => {
@@ -40,24 +41,24 @@ export default ({ node }) => {
 	}, [ model ])
 	
 	const onCreateQrcode  = React.useCallback( (name,value,none) => {
-		Dom.getNode(node).then(({ node, $drag, $temp } ) => {
+		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			if(!$fn.isValid(model.text)){
 				return $fn.toast('二维码内容不能为空')
 			}
 			
-			const $img = node.querySelector('img')
+			const _img = _drag.find('img').attr('temp',1)
 			
-			$img.setAttribute('temp',1)
-			
-			const text = $img.getAttribute('text')
+			const text = _img.attr('text')
 			if(text){
-				model.colorDark ? $img.setAttribute('colorDark',model.colorDark) : $img.removeAttribute('colorDark')
-				model.colorLight ? $img.setAttribute('colorLight',model.colorLight) : $img.removeAttribute('colorLight')
-				model.margin ? $img.setAttribute('margin',model.margin) : $img.removeAttribute('margin')
+				model.colorDark ? _img.attr('colorDark',model.colorDark) : _img.removeAttr('colorDark')
+				model.colorLight ? _img.attr('colorLight',model.colorLight) : _img.removeAttr('colorLight')
+				model.margin ? _img.attr('margin',model.margin) : _img.removeAttr('margin')
 			}else{
-				$img.setAttribute('colorDark',qrcode.colorDark)
-				$img.setAttribute('colorLight',qrcode.colorLight)
-				$img.setAttribute('margin',qrcode.margin)
+				_img.attr({
+					colorDark:qrcode.colorDark,
+					colorLight:qrcode.colorLight,
+					margin:qrcode.margin,
+				})
 				
 				colorDarkRef.current.setValue(qrcode.colorDark)
 				colorLightRef.current.setValue(qrcode.colorLight)
@@ -78,17 +79,16 @@ export default ({ node }) => {
 					delete option[i]
 				}
 			}
-			model.text ? $img.setAttribute('text',model.text) : $img.removeAttribute('text')
-			console.log(option)
-			try{
+			model.text ? _img.attr('text',model.text) : _img.removeAttr('text')
+			if(_.isString(model.text)){
 				QRCode.toDataURL(model.text, option).then(url=>{
-					$img.src = url
+					_img.src(url)
 				})
-			}catch(e){
+			}else{
 				$fn.toast('二维码内容不合法')
 			}
 		})
-	}, [ node, model ]) 
+	}, [ _node, model ]) 
 	return (
 		<>
 			<div>

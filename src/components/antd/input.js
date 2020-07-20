@@ -1,4 +1,4 @@
-﻿/* ====================================== toast  ====================================== */
+/* ====================================== toast  ====================================== */
 import React from 'react'
 import { Input } from 'antd'
 // ===================================================================== Select
@@ -27,7 +27,7 @@ export default class MyInput extends React.Component {
 	getRef = () => this.refs.inputRef.input
 	
 	render(){
-		const  { p, type, width, size, isP, clear, style, isCenter, readOnly, className, mode, loading } = this.props
+		const  { p, type, width, size, isP, clear, style, isCenter, readOnly, className, mode, loading, disabled } = this.props
 		const value = this.state.value === undefined ? this.props.value : this.state.value
 		let centerStyle = isCenter ? {textAlign:'center'} : null
 		let height = {}
@@ -50,6 +50,7 @@ export default class MyInput extends React.Component {
 							style			= {{width,...height,...centerStyle,...style}}
 							placeholder		= { isP ?  '请输入' + p : p } 
 							readOnly		= { readOnly }
+							disabled		= { disabled }
 							loading 		= { loading }
 						/>
 					)
@@ -67,6 +68,7 @@ export default class MyInput extends React.Component {
 							style			= {{width,...height,...centerStyle,...style}}
 							placeholder		= { isP ?  '请输入' + p : p } 
 							readOnly		= { readOnly }
+							disabled		= { disabled }
 						/>
 					)
 				}

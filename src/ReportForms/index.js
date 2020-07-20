@@ -286,13 +286,14 @@ export default class extends React.Component {
 		const $main = this.$drag.querySelector('.main')
 		const mainHtml = $main ? this.formatHtml($main, true) : this.formatHtml( this.$drag )
 		const paper = $fn.local('paper') || paperParam
+		const setScale = v => (`<div style='width:${this.$drag.clientWidth}px'>${this.formatHtml(v, true)}</div>`)
 		$http.submit(null,'pdf',{ 
 			param:{
-				header: this.formatHtml($header, true),
+				header: setScale($header),
+				footer: setScale($footer),
 				headerHeight: $header ? parseInt($header.style.height) : 0,
-				main: mainHtml,
-				footer: this.formatHtml($footer, true),
 				footerHeight: $footer ? parseInt($footer.style.height) : 0,
+				main: mainHtml,
 				format: paper.format,
 				name: paper.name,
 				source: this.getSource(paper)
@@ -405,12 +406,12 @@ export default class extends React.Component {
 											{ type === 'table' &&  <Table node={node} _node={_node}/> }
 											{ type === 'ul' &&  <List node={node} _node={_node}/> }
 											{ type === 'devider' &&  <Devider node={node} _node={_node}/> }
-											{ type === 'checkbox' &&  <Checkbox node={node}  _node={_node}/> }
-											{ type === 'barcode' &&  <Barcode node={node}  _node={_node}/> }
-											{ type === 'qrcode' &&  <Qrcode node={node}  _node={_node}/> }
-											{ type === 'header' &&  <Header node={node}  _node={_node}/> }
-											{ type === 'main' &&  <Main node={node}  _node={_node}/> }
-											{ type === 'footer' &&  <Footer node={node}  _node={_node}/> }
+											{ type === 'checkbox' &&  <Checkbox node={node} _node={_node}/> }
+											{ type === 'barcode' &&  <Barcode node={node} _node={_node}/> }
+											{ type === 'qrcode' &&  <Qrcode node={node} _node={_node}/> }
+											{ type === 'header' &&  <Header node={node} _node={_node}/> }
+											{ type === 'main' &&  <Main node={node} _node={_node}/> }
+											{ type === 'footer' &&  <Footer node={node} _node={_node}/> }
 										</>
 									)
 								}

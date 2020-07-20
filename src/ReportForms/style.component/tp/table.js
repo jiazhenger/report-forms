@@ -148,7 +148,7 @@ export default ({ _node }) => {
 				tbody:{
 					td:{
 						style,
-						className:'loopNode x-bind-table',
+						className:'loopNode',
 						attr:{ type:'text', }
 					}
 				}
@@ -158,6 +158,19 @@ export default ({ _node }) => {
 			Table.showHideBorder(_(table), border, colorRef.current.getValue())
 		})
 	}, [_node, col, row, border])
+	// 添加行
+	const addRow = React.useCallback(v => {
+		Dom.getNodeInfo(_node).then(({ _drag } ) => {
+			Table.addRow(_drag.find('table').el, {
+				td:{
+					style:tableConfig.style,
+					className:'loopNode',
+					attr:{ type:'text' }
+				}
+			})
+		})
+	}, [ _node ])
+	
 	return (
 		<>
 			<div className='fx'>
@@ -176,7 +189,13 @@ export default ({ _node }) => {
 				<List.Switch value={border} label='边框' onChange={onBorderChange}/>
 			</div>
 			<div className='fx'>
-				<List.Button label='' name='src' text='生成表格' onClick={ceateTable} />
+				<List.Button label='' text='生成表格' width={65} onClick={ceateTable} />
+				<List.Button text='添加行' width={65} onClick={addRow} />
+				<List.Button text='添加列' width={65} onClick={ceateTable} />
+			</div>
+			<div className='fx'>
+				<List.Button label='' text='删除行' width={65} onClick={ceateTable} />
+				<List.Button text='删除列' width={65} onClick={ceateTable} />
 			</div>
 		</>
 	)

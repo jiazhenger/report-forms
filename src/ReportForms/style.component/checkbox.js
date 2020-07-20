@@ -3,13 +3,12 @@ import Async from '@com/async'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 // ===================================================================== template
-import List from '../public.component/list'
-
 const Font  =  Async(()=>import('./tp/font'))
 const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Checkbox  =  Async(()=>import('./tp/checkbox'))
 const Lock  =  Async(()=>import('./tp/lock'))
+const Data  =  Async(()=>import('./tp/data'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -18,8 +17,7 @@ export default ({ node, _node}) => (
 		<h5 className='control-title'>文本</h5>
 		<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
 			<Panel header='常规选项'>
-				<List.Input label='名称' value='选择框' />
-				<List.Input label='数据' />
+				<Data _node={_node}/>
 				<Lock _node={_node}/>
 			</Panel>
 			<Panel header='选择框'><Checkbox node={node} _node={_node}/></Panel>

@@ -2,8 +2,8 @@ import JsBarcode from 'jsbarcode'
 import QRCode from 'qrcode'
 
 // import Html from './html'
-
 import _ from './jzer'
+import Table from './table'
 import { barcode, qrcode, axesColor, axesActiveColor, axesSpace } from '../../js/public/config'
 
 import CheckboxImage from '@img/icon/checkbox.png'
@@ -76,47 +76,48 @@ export default {
 				let model = {}
 				const _drag = _node.parents('.drag')
 				const _temp = _node.hasClass('loopNode') ? _node : _node.children('.template')
-				const _bindText = _node.find('.x-bind-text')
-				const _bindUrl = _node.find('.x-bind-url')
-				const _bindSrc = _node.find('.x-bind-src')
-				const _bindTable = _node
+				const url = _temp.attr('url')
 				const type = _node.attr('type')
 				const dragType = _drag.attr('type')
 				const rootUrl = _drag.attr('rooturl')
-				const bindUrl = _bindUrl.attr('url')
-				let url = _temp.attr('url')
 				
-				model = { _drag, _temp, _bindText, _bindSrc, _bindUrl, _bindTable, type, dragType, url, rootUrl, bindUrl }
+				model = { _drag, _temp, type, dragType, url, rootUrl }
 				
 				resolve(model)
 			}else{
-				noToast === false && window.$fn.toast('未选中目标')
+				noToast !== false && window.$fn.toast('未选中目标')
 			}
 		})
 	},
 	// 获取模板 node
 	getStyleNode(node){ return _(node).hasClass('loopNode') ? node : node.querySelector('.template') },
 	// 清空数据
-	reset({ _drag, _temp, _bindText, dragType, _bindSrc, _bindUrl, _bindTable, isArrayUrl}){
+	reset({ _drag, _temp, type, dragType, isArrayUrl}){
 		
-		if(_bindUrl.el){ _drag.removeAttr('rootUrl') }
+		if(_drag.el){ _drag.removeAttr('rootUrl') }
 		
-		_bindUrl.removeAttr('url')
+		_temp.removeAttr('url').removeClass('x-bind-url')
 		
-		if(['img','barcode','qrcode'].includes(dragType)){
-			_( _temp.el ).find('img').src(`${window.location.origin}/assets/images/img.png`)
+		if(['img','barcode','qrcode'].includes(type)){
+			_temp.find('img').src(`${window.location.origin}/assets/images/img.png`)
 		}
 		
-		if(dragType === 'text'){
-			_bindText.text('')
-		}else if( dragType === 'barcode'){
-			_(_drag.el).find('img').width(40).height(40)
-		}else if( dragType === 'table'){
-			if(isArrayUrl){
-				
-			}else{
-				_bindTable.removeAttr('url').text('')
-			}
+		if( !_temp.hasClass('loopNode')){ _temp.removeAttr('type') }
+		
+		if(type === 'text'){
+			_temp.html('')
+		}else if( type === 'barcode'){
+			_temp.find('img').width(40).height(40).removeAttr('temp,code,lineColor,codeWidth,codeHeight,displayValue,fontSize')
+		}else if( type === 'qrcode'){
+			_temp.find('img').removeAttr('temp,text,colorDark,colorLight,margin')
+		}else if( type === 'checkbox'){
+			_temp.find('img').src(CheckboxImage)
+		}
+		
+		if(dragType === 'table'){
+			Table.resetData(_temp)
+		}else{
+			
 		}
 	},
 	// 创建列表
@@ -178,13 +179,11 @@ export default {
 		}
 	},
 	// 创建 checkbox
-	createCheckbox($temp, data){
+	createCheckbox(_temp, data){
 		if(typeof data !== 'object'){
-			const $drag = this.parents($temp,'drag')
-			$drag.style.width = '18px'
-			$drag.style.height = '18px'
-			$temp.innerHTML = `<img temp='1' src=${Boolean(data) ? checkedImage : CheckboxImage} style='width:100%;height:100%' draggable='false' />`
+			_temp.find('img').src(Boolean(data)?checkedImage:CheckboxImage)
 		}else if($fn.hasArray(data)){
+			/*
 			const $drag = this.parents($temp,'drag')
 			$drag.style.removeProperty('width')
 			$drag.style.removeProperty('height')
@@ -210,10 +209,11 @@ export default {
 			})
 			$temp.innerHTML = ''
 			$temp.appendChild(fragment)
+			*/
 		}
 	},
-	createBarcode(_bindSrc,data){
-		const _img = _bindSrc.find('img')
+	createBarcode(_node,data){
+		const _img = _node.find('img')
 		_img.width('100%').height('100%').attr({
 			temp:1,
 			code:data,
@@ -223,19 +223,31 @@ export default {
 			displayValue: barcode.displayValue,
 			fontSize: barcode.fontSize
 		})
-		JsBarcode(_img.el,data, barcode)
+		if(_.isString(data) || _.isNumber(data)){
+			JsBarcode(_img.el,data, barcode)
+		}else{
+			$fn.toast('条形码码必须是字符串或数字')
+		}
 	},
-	createQrcode(_bindSrc,data){
-		const _img = _bindSrc.find('img')
+	createQrcode(_node,data){
+		const _img = _node.find('img')
 		_img.width('100%').height('100%').attr({
 			temp:1,
 			text:data,
-			colorDark: barcode.colorDark,
-			colorLight: barcode.colorLight,
-			margin: barcode.margin,
+			colorDark: qrcode.colorDark,
+			colorLight: qrcode.colorLight,
+			margin: qrcode.margin,
 		})
-		QRCode.toDataURL(data, qrcode).then(url=>{
-			_img.src(url)
-		})
+		if(_.isString(data)){
+			QRCode.toDataURL(data, qrcode).then(url=>{
+				_img.src(url)
+			})
+		}else{
+			$fn.toast('二维码必须是字符串')
+		}
+	},
+	// 绑定字段格式
+	bindField(name){
+		return '<code><s>=</s><span>'+ name +'</span></code>'
 	}
 }

@@ -1,42 +1,50 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
 const { $fn } = window
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const leftRef = React.useRef()
 	const topRef = React.useRef()
 	const widthRef = React.useRef()
 	const heightRef = React.useRef()
 	const indexRef = React.useRef()
+	const fullRef = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNode(node).then(( { $drag } ) => {
-			if( $drag ){
-				const style = Dom.getStyle($drag,true)
-				leftRef.current.setValue($fn.toNum(style.left))
-				topRef.current.setValue($fn.toNum(style.top))
-				widthRef.current.setValue($fn.toNum(style.width))
-				heightRef.current.setValue($fn.toNum(style.height))
-				indexRef.current.setValue($fn.toNum(style.zIndex))
-			}
-			
-		}, false)
-	},[ node ])
-	
-	const onChange = React.useCallback( (name,unit) => {
-		Dom.getNode(node).then(( ) => {
-			const obj = {}
-			for(var i in name){
-				obj.label = i
-				obj.value = name[i]
-			}
-			node.style[obj.label] = obj.value === '' ? '' : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + unit)
+		Dom.getNodeInfo(_node,false).then(({ _drag })=>{
+			const style = _drag.getStyle()
+			leftRef.current.setValue($fn.toNum(style.left))
+			topRef.current.setValue($fn.toNum(style.top))
+			widthRef.current.setValue($fn.toNum(style.width))
+			heightRef.current.setValue($fn.toNum(style.height))
+			indexRef.current.setValue($fn.toNum(style.zIndex))
+			console.log(_drag.width())
+			fullRef.current.setValue( _drag.width() ===  '100%')
 		})
-	}, [ node ])
+	},[ _node ])
+	
+	const onChange = React.useCallback( (v,unit) => {
+		Dom.getNodeInfo(_node).then(({ _drag })=>{
+			const { key, value} = _.getKeyValue(v); // 转换成{key:,value: }
+			_drag.style({
+				[key] : value === '' ? '' : (isNaN(parseInt(value)) ? value : value + unit)
+			})
+		})
+	}, [ _node ])
+	
+	const onFull = React.useCallback( v => {
+		Dom.getNodeInfo(_node).then(({ _drag })=>{
+			if(v){
+				// _drag.left(0).width(_('#dragContent').clientWidth())
+				_drag.left(0).width('100%')
+			}
+		})
+	}, [ _node ])
 	return (
 		<>
 			<div className='fx'>
@@ -50,6 +58,7 @@ export default ({ node }) => {
 				</div>
 				<div className='fx'>
 					<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')}  isHalf />
+					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  isHalf />
 				</div>
 			</div>
 		</>

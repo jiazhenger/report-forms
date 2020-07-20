@@ -59,8 +59,8 @@ export default {
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
 			const { x, y } = _.mouse.getCoord(e)
-			if(_this.node){
-				_(_this.node).style({
+			if(_this._node){
+				_this._node.style({
 					left: (x - differ) + 'px',
 					top: (y - differ) + 'px'
 				})
@@ -79,8 +79,8 @@ export default {
 		}
 		/*  鼠标松开时重新定位 html 元素位置 */
 		this.setNewPosition = e => {
-			if(!_this.node) return;
-			const _node = _(_this.node)
+			const _node = _this._node
+			if(!_node) return;
 			const { x, y } = _.mouse.getCoord(e)
 			dragRange(e,_this,{
 				onDrag:({$drag,dragInfo,$scroll,scrollInfo}) => {
@@ -129,15 +129,14 @@ export default {
 					dropInFixed($drag.querySelector('.main'))
 					dropInFixed($drag.querySelector('.footer'))
 					if( type === 'table' ){
-						_node.style({ left:0, width: $drag.clientWidth + 'px'})
+						_node.style({ left:0, width: '100%'})
 					}else if( type === 'ul' ){
-						_node.style({ left:0, width: $drag.clientWidth + 'px'})
-						// _this.node.style.width = '200px'
+						_node.style({ left:0, width: '100%'})
 					}else if( type === 'devider' ){
-						_node.style({ left:0, width: $drag.clientWidth + 'px', height:'10px'})
+						_node.style({ left:0, width: '100%', height:'10px'})
 						_node.find('.template').html('<div></div>').children(0).cssText('width:100%;height:1px; border-top:1px solid #ddd')
 					}else if( type === 'checkbox' ){
-						_node.style({ width: '18px', height:'18px'})
+						_node.removeStyle('width')
 					}else if( type === 'barcode' ){
 						_node.style({ width: '200px', height:'auto'})
 					}else if( type === 'qrcode' ){
@@ -150,7 +149,7 @@ export default {
 						}
 						_node.style({
 							left: 0,
-							width: $drag.clientWidth + 'px',
+							width: '100%',
 							border: '1px dashed blue'
 						}).addClass(type).addClass('x-layout')
 						
@@ -173,7 +172,7 @@ export default {
 				},
 				onFail:()=>{
 					removeHtml()
-					_this.node = null
+					_this._node = null
 					_this.setState({hasNode:null, node:null})
 				}
 			})
@@ -186,9 +185,7 @@ export default {
 			
 		}else{
 			const node = document.createElement('div')
-			const _node = _( node )
-			node.setAttribute('type',type)
-			_node.attr('type', type).addClass('move').left(x-10).top(y-10).width(50).style({
+			const _node = _( node ).attr({ type }).addClass('move').left(x-10).top(y-10).width(50).style({
 				position:'absolute',
 				zIndex:1
 			})
@@ -211,23 +208,17 @@ export default {
 					_node.width(50).height(10)
 					_( $temp ).removeStyle('background')
 				}else if(type === 'checkbox'){
-					_node.width(20)
+					_node.width(20).height(20).find('img').attr('temp',1)
 				}else if(type === 'pages'){
 					_node.width(50).height(20).lineHeight(20).style('textAlign','center')
 				}
-				// 添加通用数据绑定
-				if(  ['text','img','qrcode','barcode'].includes(type) ){ _temp.addClass('x-bind-url') }
-				// 直接绑定数据
-				if(  ['text'].includes(type) ){ _temp.addClass('x-bind-text')}
-				// 图片绑定数组
-				if( ['img','barcode','qrcode'].includes(type) ){ _temp.addClass('x-bind-src')}
 			}else{
-				_node.width(99).height(99).attr('fixed', 1)
+				_node.width(100).height(100).attr('fixed', 1)
 			}
 			
 			Dom.createPointMark(_node) // 创建拖动标点
 			
-			_this.node = node
+			_this._node = _node
 			
 			_this.setState({hasNode:true, node, _node })
 			
