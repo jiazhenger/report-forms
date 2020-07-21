@@ -142,6 +142,7 @@ export default {
 			return table
 		}
 	},
+	// 创建 thead
 	createThead(option){
 		const opt = {
 			col:2,
@@ -183,6 +184,7 @@ export default {
 		thead.appendChild(tr)
 		return thead
 	},
+	// 创建 colgroup
 	createColgroup(option){
 		const opt = {
 			cols:[],
@@ -199,33 +201,98 @@ export default {
 		return colgroup
 	},
 	// 添加行
-	addRow(table,option){
+	addRow(_table,option){
 		const opt = {
+			last:true,
 			tr:{ },
 			td:{ },
 			...option
 		}
-		const tbody = table.querySelector('tbody')
-		const children = tbody.children
-		if(children.length > 0){
-			const len = children[0].children.length
+		const _tbody = _table.find('tbody')
+		const trLen = _tbody.children().length()
+		if(trLen > 0){
+			const tdLen = _tbody.find('tr').children().length()
 			const tr = document.createElement('tr')
 			const tdFragment = document.createDocumentFragment()
 			addAttr(tr,{className:opt.tr.className, style: opt.tr.style, attr: opt.tr.attr}) // 默认样式
-			for(let j=0; j<len; j++){
+			for(let j=0; j<tdLen; j++){
 				const td = document.createElement('td')
 				addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr})
-				// td 添加内容
-				if(opt.td.text){ td.textContent = opt.td.text }
+				if(opt.td.text){ td.textContent = opt.td.text } // td 添加内容
 				tdFragment.appendChild(td)
 			}
 			tr.appendChild(tdFragment)
-			tbody.appendChild(tr)
+			if(opt.last){
+				_tbody.append(tr)
+			}
 			return tr
 		}else{
 			return false
 		}
 	},
+	// 添加列
+	addCol(_table,option){
+		const opt = {
+			last:true,
+			tbody:{
+				tr:{ },
+				td:{ },
+			},
+			thead:{
+				tr:{ },
+				td:{ },
+			},
+			...option
+		}
+		const _tbody = _table.find('tbody')
+		const _trs = _tbody.children()
+		const trLen = _trs.length()
+		const tdLen = _tbody.find('tr').children().length()
+		if(trLen > 0 && tdLen > 0){
+			_trs.each(v=>{
+				const td = document.createElement('td')
+				addAttr(td,{className:opt.tbody.td.className, style: opt.tbody.td.style, attr: opt.tbody.td.attr})
+				if(opt.tbody.td.text){ td.textContent = opt.tbody.td.text } // td 添加内容
+				if(opt.last){ v.append(td) }
+			})
+			
+			const _thead = _table.find('thead')
+			if(_thead.el){
+				const th = document.createElement('th')
+				addAttr(th,{className:opt.thead.th.className, style: opt.thead.th.style, attr: opt.thead.th.attr})
+				
+				if(opt.last){
+					_thead.find('tr').append(th)
+				}
+			}
+		}
+	},
+	// 删除行
+	delRow(_table){
+		const _tbody = _table.find('tbody')
+		const trLen =  _tbody.children().length()
+		const tdLen = _tbody.find('tr').children().length()
+		console.log(tdLen)
+		if(trLen >1){
+			_tbody.last().remove()
+		}else{
+			window.$fn.toast('无法删除')
+		}
+	},
+	// 删除列
+	delCol(_table){
+		const _tbody = _table.find('tbody')
+		const trLen = _tbody.children().length()
+		const tdLen = _tbody.find('tr').children().length()
+		if(trLen > 0 && tdLen > 1){
+			_table.finds('tr').each(v=>{
+				v.last().remove()
+			})
+		}else{
+			window.$fn.toast('无法删除')
+		}
+	},
+	// 设置边框颜色
 	setBorderColor(_node, color){
 		_node.finds('th').borderColor( color )
 		_node.finds('td').borderColor( color )
@@ -254,6 +321,7 @@ export default {
 			}
 		}
 	},
+	// 绑定列数据
 	bindData(_td, _drag, data, name, url, isContent){
 		const row = isContent ? data.length : 1
 		const index = _td.index()
@@ -283,12 +351,57 @@ export default {
 			_tbody.find('tr').children(index).attr({url})
 		}
 	},
-	
+	// 重置数据绑定
 	resetData(td){
 		const index = td.index()
 		const _tbody = td.parent('tbody')
 		_tbody.finds('tr').each(v=>{
 			v.children(index).html('')
 		})
-	}
+	},
+	// 合并行
+	mergeRow(_table){
+		let rowspan = 0
+		_table.finds('.tableSpan').each(v=>{
+			let span = v.attr('rowspan')
+			if(span){
+				rowspan += +span
+			}else{
+				rowspan += 1
+			}
+		})
+		
+		_table.finds('.tableSpan').each((v,i)=>{
+			if(i === 0){
+				v.attr('rowspan', rowspan)
+			}else{
+				v.remove()
+			}
+			v.removeClass('tableSpan')
+		})
+	},
+	// 合并列
+	mergeCol(_table){
+		const _tr = _table.finds('tr')
+		_tr.each( _trv => {
+			let colspan = 0
+			_trv.finds('.tableSpan').each(v=>{
+				let span = v.attr('colspan')
+				if(span){
+					colspan += +span
+				}else{
+					colspan += 1
+				}
+			})
+		
+			_trv.finds('.tableSpan').each((v,i)=>{
+				if(i === 0){
+					v.attr('colspan', colspan)
+				}else{
+					v.remove()
+				}
+				v.removeClass('tableSpan')
+			})
+		})
+	},
 }

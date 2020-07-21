@@ -116,7 +116,7 @@ export default class extends React.Component {
 	}
 	/* ================================================== 获取 node 上的数据 ================================================== */
 	getNode = () => {
-		Dom.getNodeInfo(this.props._node).then(( { url, type, rootUrl } ) =>{
+		Dom.getNodeInfo(this.props._node, false).then(( { url, type, rootUrl } ) =>{
 			if(url){
 				const rootField = Format.getRootUrl(url)
 				const rootData = this.state.data[rootField]

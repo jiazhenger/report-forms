@@ -12,6 +12,7 @@ $.listener = function(el,callback){
 	if(el){
 		return callback(el)
 	}else{
+		console.log('选择器不存在')
 		return Init.prototype
 	}
 }
@@ -40,6 +41,10 @@ $.mouse = {
 (['String', 'Number', 'Array', 'Object', 'Boolean', 'Undefined']).forEach(v => {
 	$['is' + v] = obj => ( {}.toString.call(obj) === '[object '+ v +']' )
 })
+
+$.isHtmlNodeList = function(el){
+	return el instanceof HTMLCollection || el instanceof NodeList
+}
 
 function Init(selector,all){
 	if( $.isString(selector) ){
@@ -83,7 +88,7 @@ const classExtend = {
 	// 移除 calssName
 	removeClass(className){
 		return $.listener(this.el, el => {
-			if(el instanceof NodeList){
+			if($.isHtmlNodeList(el)){
 				for(let v of el){
 					const c = v.className.replace(' ' + className,'')
 					v.className = c
@@ -118,7 +123,7 @@ const styleExtend = {
 				if($.isString(name)){
 					return el.style[name]
 				}else if($.isObject(name)){
-					if( el instanceof HTMLCollection || el instanceof NodeList ){
+					if( $.isHtmlNodeList(el) ){
 						$(el).each( (v,i,n) => {
 							for(let i in name){ n.style[i] = name[i] }
 						})
@@ -128,7 +133,7 @@ const styleExtend = {
 					return this
 				}
 			}else if( arguments.length === 2 ){
-				if( el instanceof HTMLCollection || el instanceof NodeList ){
+				if( $.isHtmlNodeList(el) ){
 					$(el).each( (v,i,n) => n.style[name]=value )
 				}else{
 					el.style[name] = value
@@ -150,7 +155,7 @@ const styleExtend = {
 	removeStyle(name){
 		return $.listener(this.el, el => {
 			if(name.indexOf(',') === -1){
-				if( el instanceof HTMLCollection || el instanceof NodeList ){
+				if( $.isHtmlNodeList(el) ){
 					$(el).each( (v,i,n) => n.style.removeProperty(name) )
 				}else{
 					el.style.removeProperty(name)
@@ -158,7 +163,7 @@ const styleExtend = {
 			}else{
 				const arr = name.split(',')
 				arr.forEach(v=>{
-					v.style.removeProperty(v)
+					el.style.removeProperty(v)
 				})
 			}
 			return this
@@ -170,7 +175,7 @@ const styleExtend = {
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
 				let r = this.style(v)
-				r = isNaN(+r) ? r : parseInt(r)
+				r = isNaN(parseInt(r)) ? r : parseInt(r)
 				return r
 			}else if(arguments.length === 1){
 				if($.isNumber( parseInt(value) )){
@@ -247,7 +252,12 @@ const attrExtend = {
 	removeAttr(attr){
 		return $.listener(this.el, el => {
 			if(attr.indexOf(',') === -1){
-				el.removeAttribute(attr)
+				if( $.isHtmlNodeList(el) ){
+					$(el).each( (v,i,n) => n.removeAttribute(attr) )
+				}else{
+					el.removeAttribute(attr)
+				}
+				
 			}else{ // 获取多个属性
 				attr = attr.split(',')
 				attr.forEach(v=>{
@@ -322,7 +332,7 @@ const parentExtend = {
 	finds(s){ return this.find(s, true)},
 	each(callback){
 		return $.listener(this.el, el => {
-			if(el instanceof HTMLCollection || el instanceof NodeList){
+			if($.isHtmlNodeList(el)){
 				Array.prototype.slice.call(el).forEach((v,i)=>{
 					const _v = __(v)
 					callback(_v, i, _v.el)
@@ -380,6 +390,16 @@ const parentExtend = {
 	length(){
 		return $.listener(this.el, el => {
 			return el.length
+		})
+	},
+	clone(){
+		return $.listener(this.el, el => {
+			return __(el.cloneNode(true))
+		})
+	},
+	hasChild(){
+		return $.listener(this.el, el => {
+			return el.hasChildNodes()
 		})
 	}
 }
@@ -473,14 +493,25 @@ const infoExtend = {
 			}
 		})
 	},
-	clientWidth(){
+	
+	innerWidth(){
 		return $.listener(this.el, el => {
 			return el.clientWidth
 		})
 	},
-	clientHeight(){
+	innerHeight(){
 		return $.listener(this.el, el => {
 			return el.clientHeight
+		})
+	},
+	outerWidth(){
+		return $.listener(this.el, el => {
+			return el.offsetWidth
+		})
+	},
+	outerHeight(){
+		return $.listener(this.el, el => {
+			return el.offsetHeight
 		})
 	}
 }
@@ -500,9 +531,19 @@ const appendExtend = {
 	},
 	remove(){
 		return $.listener(this.el, el => {
-			if(el.parentElement){
-				el.parentElement.removeChild(el)
+			if($.isHtmlNodeList(el)){
+				$(el).each((v,i,n)=>{
+					if(n.parentElement){ n.parentElement.removeChild(n) }
+				})
+			}else{
+				if(el.parentElement){ el.parentElement.removeChild(el) }
 			}
+			return this
+		})
+	},
+	replace(node){
+		return $.listener(this.el, el => {
+			el.parentElement.replaceChild(node, el)
 			return this
 		})
 	}
@@ -521,11 +562,36 @@ const eventExtend = {
 			return this
 		})
 	},
+	focus(){
+		return $.listener(this.el, el => {
+			el.focus()
+			return this
+		})
+	},
+	blur(){
+		return $.listener(this.el, el => {
+			el.blur()
+			return this
+		})
+	},
+	once(event, callback){
+		return $.listener(this.el, el => {
+			el['on' + event] = callback
+			return this
+		})
+	},
+	unonce(event,callback){
+		return $.listener(this.el, el => {
+			el['on' + event] = null
+			return this
+		})
+	}
 }
 // 判断
 const judgeExtend = {
 	isElement(){ return this.el instanceof HTMLElement },
 	isNodeList(){ return this.el instanceof NodeList },
+	isHtmlNodeList(){ return this.el instanceof HTMLCollection || this.el instanceof NodeList }
 }
 
 Init.prototype = {

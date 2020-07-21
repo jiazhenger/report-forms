@@ -113,21 +113,23 @@ export default {
 							if(_top >= f.top && _top < s){
 								if(['header','footer','main'].includes(type)){
 									_node.remove()
-									isFixed = true
 									return window.$fn.toast('无法放置')
 								}else{
 									_node.appendTo($f)
-									isFixed = true
 									minusTop = f.top
 									const top2 = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ - minusTop
 									_node.style('top',top2 + 'px')
 								}
+								isFixed = true
 							}
 						}
 					}
+					
 					dropInFixed($drag.querySelector('.header'))
 					dropInFixed($drag.querySelector('.main'))
 					dropInFixed($drag.querySelector('.footer'))
+					dropInFixed(_this.prevNode)
+					
 					if( type === 'table' ){
 						_node.style({ left:0, width: '100%'})
 					}else if( type === 'ul' ){
@@ -141,6 +143,8 @@ export default {
 						_node.style({ width: '200px', height:'auto'})
 					}else if( type === 'qrcode' ){
 						_node.style({ width: '80px', height:'80px'})
+					}else if( type === 'flexbox'){
+						_node.style({ left:0, width: '100%', height:'100px'}).addClass(type)
 					}else if( ['header','footer','main'].includes(type) ){
 						if(type === 'header'){ 
 							_node.style('top',0)
@@ -167,13 +171,17 @@ export default {
 						_node.appendTo($drag)
 					}
 					
-					_this.runNode()
+					
+					_this.setState({hasNode:true, node:_node.el, _node }, ()=>{
+						_this.runNode()
+					})
 					
 				},
 				onFail:()=>{
 					removeHtml()
 					_this._node = null
-					_this.setState({hasNode:null, node:null})
+					_this.node = null
+					_this.setState({hasNode:null, node:null, _node:null})
 				}
 			})
 		}
@@ -184,6 +192,7 @@ export default {
 		if(document.querySelector('.move')){
 			
 		}else{
+			_this.prevNode = _this.node
 			const node = document.createElement('div')
 			const _node = _( node ).attr({ type }).addClass('move').left(x-10).top(y-10).width(50).style({
 				position:'absolute',
@@ -219,8 +228,8 @@ export default {
 			Dom.createPointMark(_node) // 创建拖动标点
 			
 			_this._node = _node
+			_this.node = node
 			
-			_this.setState({hasNode:true, node, _node })
 			
 			document.body.appendChild(node)
 			document.body.addEventListener('mousemove',this.setHtmlPosition)

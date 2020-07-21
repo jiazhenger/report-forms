@@ -1,6 +1,8 @@
 import React from 'react'
 // ===================================================================== template
 import List from '../../public.component/list'
+import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== upload
 const { $fn } = window
 const imageType = ['jpg','png','jpeg','gif']
@@ -44,73 +46,70 @@ const Upload = async e => {
 	}
 }
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const file = React.useRef()
 	const link = React.useRef()
 	
 	React.useEffect(()=>{
-		if(node){
-			const $img = node.querySelector('img')
-			const attr = $img.src
-			link.current.setValue(attr)
+		if(_node.el){
+			const src = _node.find('img').src()
+			if(src){
+				link.current.setValue(src)
+			}
 		}
 		
-	},[ node ])
+	},[ _node ])
 	
 	const onChange = React.useCallback( (name,value,none) => {
-		if(node){
-			const $img = node.querySelector('.template').querySelector('img')
-			const obj = {}
-			for(var i in name){
-				obj.label = i
-				obj.value = name[i]
-			}
-			if(obj.value === '') {
-				if($img){ $img.parentNode.removeChild($img)}
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			const _img = _temp.find('img')
+			const { key, value } = _.getKeyValue(name) 
+			
+			if(key === '') {
+				_img.remove()
 				return
 			}
-			if($img){
-				$img.setAttribute(obj.label,obj.value)
-				$img.setAttribute('temp',1)
-				$img.style.cssText = 'width:100%;height:100%;margin:0'
+			if(_img.el){
+				_img.attr({
+					[key]:value,
+					temp: 1
+				}).cssText('width:100%;height:100%;margin:0')
 			}else{
-				let imgNode = document.createElement('img')
-				imgNode.setAttribute(obj.label,obj.value)
-				imgNode.setAttribute('temp',1)
-				imgNode.style.cssText = 'width:100%;height:100%;margin:0'
-				imgNode.draggable = false
-				node.querySelector('.template').appendChild(imgNode)
+				const imgNode = document.createElement('img')
+				_(imgNode).attr({
+					[key]:value,
+					temp: 1,
+					draggable:false
+				}).cssText('width:100%;height:100%;margin:0')
+				_temp.append(imgNode)
 			}
-		}else{
-			window.$fn.toast('未选中目标')
-		}
-	}, [ node ])
+		})
+	}, [ _node ])
 	// 打开文件选择目录
 	const openUpload = React.useCallback( e => {
-		if(node){
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
 			file.current.click()
 			file.current.onchange = e => {
 				Upload(e).then(base64=>{
-					const $img = node.querySelector('.template').querySelector('img')
-					
-					if($img){
-						$img.setAttribute('src',base64)
-						$img.setAttribute('temp',1)
-						$img.style.cssText = 'width:100%;height:100%;margin:0'
+					const _img = _temp.find('img')
+					if(_img.el){
+						_img.attr({
+							src:base64,
+							temp: 1,
+						}).cssText('width:100%;height:100%;margin:0')
 					}else{
-						let imgNode = document.createElement('img')
-						imgNode.setAttribute('src',base64)
-						imgNode.setAttribute('temp',1)
-						imgNode.style.cssText = 'width:100%;height:100%;margin:0'
-						imgNode.draggable = false
-						node.querySelector('.template').appendChild(imgNode)
+						const imgNode = document.createElement('img')
+						_(imgNode).attr({
+							src:base64,
+							temp: 1,
+							draggable:false
+						}).cssText('width:100%;height:100%;margin:0')
+						_temp.append(imgNode)
 					}
 				})
 			}
-		}else{
-			window.$fn.toast('未选中目标')
-		}
-	}, [ node ])
+		})
+	}, [ _node ])
 	return (
 		<>
 			<div>

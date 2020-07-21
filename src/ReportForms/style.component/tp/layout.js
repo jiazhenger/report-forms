@@ -1,32 +1,33 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 const { $fn } = window
 // ===================================================================== page component
-export default ({ node, tempStyle }) => {
+export default ({ _node }) => {
 	const padding = React.useRef()
 	const backgroundColor = React.useRef()
 	const opacity = React.useRef()
 	
 	React.useEffect(()=>{
-		const style = tempStyle || {}
-		padding.current.setValue($fn.toNum(style.padding))
-		backgroundColor.current.setValue(style.backgroundColor)
-		opacity.current.setValue($fn.toNum(style.opacity))
-	},[ tempStyle ])
+		Dom.getNodeInfo(_node, false).then(( { _temp } ) => {
+			const style = _temp.getStyle(true)
+			padding.current.setValue($fn.toNum(style.padding))
+			backgroundColor.current.setValue(style.backgroundColor)
+			opacity.current.setValue($fn.toNum(style.opacity))
+		})
+	},[ _node ])
 	
 	const onChange = React.useCallback( (name, def) => {
-		Dom.getNode(node).then(({ node } ) => {
-			const obj = {}
-			for(var i in name){
-				obj.label = i
-				obj.value = name[i]
-			}
-			Dom.getStyleNode(node).style[obj.label] = obj.value === '' ? (def ? def : 0) : (isNaN(parseInt(obj.value)) ? obj.value : obj.value + 'px')
+		Dom.getNodeInfo(_node).then(( { _temp } ) => {
+			const { key, value } = _.getKeyValue(name)
+			_temp.style({
+				[key]: value === '' ?  (def ? def : 0) : (isNaN(parseInt(value)) ? value : value + 'px')
+			})
 		})
-	}, [ node ])
+	}, [ _node ])
 	return (
 		<>
 			<div className='fx'>

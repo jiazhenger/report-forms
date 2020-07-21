@@ -62,7 +62,7 @@ const style = {
 	textIndent: { value: '2em' }
 }
 // ===================================================================== page component
-export default ({ node, _node }) => {
+export default ({ _node }) => {
 	// select
 	const fontFamily = React.useRef()
 	const fontSize = React.useRef()
@@ -78,8 +78,7 @@ export default ({ node, _node }) => {
 	const textIndent = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNodeInfo(_node).then(( { _temp } ) => {
-			const style = _temp.style()
+		Dom.getNodeInfo(_node, false).then(( { _temp } ) => {
 			// select
 			fontFamily.current.setValue(style.fontFamily)
 			fontSize.current.setValue(style.fontSize)
@@ -93,7 +92,7 @@ export default ({ node, _node }) => {
 			fontStyle.current.setValue(style.fontStyle === 'italic')
 			textDecoration.current.setValue(style.textDecoration === 'underline')
 			textIndent.current.setValue(style.textIndent === '2em')
-		}, false)
+		})
 	},[ _node ])
 	const onChange = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(( { _temp } ) => {

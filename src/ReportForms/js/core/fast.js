@@ -28,10 +28,12 @@ export default {
 	},
 	// 删除选中的拖动元素
 	del(_this){
-		if(_this.node && _this.node.parentNode){
-			_this.node.parentNode.removeChild(_this.node)
+		const _node = _this.state.node
+		if(_node){
+			_node.remove()
 			_this.node = null
-			_this.setState({hasNode:null, node:null})
+			_this._node = null
+			_this.setState({hasNode:null, node:null, _node:null })
 		}else{
 			window.$fn.toast('未选中目标')
 		}

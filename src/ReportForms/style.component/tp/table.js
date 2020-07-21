@@ -160,14 +160,62 @@ export default ({ _node }) => {
 	}, [_node, col, row, border])
 	// 添加行
 	const addRow = React.useCallback(v => {
-		Dom.getNodeInfo(_node).then(({ _drag } ) => {
-			Table.addRow(_drag.find('table').el, {
+		Dom.getNodeInfo(_node).then(({ _temp } ) => {
+			const _table = _temp.find('table')
+			Table.addRow(_table, {
 				td:{
-					style:tableConfig.style,
+					style:{
+						...tableConfig.style,
+						borderColor: _table.find('tbody').find('td').style('borderColor')
+					},
 					className:'loopNode',
 					attr:{ type:'text' }
 				}
 			})
+		})
+	}, [ _node ])
+	// 添加行
+	const delRow = React.useCallback(v => {
+		Dom.getNodeInfo(_node).then(({ _temp } ) => {
+			Table.delRow(_temp.find('table'))
+		})
+	}, [ _node ])
+	// 添加列
+	const addCol = React.useCallback(v => {
+		Dom.getNodeInfo(_node).then(({ _temp } ) => {
+			const _table = _temp.find('table')
+			const style = tableConfig.style
+			const borderColor = _table.find('tbody').find('td').style('borderColor')
+			Table.addCol(_table, {
+				thead:{
+					th: {
+						style:{
+							background:'#f5f5f5',
+							...style,
+							borderColor
+						},
+						className:'loopNode',
+						attr:{ type:'text' }
+					}
+				},
+				tbody:{
+					td:{
+						style:{
+							...style,
+							borderColor
+						},
+						className:'loopNode',
+						attr:{ type:'text' }
+					}
+				}
+			})
+		})
+	}, [ _node ])
+	
+	// 删除列
+	const delCol = React.useCallback(v => {
+		Dom.getNodeInfo(_node).then(({ _temp } ) => {
+			Table.delCol(_temp.find('table'))
 		})
 	}, [ _node ])
 	
@@ -191,11 +239,11 @@ export default ({ _node }) => {
 			<div className='fx'>
 				<List.Button label='' text='生成表格' width={65} onClick={ceateTable} />
 				<List.Button text='添加行' width={65} onClick={addRow} />
-				<List.Button text='添加列' width={65} onClick={ceateTable} />
+				<List.Button text='添加列' width={65} onClick={addCol} />
 			</div>
 			<div className='fx'>
-				<List.Button label='' text='删除行' width={65} onClick={ceateTable} />
-				<List.Button text='删除列' width={65} onClick={ceateTable} />
+				<List.Button label='' text='删除行' width={65} onClick={delRow} />
+				<List.Button text='删除列' width={65} onClick={delCol} />
 			</div>
 		</>
 	)

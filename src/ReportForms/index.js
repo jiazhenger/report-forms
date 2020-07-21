@@ -32,6 +32,7 @@ const Qrcode = Async(()=>import('./style.component/qrcode'))
 const Header = Async(()=>import('./style.component/header'))
 const Main = Async(()=>import('./style.component/main'))
 const Footer = Async(()=>import('./style.component/footer'))
+const Flexbox = Async(()=>import('./style.component/flexbox'))
 // const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
@@ -160,6 +161,7 @@ export default class extends React.Component {
 	formatHtml = (el,isPdf) => {
 		if(!el) return null
 		const node = document.createElement('div')
+		const _node = _( node )
 		if(el.id === 'dragContent'){ node.innerHTML = el.innerHTML }
 		else {
 			// el.style.removeProperty('position')
@@ -175,47 +177,42 @@ export default class extends React.Component {
 				// `
 				const clone = el.cloneNode(true)
 				// clone.style.removeProperty('position')
-				clone.style.width = '100%'
-				clone.style.position = 'relative'
-				clone.style.left = 0
-				clone.style.top = 0
-				if(clone.getAttribute('type') === 'main'){
-					clone.style.removeProperty('height')
-				}
-				node.appendChild(clone)
+				const _clone = _( clone )
+				_clone.style({
+					width: '100%',
+					position:'relative',
+					left: 0,
+					top: 0
+				})
 				
-				for(let v of node.querySelectorAll('.more')){
-					v.style.removeProperty('height')
-				}
-				
-				// node.innerHTML = style + clone.innerHTML
+				if(_clone.attr('type') === 'main'){ clone.removeStyle('height') }
+				_clone.appendTo(node)
+				_node.finds('.more').removeStyle('height')
 			}else{
-				node.appendChild(el.cloneNode(true))
+				_node.append(el.cloneNode(true))
 			}
 		}
 		
-		const $drag = node.querySelectorAll('.drag')
-		const $loop = node.querySelectorAll('.loopNode')
-		if($loop){
-			_( $loop ).each(v=> v.removeClass('activeLoop'))
-		}
-		if($drag){
-			for(let v of $drag){
-				v.style.removeProperty('border')
-				const temp = v.querySelector('.template')
-				if(temp){
-					const $img = temp.querySelector('img')
-					if(temp.innerHTML === '' || ($img && !$img.getAttribute('temp'))){
-						v.parentNode.removeChild(v)
-					}
-				}
-				const $mark = v.querySelector('.point-mark')
-				if($mark){
-					$mark.parentNode.removeChild($mark)
+		_node.finds('.loopNode').removeClass('activeLoop')
+		_node.finds('.tableSpan').removeClass('tableSpan')
+		_node.finds('.point-mark').remove()
+		
+		_node.finds('.drag').removeAttr('mergeTable').each(v=>{
+			v.removeStyle('border')
+			const _temp = v.find('.template')
+			if(_temp.el){
+				const _img = _temp.find('img')
+				if(_temp.html() === '' || ( _img.el && !_img.attr('temp') )){
+					v.remove()
 				}
 			}
-		}
-		return node.innerHTML
+		})
+		_node.finds('.wraper').each(v=>{
+			if(!v.hasChild()){ 
+				v.remove()
+			}
+		})
+		return _node.html()
 	}
 	// 获取生成 html 的内容
 	getHtml = title => {
@@ -385,6 +382,7 @@ export default class extends React.Component {
 								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
 								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
 								<IconButton2 icon={CheckboxImage} label='分页' onDragStart={e=>this.onDragStart(e,'pages')}/>
+								<IconButton2 icon={CheckboxImage} label='弹性盒' onDragStart={e=>this.onDragStart(e,'flexbox')}/>
 							</ul>
 						</div>
 					</nav>
@@ -412,6 +410,7 @@ export default class extends React.Component {
 											{ type === 'header' &&  <Header node={node} _node={_node}/> }
 											{ type === 'main' &&  <Main node={node} _node={_node}/> }
 											{ type === 'footer' &&  <Footer node={node} _node={_node}/> }
+											{ type === 'flexbox' &&  <Flexbox node={node} _node={_node}/> }
 										</>
 									)
 								}

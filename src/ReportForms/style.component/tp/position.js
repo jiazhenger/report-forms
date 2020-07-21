@@ -13,17 +13,18 @@ export default ({ _node }) => {
 	const widthRef = React.useRef()
 	const heightRef = React.useRef()
 	const indexRef = React.useRef()
+	const marginRef = React.useRef()
 	const fullRef = React.useRef()
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node,false).then(({ _drag })=>{
-			const style = _drag.getStyle()
-			leftRef.current.setValue($fn.toNum(style.left))
-			topRef.current.setValue($fn.toNum(style.top))
-			widthRef.current.setValue($fn.toNum(style.width))
-			heightRef.current.setValue($fn.toNum(style.height))
+			const style = _drag.getStyle(true)
+			leftRef.current.setValue(style.left)
+			topRef.current.setValue(style.top)
+			widthRef.current.setValue(style.width)
+			heightRef.current.setValue(style.height)
 			indexRef.current.setValue($fn.toNum(style.zIndex))
-			console.log(_drag.width())
+			marginRef.current.setValue(style.top)
 			fullRef.current.setValue( _drag.width() ===  '100%')
 		})
 	},[ _node ])
@@ -32,7 +33,7 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			const { key, value} = _.getKeyValue(v); // 转换成{key:,value: }
 			_drag.style({
-				[key] : value === '' ? '' : (isNaN(parseInt(value)) ? value : value + unit)
+				[key] : value
 			})
 		})
 	}, [ _node ])
@@ -57,7 +58,10 @@ export default ({ _node }) => {
 					<List.Input label='上' ref={topRef} name='top' onChange={v=>onChange(v,'px')}  isHalf />
 				</div>
 				<div className='fx'>
-					<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')}  isHalf />
+					<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')} isHalf />
+					<List.Input label='边距' ref={marginRef} name='margin' onChange={v=>onChange(v,'px')} isHalf />
+				</div>
+				<div className='fx'>
 					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  isHalf />
 				</div>
 			</div>
