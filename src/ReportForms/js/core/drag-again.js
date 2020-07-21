@@ -21,27 +21,25 @@ export default {
 		// 拖动改变尺寸
 		const DragSizeMove = e => {
 			const { x, y } = _.mouse.getCoord(e)
-			const { offsetLeft, offsetTop } = _( $drag ).getInfo()
 			const { scrollTop, scrollLeft }  = _( $scroll ).getInfo()
 			if(_this.dragNode){
-				const _drag = _( _this.dragNode )
+				const _drag = _(_this.dragNode)
+				const { offsetLeft, offsetTop } = _drag.parent('.drag').getInfo()
 				const size = _drag.getInfo()
 				const sizeOffsetLeft = size.offsetLeft
 				const sizeOffsetTop = size.offsetTop
 				const sizeWidth = size.width
 				const sizeHeight = size.height
 				const { left, top } = size
-				
 				// 右侧拖宽
 				if( findSize('rc-w') || findSize('rt-wh') || findSize('rb-wh')){
 					_drag.width(x - sizeOffsetLeft + scrollLeft)
 				}
 				// 左侧拖宽
 				if( findSize('lc-w') || findSize('lt-wh') || findSize('lb-wh')){
-					const { fixedLeft } = dropInFixed(_this.dragNode)
 					const _x = x + scrollLeft
 					if(left >= 0){
-						_drag.width(sizeOffsetLeft  - _x + sizeWidth).left(_x - fixedLeft - offsetLeft)
+						_drag.width(sizeOffsetLeft  - _x + sizeWidth).left(_x - offsetLeft )
 					}
 				}
 				// 底部拖高
@@ -50,65 +48,32 @@ export default {
 				}
 				// 顶部拖高
 				if( findSize('tc-h') || findSize('rt-wh') || findSize('lt-wh')){
-					const { fixedTop } = dropInFixed(_this.dragNode)
 					const _y = y + scrollTop
 					if(top >= 0){
-						_drag.height(sizeOffsetTop - _y  + sizeHeight).top(_y - fixedTop - offsetTop)
+						_drag.height(sizeOffsetTop - _y  + sizeHeight).top(_y - offsetTop )
 					}
 				}
 			}
-		}
-		// 布局dom计算
-		const dropInFixed = node =>{
-			let minusTop = { fixedTop:0, fixedHeight:0, fixedLeft: 0 }
-			const _header = _(node).parent('.header')
-			const _main = _(node).parent('.main')
-			const _footer = _(node).parent('.footer')
-			const _flexbox = _(node).parent('.flexbox')
-			
-			const Fixed = _node => {
-				if(_node.el){
-					const d = __drag.getInfo() // 获取 dragContent 的向上偏移量
-					const _top = _node.top()
-					const f = _node.getInfo()
-					const offsetTop = f.offsetTop - d.offsetTop
-					const s =  offsetTop + f.offsetHeight
-					if(_top >= offsetTop && _top < s){
-						minusTop = {
-							fixedTop: offsetTop,
-							fixedHeight:f.offsetHeight,
-							fixedLeft: f.left
-						}
-					}
-				}
-			}
-			Fixed(_header)
-			Fixed(_main)
-			Fixed(_footer)
-			// Fixed(_flexbox)
-			return minusTop
 		}
 		// 拖动中
 		const DragMove = e => {
 			const { x, y } = _.mouse.getCoord(e)
-			const { offsetLeft, offsetTop, width, height } = __drag.getInfo()
 			const _node = _this._node
+			const { offsetLeft, offsetTop, width, offsetWidth, offsetHeight, height } = _node.parent('.drag').getInfo()
 			const targetInfo = _node.getInfo()
-			const targetWidth = targetInfo.width
-			const targetHeight = targetInfo.height
-			const parentInfo = _node.parent('.drag').getInfo()  // 获取父级偏移
+			const targetWidth = targetInfo.offsetWidth
+			const targetHeight = targetInfo.offsetHeight
+			// const parentInfo = _node.parent('.drag').getInfo()  // 获取父级偏移
 			if(_node.el){
-				const left = x - offsetLeft - startX
+				// const left = x - offsetLeft - startX
 				// const top = y - offsetTop  - startY
-				const top = y - offsetTop - startY - ( parentInfo.offsetTop - offsetTop )
-				const { fixedTop, fixedHeight } = dropInFixed(_this.node)
-				const top2 = top - fixedTop
+				const left = x - startX - offsetLeft
+				const top = y - startY - offsetTop
+				const fixedHeight = _node.outerHeight()
 				
-				if(left >= 0 && left <= width - targetWidth ){ _node.left(left)}
+				if(left >= 0 && left <= offsetWidth - targetWidth){ _node.left(left) }
 				
-				if(top2 >= 0  && top2 <= (fixedHeight ? fixedHeight : height) - targetHeight){
-					_node.top(top2)
-				}
+				if(top >= 0  && top <= offsetHeight - targetHeight){ _node.top(top) }
 				
 				_node.find('.point-mark').hide()
 				_node.style('border', 0)
@@ -126,6 +91,7 @@ export default {
 			const { x, y } = _.mouse.getCoord(e)
 			const _t = _( target ).parents('.drag')
 			const t = _t.el
+			if(t && _t.attr('id')) return;
 			if(t){
 				const lock = Boolean(+_t.attr('lock'))
 				if(lock) return
@@ -186,7 +152,7 @@ export default {
 				}
 				return false
 			}
-			if(t && _this._node.el){
+			if(t && _this._node){
 				const _node = _this._node
 				const { left, top } = _node.getPos()
 				if(_this.isRel){
@@ -212,14 +178,17 @@ export default {
 			const t = _t.el
 			const _m = _( target ).parents('.move')
 			const m = _m.el
+			
+			const isRun = _t.el && !_t.attr('id')
+			
 			if( _this.dragNode ){
 				
 			}else{
-				if(t){
+				if(isRun){
 					
 				}else{
 					_this.stop = false
-					_( $drag ).finds('.drag').each(_v => {
+					__drag.finds('.drag').each(_v => {
 						_v.removeClass('hide')
 						clearMark(_v) // 清除 mark
 					})
@@ -227,14 +196,14 @@ export default {
 			}
 			
 			// 获取样式
-			if(t || m){
+			if((isRun || m)){
 				
 			}else{
 				// 清除选中 node
-				const drag = $drag.querySelectorAll('.drag')
+				const _drag = __drag.finds('.drag')
 				let hasDrag = false
-				if(drag.length > 0){
-					hasDrag = [].slice.call(drag).some(v => v.style.display === 'block')
+				if(_drag.length() > 0){
+					hasDrag = [].slice.call(_drag.el).some(v => v.style.display === 'block')
 				}
 				
 				if(!hasDrag){
@@ -246,23 +215,17 @@ export default {
 				}
 				
 				// 清除循环绑定背景 table ul checkbox
-				const nodes = document.querySelectorAll('.loopNode')
-				const _drag = _( document.querySelectorAll('.drag') )
-				const _nodes = _( nodes )
-				if(nodes.length > 0){
-					_nodes.removeClass('activeLoop') // 移除背景
-					_drag.removeClass('hide')
-					_nodes.removeClass('tableSpan')
-					_drag.removeAttr('mergeTable')
+				const _loopNode = __drag.finds('.loopNode')
+				if(_loopNode.length() > 0){
+					_loopNode.removeClass('activeLoop').removeClass('tableSpan') // 移除背景
+					_drag.removeClass('hide').removeAttr('mergeTable')
 				}
 			}
 			
 			// 清除标线
-			const $axes = _this.$axes.querySelectorAll('i')
-			Array.prototype.slice.call($axes).forEach((v,i)=>{
-				v.style.background = axesColor
+			_(_this.$axes).finds('i').each(v=>{
+				v.background(axesColor)
 			})
-			
 			
 			$drag.removeEventListener('mousemove',DragMove)
 			$drag.removeEventListener('mousemove',DragSizeMove)
@@ -278,9 +241,9 @@ export default {
 			const _t = _( target ).parents('.drag')
 			const _t2 = _( target ).parents('.loopNode')
 			e.stopPropagation()
-			if(_t.el){
+			if(_t.el && !_t.attr('id')){
 				Dom.createPointMark(_t) // 拖动标点
-				_($drag).finds('.drag').each(_v=>{
+				__drag.finds('.drag').each(_v=>{
 					clearMark(_v) // 清除 mark
 					// 给固定布局加不同颜色
 					if(_v.attr('fixed')){

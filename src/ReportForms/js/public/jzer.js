@@ -89,10 +89,10 @@ const classExtend = {
 	removeClass(className){
 		return $.listener(this.el, el => {
 			if($.isHtmlNodeList(el)){
-				for(let v of el){
+				$(el).each(v=>{
 					const c = v.className.replace(' ' + className,'')
 					v.className = c
-				}
+				})
 			}else{
 				if($(el).hasClass(className)){
 					const c = el.className.replace(' ' + className,'')
