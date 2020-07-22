@@ -24,6 +24,11 @@ $.getKeyValue = function(obj){
 	}
 	return stack
 }
+// 获取数字
+$.getNum = function(value, flag){
+	const r = parseInt(value)
+	return isNaN(r) ? (flag?value:0) : r
+}
 // 将横杠线转换驼峰
 // $.toHump = name => ( name.replace(/\-(\w)/g, (all, letter) => letter.toUpperCase() ) )
 // 驼峰转换横杠线
@@ -170,13 +175,11 @@ const styleExtend = {
 		})
 	}
 };
-(['width','height','lineHeight','left','top','letterSpacing','fontSize']).forEach(function(v){
+(['width','height','lineHeight','left','top','letterSpacing','fontSize','marginTop','marginLeft']).forEach(function(v){
 	styleExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
-				let r = this.style(v)
-				r = isNaN(parseInt(r)) ? r : parseInt(r)
-				return r
+				return $.getNum( this.style(v) )
 			}else if(arguments.length === 1){
 				if($.isNumber( parseInt(value) )){
 					value = isNaN(+value) ? value : value + 'px'

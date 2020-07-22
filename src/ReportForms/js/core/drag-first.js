@@ -101,34 +101,40 @@ export default {
 					
 					// 放置元素到不同的框
 					const type = _node.attr('type')
-					
-					let minusTop = 0
-					let isFixed = false
-					
-					const _top = _node.top()
-					const dropInFixed = $f => {
-						if($f){
-							const f = _( $f ).getInfo()
-							const s = f.top + f.clientHeight
-							if(_top >= f.top && _top < s){
+					_this.isLayout = false
+					const dropInFixed = (_node, $prevNode, type) => {
+						const _prev = _( $prevNode )
+						if(_prev.el && _prev.hasClass('x-layout')){
+							const currentTop = _node.top()
+							const currentLeft = _node.left()
+							const prevInfo = _prev.getInfo()
+							const minusTop = prevInfo.offsetTop - dragInfo.offsetTop      // 放置框距离顶部距离
+							const minusLeft = prevInfo.offsetLeft - dragInfo.offsetLeft	 // 放置框距离左侧距离
+							const height = _prev.outerHeight()
+							const width = _prev.outerWidth()
+							const isHeight = currentTop >= minusTop && currentTop < (minusTop + height) // 当前拖动 top > 放置框 top
+							const isWidth = currentLeft >= minusLeft && currentLeft < (minusLeft + width)
+							if(isHeight && isWidth){
 								if(['header','footer','main'].includes(type)){
 									_node.remove()
 									return window.$fn.toast('无法放置')
 								}else{
-									_node.appendTo($f)
-									minusTop = f.top
-									const top2 = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ - minusTop
-									_node.style('top',top2 + 'px')
+									// _node.appendTo(_prev.find('.drop').el)
+									_node.appendTo(_prev.el)
+									let newTop = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ - minusTop
+									let newLeft = x - (dragInfo.offsetLeft - scrollInfo.scrollLeft ) - differ - minusLeft
+									newTop = newTop - (newTop % axesSpace)
+									newLeft = newLeft - (newLeft % axesSpace)
+									_node.top( newTop ).left( newLeft )
 								}
-								isFixed = true
+							}else{
+								_node.appendTo($drag)
 							}
+							_this.isLayout = true
 						}
 					}
 					
-					dropInFixed($drag.querySelector('.header'))
-					dropInFixed($drag.querySelector('.main'))
-					dropInFixed($drag.querySelector('.footer'))
-					dropInFixed(_this.prevNode)
+					dropInFixed(_node,_this.prevNode,type)
 					
 					if( type === 'table' ){
 						_node.style({ left:0, width: '100%'})
@@ -144,19 +150,14 @@ export default {
 					}else if( type === 'qrcode' ){
 						_node.style({ width: '80px', height:'80px'})
 					}else if( type === 'flexbox'){
-						_node.style({ left:0, width: '100%', height:'100px'}).addClass(type)
+						_node.height(100).style({outline:'1px dashed green'}).attr('fixed', 2)
 					}else if( ['header','footer','main'].includes(type) ){
 						if(type === 'header'){ 
 							_node.style('top',0)
 						}else if( type === 'main'){
 							_node.style('height','200px')
 						}
-						_node.style({
-							left: 0,
-							width: '100%',
-							border: '1px dashed blue'
-						}).addClass(type).addClass('x-layout')
-						
+						_node.style({outline:'1px dashed blue'}).attr('fixed', 1)
 						if($drag.querySelector('.' + type)){
 							let txt = null
 							if(type === 'header'){ txt ='页眉' }
@@ -167,15 +168,20 @@ export default {
 						}
 					}
 					
-					if(!isFixed) {
-						_node.appendTo($drag)
+					if(['header','footer','main','flexbox'].includes(type)){
+						_node.style({left: 0,width: '100%'}).border(0)
+							.addClass(type)
+							.addClass('x-layout')
+							// .html(`<div class='drop' style='width:100%;height:100%;overflow:hidden;position:absolute'></div>`)
 					}
 					
+					if(!_this.isLayout){
+						_node.appendTo($drag)
+					}
 					
 					_this.setState({hasNode:true, node:_node.el, _node }, ()=>{
 						_this.runNode()
 					})
-					
 				},
 				onFail:()=>{
 					removeHtml()
@@ -222,7 +228,7 @@ export default {
 					_node.width(50).height(20).lineHeight(20).style('textAlign','center')
 				}
 			}else{
-				_node.width(100).height(100).attr('fixed', 1)
+				_node.width(100).height(100)
 			}
 			
 			Dom.createPointMark(_node) // 创建拖动标点

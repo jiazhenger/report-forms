@@ -79,20 +79,24 @@ export default class extends React.Component {
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
 		
+		this._drag = _( this.$drag )
+		this._paper = _( this.$paper )
+		
 		this.setPaper()
 		MouseEvent.init(this)
 		// Size(this)
 		const local = $fn.local('html')
-		this.$drag.innerHTML = local ? $fn.local('html') : ''
+		this._drag.each(v=>{
+			if(!v.hasClass('x-layout')){
+				v.style.border = '1px dashed ' + stopBorderColor
+			}
+		}).html( local ? $fn.local('html') : '' )
 		
-		for(let v of this.$drag.querySelectorAll('.drag')){
-			v.style.border = '1px dashed ' + stopBorderColor
-		}
 		
 		setInterval(()=>{
 			const html = $fn.local('html')
 			const formatHtml = this.formatHtml(this.$drag)
-			if(this.$drag.innerHTML !== '' && html !==  formatHtml){
+			if(this._drag.html() !== '' && html !==  formatHtml){
 				$fn.local('html', formatHtml)
 			}
 		},3000)
@@ -113,7 +117,7 @@ export default class extends React.Component {
 					info.myWidth && $fn.local('myWidth',info.myWidth)
 					info.myHeight && $fn.local('myHeight',info.myHeight)
 					this.setPaper()
-					this.$drag.innerHTML = sourceNode.innerHTML
+					this._drag.html( sourceNode.innerHTML )
 					$fn.local('html',sourceNode.innerHTML)
 					window.location.reload()
 				}
@@ -137,8 +141,7 @@ export default class extends React.Component {
 		if(myHeight){ paperHeight = myHeight }
 		if(myWidth) { paperWidth = myWidth}
 		
-		this.$paper.style.width =  paperWidth
-		this.$paper.style.height = paperHeight
+		this._paper.width(paperWidth).height(paperHeight)
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
@@ -370,6 +373,7 @@ export default class extends React.Component {
 								<IconButton2 icon={ListImage} label='列表' onDragStart={e=>this.onDragStart(e,'ul')}/>
 								<IconButton2 icon={CheckboxImage} label='选择框' onDragStart={e=>this.onDragStart(e,'checkbox')}/>
 								<IconButton2 icon={DeviderImage} label='分隔线' onDragStart={e=>this.onDragStart(e,'devider')}/>
+								<IconButton2 icon={CheckboxImage} label='弹性盒' onDragStart={e=>this.onDragStart(e,'flexbox')}/>
 							</ul>
 							<h2 className='plr10 b f12'>码</h2>
 							<ul className='fxw plr5 pt10 drag-list nosel'>
@@ -382,7 +386,6 @@ export default class extends React.Component {
 								<IconButton2 icon={CheckboxImage} label='主体' onDragStart={e=>this.onDragStart(e,'main')}/>
 								<IconButton2 icon={CheckboxImage} label='页脚' onDragStart={e=>this.onDragStart(e,'footer')}/>
 								<IconButton2 icon={CheckboxImage} label='分页' onDragStart={e=>this.onDragStart(e,'pages')}/>
-								<IconButton2 icon={CheckboxImage} label='弹性盒' onDragStart={e=>this.onDragStart(e,'flexbox')}/>
 							</ul>
 						</div>
 					</nav>

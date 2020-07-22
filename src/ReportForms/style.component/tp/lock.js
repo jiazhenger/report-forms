@@ -14,7 +14,7 @@ export default ({ _node }) => {
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _drag } ) => {
 			lockRef.current.setValue( Boolean(+_drag.attr('lock')) )
-			posRef.current.setValue( _drag.style('position') === 'absolute' )
+			posRef.current.setValue( Boolean(_drag.style('position') === 'absolute') )
 		})
 	},[ _node ])
 	
@@ -34,19 +34,22 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			if(v){
 				_drag.style('position','absolute')
+				/*
 				const _parent = _drag.parent()
 				if(_parent.el){
 					if(_parent.hasClass('wraper')){
 						_parent.replace(_drag.clone().el)
 					}
-				}
+				}*/
 			}else{
-				if(!_drag.parent('.wraper').el){
+				_drag.style('position','relative').removeStyle('left,top')
+				/*
+				if(!_drag.parent().hasClass('wraper')){
 					_drag.style('position','relative').removeStyle('left,top')
 					const clone = _drag.clone().el
 					const height = _drag.outerHeight()
 					_drag.addClass('wraper',true).removeAttr('style,type').height(height).html('').append(clone)
-				}
+				}*/
 			}
 			_(document.querySelector('#dragContent')).finds('.point-mark').hide()
 		})

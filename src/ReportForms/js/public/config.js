@@ -3,7 +3,7 @@ module.exports =  {
 	differ: 10,			// 鼠标在组件拖动时的起点位置
 	// axes 配置
 	axesColor: '#eee',
-	axesActiveColor: 'teal',
+	axesActiveColor: '#000',
 	axesSpace: 10,
 	// 拖动框配置
 	moveBorderColor:'#aaa',

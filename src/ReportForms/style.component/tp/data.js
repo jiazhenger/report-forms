@@ -16,7 +16,7 @@ export default ({ _node }) => {
 			const data = $fn.local('dataSource')
 			if( data ){
 				const rs = Format.parse(data, url)
-				dataRef && dataRef.current.setValue(rs)
+				dataRef.current && dataRef.current.setValue(rs)
 			}
 			if(url) setRead(true)
 		})

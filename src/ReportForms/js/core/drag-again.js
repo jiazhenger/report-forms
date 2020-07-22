@@ -15,13 +15,14 @@ export default {
 	init(_this){
 		const { $drag, $scroll, $control } = _this
 		const __drag = _($drag)
+		const __scroll = _($scroll)
 		let startX = 0
 		let startY = 0
 		const findSize = name => _(this.sizeNode).hasClass(name)
 		// 拖动改变尺寸
 		const DragSizeMove = e => {
 			const { x, y } = _.mouse.getCoord(e)
-			const { scrollTop, scrollLeft }  = _( $scroll ).getInfo()
+			const { scrollTop, scrollLeft }  = __scroll.getInfo()
 			if(_this.dragNode){
 				const _drag = _(_this.dragNode)
 				const { offsetLeft, offsetTop } = _drag.parent('.drag').getInfo()
@@ -55,34 +56,6 @@ export default {
 				}
 			}
 		}
-		// 拖动中
-		const DragMove = e => {
-			const { x, y } = _.mouse.getCoord(e)
-			const _node = _this._node
-			const { offsetLeft, offsetTop, width, offsetWidth, offsetHeight, height } = _node.parent('.drag').getInfo()
-			const targetInfo = _node.getInfo()
-			const targetWidth = targetInfo.offsetWidth
-			const targetHeight = targetInfo.offsetHeight
-			// const parentInfo = _node.parent('.drag').getInfo()  // 获取父级偏移
-			if(_node.el){
-				// const left = x - offsetLeft - startX
-				// const top = y - offsetTop  - startY
-				const left = x - startX - offsetLeft
-				const top = y - startY - offsetTop
-				const fixedHeight = _node.outerHeight()
-				
-				if(left >= 0 && left <= offsetWidth - targetWidth){ _node.left(left) }
-				
-				if(top >= 0  && top <= offsetHeight - targetHeight){ _node.top(top) }
-				
-				_node.find('.point-mark').hide()
-				_node.style('border', 0)
-				_node.style('border', '1px solid ' + moveBorderColor)
-				
-				Dom.setMark(_this,'.axesY', left)
-				Dom.setMark(_this,'.axesX', top)
-			}
-		}
 		// 开始拖动
 		$drag.addEventListener('mousedown',e => {
 			e.stopPropagation()
@@ -107,33 +80,72 @@ export default {
 			if(t){
 				_this.node = t
 				_this._node = _t
-				_this.setState({hasNode:true,node:t, _node: _t, target})
-				if(_t.style('position') !== 'absolute'){
-					_t.style('position','absolute')
-					_this.isRel = true
-				}
+				const nodeInfo = _t.getInfo()
+				const dragInfo = __drag.getInfo()
+				const parentInfo = _t.parent('.drag').getInfo()
+				const spaceLeft = parentInfo.offsetLeft - dragInfo.offsetLeft
+				const spaceTop = parentInfo.offsetTop - dragInfo.offsetTop
+				
 				_this.zIndex = _t.getStyle(true).zIndex
-				_this._node.style('zIndex',10)
+				_t.style('zIndex',10)
 				const targetInfo = _t.getInfo()
-				const targetOffsetLeft = targetInfo.offsetLeft
-				const targetOffsetTop = targetInfo.offsetTop
-				startX = x - targetOffsetLeft
-				startY = y - targetOffsetTop
+				startX = x -  targetInfo.offsetLeft
+				startY = y - targetInfo.offsetTop
+				_this.setState({hasNode:true,node:t, _node: _t, target})
 				$drag.addEventListener('mousemove',DragMove)
 			}
 		})
+		// 拖动中
+		const DragMove = e => {
+			const { x, y } = _.mouse.getCoord(e)
+			const _node = _this._node
+			const dragInfo = __drag.getInfo()
+			const { offsetLeft, offsetTop, width, height } = _node.parent('.drag').getInfo()
+			
+			const targetInfo = _node.getInfo()
+			const targetWidth = targetInfo.width
+			const targetHeight = targetInfo.height
+			
+			const spaceLeft = offsetLeft - targetInfo.offsetLeft
+			const spaceTop = offsetTop - targetInfo.offsetTop
+			if(_node.el){
+				let left = x - startX - offsetLeft
+				let top = y - startY - offsetTop
+				if(_node.style('position') === 'relative'){
+					left = x - startX - targetInfo.offsetLeft
+					top = y - startY - targetInfo.offsetTop
+					console.log(startX)
+				}
+				
+				if(left >= 0 && left <= width - targetWidth){ _node.left(left) }
+				
+				if(top >= 0  && top <= height - targetHeight){ _node.top(top) }
+				
+				_node.find('.point-mark').hide()
+				
+				const fixed = parseInt(_node.attr('fixed'))
+				if( fixed === 1 ){
+					_node.style('outline','1px solid blue').removeStyle('border')
+				}else if( fixed === 2 ){
+					_node.style('outline','1px solid green').removeStyle('border')
+				}else{
+					_node.style('border', 0)
+					_node.style('border', '1px solid ' + moveBorderColor)
+				}
+				
+				// 标线
+				Dom.setMark(_this,'.axesY', left + (offsetLeft - dragInfo.offsetLeft) )
+				Dom.setMark(_this,'.axesX', top + (offsetTop - dragInfo.offsetTop))
+			}
+		}
 		// 结束拖动
 		$drag.addEventListener('mouseup',e=>{
-			const { target } = e
-			const _t = _( target ).parents('.drag')
-			const t = _t.el
 			// 获取拖动尺寸的元素
 			if( _this.dragNode ){
 				const _drag = _( _this.dragNode )
 				const { left, top, width, height } = _drag.getInfo()
-				const fixed = _drag.attr('fixed')
-				const ax = fixed ? 0 : axesSpace
-				// const ax = axesSpace
+				// const ax = _drag.attr('fixed') ? 0 : axesSpace
+				const ax = axesSpace
 				// 右侧拖宽
 				if( findSize('rc-w') || findSize('rt-wh') || findSize('rb-wh')){
 					_drag.width( width - (width%axesSpace) + (width%axesSpace>0 ? axesSpace : 0) )
@@ -152,12 +164,23 @@ export default {
 				}
 				return false
 			}
-			if(t && _this._node){
+			if(_this._node){
 				const _node = _this._node
+				_node.style('zIndex', _this.zIndex || 0)
 				const { left, top } = _node.getPos()
-				if(_this.isRel){
-					_this.isRel = false
-					_node.style('position','relative').removeStyle('left,top')
+				// const { left, top, width, height } = _drag.getInfo()
+				// 相对定位处理
+				if(_node.style('position') === 'relative'){
+					// _this.isRel = false
+					_node.removeStyle('left,top')
+					// 计算居中
+					if(Boolean(_node.attr('center'))){
+						const parentWidth = _node.parent('.drag').outerWidth()
+						const childWidth = _node.outerWidth()
+						const lastLeft = (parentWidth - childWidth)/2
+						const ax = lastLeft % axesSpace
+						_node.left(lastLeft - ax).width(childWidth - (ax ? 10 : 0))
+					}
 				}else{
 					if(_node.attr('type') === 'devider'){
 						_node.left(left).top(top)
@@ -165,17 +188,12 @@ export default {
 						_node.left( left - (left % axesSpace) ).top( top - (top % axesSpace) )
 					}
 				}
-				
-				_node.style('zIndex', _this.zIndex || 0)
-				
-				_node.find('.point-mark').removeStyle('border').show()
 			}
 		})
 		// 停止拖动处理
 		document.body.addEventListener('mouseup',e=>{
 			const { target } = e
 			const _t = _( target ).parents('.drag')
-			const t = _t.el
 			const _m = _( target ).parents('.move')
 			const m = _m.el
 			
@@ -194,7 +212,6 @@ export default {
 					})
 				}
 			}
-			
 			// 获取样式
 			if((isRun || m)){
 				
@@ -220,15 +237,25 @@ export default {
 					_loopNode.removeClass('activeLoop').removeClass('tableSpan') // 移除背景
 					_drag.removeClass('hide').removeAttr('mergeTable')
 				}
+				
+				__drag.finds('.x-layout').each(v=>{
+					const fixed = parseInt(v.attr('fixed'))
+					if( fixed === 1 ){
+						v.style('outline','1px dashed blue').removeStyle('border')
+					}else if( fixed === 2 ){
+						v.style('outline','1px dashed green').removeStyle('border')
+					}else{
+						v.style('border', '1px dashed ' + stopBorderColor)
+					}
+				})
 			}
 			
 			// 清除标线
 			_(_this.$axes).finds('i').each(v=>{
 				v.background(axesColor)
 			})
-			
-			$drag.removeEventListener('mousemove',DragMove)
-			$drag.removeEventListener('mousemove',DragSizeMove)
+			__drag.unbind('mousemove',DragMove)
+			__drag.unbind('mousemove',DragSizeMove)
 			this.sizeNode = null
 			_this.dragNode = null
 		})
@@ -239,17 +266,20 @@ export default {
 		$drag.addEventListener('click',e=>{
 			const { target } = e
 			const _t = _( target ).parents('.drag')
-			const _t2 = _( target ).parents('.loopNode')
 			e.stopPropagation()
 			if(_t.el && !_t.attr('id')){
+				const _t2 = _( target ).parents('.loopNode')
 				Dom.createPointMark(_t) // 拖动标点
 				__drag.finds('.drag').each(_v=>{
 					clearMark(_v) // 清除 mark
 					// 给固定布局加不同颜色
-					if(_v.attr('fixed')){
-						_v.style('border', '1px dashed blue')
+					const fixed = parseInt(_v.attr('fixed'))
+					if( fixed === 1 ){
+						_v.style('outline','1px dashed blue').removeStyle('border')
+					}else if( fixed === 2 ){
+						_v.style('outline','1px dashed green').removeStyle('border')
 					}else{
-						_v.style('border', '1px dashed ' + stopBorderColor)
+						_v.border('1px dashed ' + stopBorderColor)
 					}
 				})
 				if(Dom.hasMark(_t.el)){
@@ -260,12 +290,11 @@ export default {
 					Boolean(+_t.attr('lock')) ? _mark.addClass('lock') : _mark.removeClass('lock')
 				}
 				
-				// t.style.borderColor = '#fff'
+				// 表格处理
 				if(_t.hasClass('hide')){
 					const isMergeTable = _t.attr('mergeTable')
 					const nodes = document.querySelectorAll('.loopNode')
 					const _nodes = _( nodes )
-					
 					if(nodes.length > 0){
 						if(_t2.el){
 							_nodes.removeClass('activeLoop')
@@ -280,9 +309,9 @@ export default {
 								_t2.addClass('activeLoop')
 							}
 							
-							_this.setState({ node:_t2.el, _node: _t2, target }, ()=>{
-								_this.runNode()
-							})
+							// _this.setState({ node:_t2.el, _node: _t2, target }, ()=>{
+							// 	_this.runNode()
+							// })
 						}else{
 							_nodes.removeClass('activeLoop')
 						}

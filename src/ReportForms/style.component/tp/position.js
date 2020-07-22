@@ -1,5 +1,6 @@
 import React from 'react'
 // ===================================================================== js
+import { axesSpace } from '../../js/public/config'
 import Dom from '../../js/public/dom'
 import _ from '../../js/public/jzer'
 // ===================================================================== template
@@ -15,6 +16,7 @@ export default ({ _node }) => {
 	const indexRef = React.useRef()
 	const marginRef = React.useRef()
 	const fullRef = React.useRef()
+	const centerRef = React.useRef()
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node,false).then(({ _drag })=>{
@@ -24,25 +26,65 @@ export default ({ _node }) => {
 			widthRef.current.setValue(style.width)
 			heightRef.current.setValue(style.height)
 			indexRef.current.setValue($fn.toNum(style.zIndex))
-			marginRef.current.setValue(style.top)
+			marginRef.current.setValue(style.margin)
 			fullRef.current.setValue( _drag.width() ===  '100%')
+			
+			const parentWidth = _drag.parent('.drag').outerWidth()
+			const childWidth = _drag.outerWidth()
+			const left = (parentWidth - childWidth)/2
+			centerRef.current.setValue( _drag.left() === left )
+			
+			const _parent = _drag.parent()
+			if(_parent.hasClass('wraper')){
+				marginRef.current.setValue(_parent.style('margin'))
+			}
 		})
 	},[ _node ])
 	
 	const onChange = React.useCallback( (v,unit) => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			const { key, value} = _.getKeyValue(v); // 转换成{key:,value: }
-			_drag.style({
-				[key] : value
-			})
+			
+			const _parent = _drag.parent()
+			if(_parent.hasClass('wraper')){
+				_parent.style({
+					[key] : value
+				})
+			}else{
+				_drag.style({
+					[key] : value
+				})
+			}
+			
 		})
 	}, [ _node ])
-	
+	// 全屏
 	const onFull = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			if(v){
-				// _drag.left(0).width(_('#dragContent').clientWidth())
 				_drag.left(0).width('100%')
+			}
+		})
+	}, [ _node ])
+	const onCenter = React.useCallback( v => {
+		Dom.getNodeInfo(_node).then(({ _drag })=>{
+			if(v){
+				const parentWidth = _drag.parent('.drag').outerWidth()
+				const childWidth = _drag.outerWidth()
+				const lastLeft = (parentWidth - childWidth)/2
+				const ax = lastLeft % axesSpace
+				_drag.left(lastLeft - ax).width(childWidth - (ax ? 10 : 0)).attr('center',1)
+			}else{
+				_drag.left(0).removeAttr('center')
+			}
+		})
+	}, [ _node ])
+	const onAuto = React.useCallback( v => {
+		Dom.getNodeInfo(_node).then(({ _drag })=>{
+			if(v){
+				_drag.style('flex',1)
+			}else{
+				_drag.removeStyle('flex')
 			}
 		})
 	}, [ _node ])
@@ -63,6 +105,8 @@ export default ({ _node }) => {
 				</div>
 				<div className='fx'>
 					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  isHalf />
+					<List.Switch label='居中' ref={centerRef} onChange={onCenter}  isHalf />
+					<List.Switch label='自适应' ref={centerRef} onChange={onAuto}  isHalf />
 				</div>
 			</div>
 		</>
