@@ -1,7 +1,7 @@
 import Dom from '../public/dom'
 import Html from '../public/html'
 import _ from '../public/jzer'
-import { differ, axesSpace, stopBorderColor  } from '../public/config'
+import { differ, axesSpace  } from '../public/config'
 // 移除缓存元素
 const removeHtml = () => {
 	const $move = document.querySelector('.move')
@@ -56,6 +56,7 @@ const dragRange = (e,_this, opt) => {
 export default {
 	// 默认执行
 	init(_this){
+		const __drag = _(_this.$drag)
 		/* 设置拖动 html 元素的位置 */
 		this.setHtmlPosition = e => {
 			const { x, y } = _.mouse.getCoord(e)
@@ -96,15 +97,14 @@ export default {
 					// top = top - (top % (axesSpace/2)) + 1
 					left = left - (left % axesSpace)
 					top = top - (top % axesSpace)
-					_node.left(left).top(top).style('border','1px dashed ' + stopBorderColor)
-					_node.find('.point-mark').show()
+					_node.left(left).top(top)
+					_node.find('.point-mark').addClass('mark-show')
 					
 					// 放置元素到不同的框
 					const type = _node.attr('type')
 					_this.isLayout = false
-					const dropInFixed = (_node, $prevNode, type) => {
-						const _prev = _( $prevNode )
-						if(_prev.el && _prev.hasClass('x-layout')){
+					const dropInFixed = (_node, _prev, type) => {
+						if(_prev && _prev.hasClass('x-layout')){
 							const currentTop = _node.top()
 							const currentLeft = _node.left()
 							const prevInfo = _prev.getInfo()
@@ -114,6 +114,7 @@ export default {
 							const width = _prev.outerWidth()
 							const isHeight = currentTop >= minusTop && currentTop < (minusTop + height) // 当前拖动 top > 放置框 top
 							const isWidth = currentLeft >= minusLeft && currentLeft < (minusLeft + width)
+							
 							if(isHeight && isWidth){
 								if(['header','footer','main'].includes(type)){
 									_node.remove()
@@ -133,7 +134,6 @@ export default {
 							_this.isLayout = true
 						}
 					}
-					
 					dropInFixed(_node,_this.prevNode,type)
 					
 					if( type === 'table' ){
@@ -150,14 +150,13 @@ export default {
 					}else if( type === 'qrcode' ){
 						_node.style({ width: '80px', height:'80px'})
 					}else if( type === 'flexbox'){
-						_node.height(100).style({outline:'1px dashed green'}).attr('fixed', 2)
+						_node.height(100)
 					}else if( ['header','footer','main'].includes(type) ){
 						if(type === 'header'){ 
 							_node.style('top',0)
 						}else if( type === 'main'){
 							_node.style('height','200px')
 						}
-						_node.style({outline:'1px dashed blue'}).attr('fixed', 1)
 						if($drag.querySelector('.' + type)){
 							let txt = null
 							if(type === 'header'){ txt ='页眉' }
@@ -169,15 +168,20 @@ export default {
 					}
 					
 					if(['header','footer','main','flexbox'].includes(type)){
-						_node.style({left: 0,width: '100%'}).border(0)
-							.addClass(type)
-							.addClass('x-layout')
+						_node.style({left: 0,width: '100%'}).addClass(type).addClass('x-layout')
+						.find('.point-mark').removeStyle('background')
 							// .html(`<div class='drop' style='width:100%;height:100%;overflow:hidden;position:absolute'></div>`)
+					}else{
+						_node.addClass('drag-elem')
 					}
+					
+					_node.parent().children('.point-mark').removeClass('mark-show') // 移除父级的 mark
 					
 					if(!_this.isLayout){
 						_node.appendTo($drag)
 					}
+					
+					Dom.setParentBorder(__drag, _node)
 					
 					_this.setState({hasNode:true, node:_node.el, _node }, ()=>{
 						_this.runNode()
@@ -198,7 +202,7 @@ export default {
 		if(document.querySelector('.move')){
 			
 		}else{
-			_this.prevNode = _this.node
+			_this.prevNode = _this._node
 			const node = document.createElement('div')
 			const _node = _( node ).attr({ type }).addClass('move').left(x-10).top(y-10).width(50).style({
 				position:'absolute',

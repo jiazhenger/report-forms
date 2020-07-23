@@ -1,7 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
-import _ from '../../js/public/jzer'
+// import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -13,19 +13,18 @@ export default ({ _node }) => {
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _drag } ) => {
-			lockRef.current.setValue( Boolean(+_drag.attr('lock')) )
+			lockRef.current.setValue( _drag.hasClass('lock') )
 			posRef.current.setValue( Boolean(_drag.style('position') === 'absolute') )
 		})
 	},[ _node ])
 	
 	const onChange = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
-			_drag.attr('lock', v ? 1 : 0)
-			const _mark = _(_drag.el).children('.point-mark')
+			
 			if(v){
-				_mark.addClass('lock')
+				_drag.addClass('lock')
 			}else{
-				_mark.removeClass('lock')
+				_drag.removeClass('lock')
 			}
 		})
 	}, [ _node ])
@@ -34,24 +33,9 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			if(v){
 				_drag.style('position','absolute')
-				/*
-				const _parent = _drag.parent()
-				if(_parent.el){
-					if(_parent.hasClass('wraper')){
-						_parent.replace(_drag.clone().el)
-					}
-				}*/
 			}else{
 				_drag.style('position','relative').removeStyle('left,top')
-				/*
-				if(!_drag.parent().hasClass('wraper')){
-					_drag.style('position','relative').removeStyle('left,top')
-					const clone = _drag.clone().el
-					const height = _drag.outerHeight()
-					_drag.addClass('wraper',true).removeAttr('style,type').height(height).html('').append(clone)
-				}*/
 			}
-			_(document.querySelector('#dragContent')).finds('.point-mark').hide()
 		})
 	}, [ _node ])
 	

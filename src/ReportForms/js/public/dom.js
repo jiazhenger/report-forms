@@ -12,6 +12,7 @@ import checkedImage from '@img/icon/checked.png'
 const { $fn } = window
 
 export default {
+	// 设置移动标线
 	setMark(_this, $axes, left){
 		const n = parseInt(left / axesSpace)
 		_(_this.$axes).find($axes).children().each((v,i)=>{
@@ -22,21 +23,49 @@ export default {
 			}
 		})
 	},
-	// 获取样式
-	getStyle(el,deep){
-		if(deep) {
-			return document.defaultView ? document.defaultView.getComputedStyle(el, null) : el.style
+	// 清除 mark
+	clearMark(_node){
+		_node.find('.point-mark').removeClass('mark-show')
+	},
+	// 设置父级边框
+	setParentBorder(__drag, _drag){
+		__drag.parent().finds('.border-parent').removeClass('border-parent')
+		
+		_drag.parent('.drag').addClass('border-parent')
+	},
+	// 移动中添加的边框
+	setMoveBorder(_drag){
+		this.clearMark(_drag)
+		_drag.addClass('drag-move')
+	},
+	// 重置所有边框
+	resetBorder(__drag){
+		const _mark = __drag.removeStyle('outline').find('.mark-show').removeClass('mark-show')
+		if(_mark.el){
+			const _drag = _mark.style('zIndex',0).parent().style('zIndex',1)
+			_drag.removeClass('drag-move')
 		}else{
-			return el.style
+			__drag.find('.drag-move').removeClass('drag-move')
+		}
+		__drag.parent().find('.border-parent').removeClass('border-parent')
+	},
+	// 隐藏 mark
+	hideMark(__drag, _node){
+		const _drag = __drag.find('.mark-show').parent('.drag')
+		if(!_node.el.isSameNode(_drag.el)){
+			this.resetBorder(__drag)
 		}
 	},
-	// 获取能够添加样式类型的节点的节点
-	getNodeStyle(_node,opt, deep){
-		if(_node.el){
-			const _styleNode = _node.find('.x-com-style')
-			if(_styleNode.el){
-				opt.onAll && opt.onAll(_styleNode, _styleNode.getStyle(deep))
-			}
+	// 显示 mark
+	showMark(__drag, _drag){
+		if(!_drag.attr('id')){ this.createPointMark(_drag) }
+		this.hideMark(__drag, _drag)
+		const _mark = _drag.style('zIndex',10).children('.point-mark').addClass('mark-show')
+		this.setParentBorder(__drag,_drag)
+		
+		// 
+		if(_drag.attr('fixed')){
+			_mark.removeStyle('background').style('zIndex',0)
 		}
 	},
 	// 获取节点信息

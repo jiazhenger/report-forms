@@ -5,9 +5,6 @@ module.exports =  {
 	axesColor: '#eee',
 	axesActiveColor: '#000',
 	axesSpace: 10,
-	// 拖动框配置
-	moveBorderColor:'#aaa',
-	stopBorderColor:'#aaa',
 	// 拖动滚动
 	scrollSpace:10,
 	// 条形码

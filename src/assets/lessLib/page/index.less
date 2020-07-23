@@ -24,20 +24,48 @@
 		&:nth-child(7){.l_b(50%,@f);.ml(-@w/2);.cd(n-resize);}
 		&:nth-child(8){.l_t(@f,50%);.mt(-@w/2);.cd(w-resize);}
 	}
-	&.lock{.bor_c(#000);
-		p{.bc(#000)}
-	}
+	&.mark-show{.db}
 }
 .activeNode{.cd;.g9;}
 .activeLoop{.bc(yellow)!important;}
 .tableSpan{.bc(pink)!important;}
 .control-title:extend(.ptb5,.b,.c0,.f12,.tc){.bbor(#eee)}
 
-#dargContent .drag{
-	&.more{.h(61)!important;}
-	.template{}
-	code:extend(.fxm){.ar;.i;.c(green);
-		s{.c(red);.mr(2)}
+#paper{
+	.drag{
+		code:extend(.fxm){.ar;.i;.c(green);
+			s{.c(red);.mr(2)}
+		}
+		&.lock{
+			>.point-mark{.bor_c(#000);
+				p{.bc(#000)}
+			}
+		}
 	}
+	.header{
+		&:after{.cn('Header')}
+	}
+	.main{
+		&:after{.cn('Body')}
+	}
+	.footer{
+		&:after{.cn('Footer')}
+	}
+	.flexbox{ outline: 1px dashed green;
+		&.drag-move{ outline: 1px solid green;border:0 }
+	}
+	.header,.main,.footer,.flexbox{
+		.point-mark{.bc!important;}
+	}
+	.header,.main,.footer{ outline: 1px dashed blue;
+		&.drag-move{ outline: 1px solid blue  }
+		&:after{.abs_rt(-45,0);.c(red);.b;.ar;.f16}
+	}
+	
+	.drag-elem{ border:1px dashed #999;
+		&.drag-move{border:1px solid red;}
+	}
+	
+	.border-parent{ outline: 1px dashed purple !important }
 }
 

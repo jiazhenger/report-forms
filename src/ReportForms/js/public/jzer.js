@@ -94,9 +94,11 @@ const classExtend = {
 	removeClass(className){
 		return $.listener(this.el, el => {
 			if($.isHtmlNodeList(el)){
-				$(el).each(v=>{
-					const c = v.className.replace(' ' + className,'')
-					v.className = c
+				$(el).each((v,i,n)=>{
+					const c = n.className
+					if($.isString(c)){
+						n.className = c.replace(' ' + className,'')
+					}
 				})
 			}else{
 				if($(el).hasClass(className)){

@@ -6,16 +6,16 @@ import _ from '../../js/public/jzer'
 import List from '../../public.component/list'
 // ===================================================================== data
 const justifyContent = [
-	{ label:'开始对齐', value:'flex-start' },
-	{ label:'结束对齐', value:'flex-end	' },
-	{ label:'居中对齐', value:'center' },
+	{ label:'左对齐', value:'flex-start' },
+	{ label:'右对齐', value:'flex-end	' },
+	{ label:'中对齐', value:'center' },
 	{ label:'平均对齐', value:'space-between' },
 	{ label:'两侧对齐', value:'space-around' },
 ]
 const alignItems = [
-	{ label:'开始对齐', value:'flex-start' },
-	{ label:'结束对齐', value:'flex-end	' },
-	{ label:'居中对齐', value:'center' },
+	{ label:'上对齐', value:'flex-start' },
+	{ label:'下对齐', value:'flex-end	' },
+	{ label:'中对齐', value:'center' },
 	{ label:'基线对齐', value:'baseline' },
 	{ label:'拉伸对齐', value:'stretch' },
 ]
@@ -56,7 +56,7 @@ export default ({ _node }) => {
 			</div>
 			<div className='fx'>
 				<List.Select label='水平' ref={justifyContentRef} isHalf name='justifyContent' data={justifyContent} onChange={onChange}/>
-				<List.Select label='垂直' ref={alignItems} isHalf name='alignItems' data={alignItems} onChange={onChange}/>
+				<List.Select label='垂直' ref={alignItemsRef} isHalf name='alignItems' data={alignItems} onChange={onChange}/>
 			</div>
 		</>
 	)

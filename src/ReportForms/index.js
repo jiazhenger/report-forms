@@ -1,6 +1,7 @@
 import React from 'react'
 import Async from '@com/async'
 import _ from './js/public/jzer'
+// import Dom from './js/public/dom'
 // ===================================================================== image
 import TableImage from '@img/icon/table.png'
 import ImgImage from '@img/icon/img.png'
@@ -91,7 +92,6 @@ export default class extends React.Component {
 				v.style.border = '1px dashed ' + stopBorderColor
 			}
 		}).html( local ? $fn.local('html') : '' )
-		
 		
 		setInterval(()=>{
 			const html = $fn.local('html')
@@ -208,6 +208,9 @@ export default class extends React.Component {
 				if(_temp.html() === '' || ( _img.el && !_img.attr('temp') )){
 					v.remove()
 				}
+			}
+			if(v.hasClass('flexbox')){
+				v.removeStyle('outline')
 			}
 		})
 		_node.finds('.wraper').each(v=>{

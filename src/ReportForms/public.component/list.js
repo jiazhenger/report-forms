@@ -24,7 +24,7 @@ class StaticSwitch extends React.Component{
 	}
 }
 
-class StaticSelet extends React.Component{
+class StaticSelect extends React.Component{
 	setValue = v => this.refs.select.setValue(v)
 	getValue = () => this.refs.select.state.value
 	render(){
@@ -45,7 +45,7 @@ class StaticInput extends React.Component{
 export default class extends React.Component{
 	static Switch = StaticSwitch
 	static Input = StaticInput
-	static Select = StaticSelet
+	static Select = StaticSelect
 	static Button = StaticButton
 	render(){
 		const { label, value } = this.props
