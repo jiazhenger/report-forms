@@ -155,7 +155,6 @@ export default class extends React.Component {
 	// 获取到 node 时执行
 	runNode = () => {
 		this.refs.dataSource && this.refs.dataSource.getNode()
-		// console.log(this.refs.dataSource)
 	}
 	// 取消 node 时执行
 	cancelNode = () => {
@@ -198,19 +197,17 @@ export default class extends React.Component {
 		
 		_node.finds('.loopNode').removeClass('activeLoop')
 		_node.finds('.tableSpan').removeClass('tableSpan')
+		_node.finds('.no-border').removeClass('no-border')
+		_node.finds('.hide').removeClass('hide')
 		_node.finds('.point-mark').remove()
 		
 		_node.finds('.drag').removeAttr('mergeTable').each(v=>{
-			v.removeStyle('border')
 			const _temp = v.find('.template')
 			if(_temp.el){
 				const _img = _temp.find('img')
-				if(_temp.html() === '' || ( _img.el && !_img.attr('temp') )){
+				if( _img.el && !_img.attr('temp') ){
 					v.remove()
 				}
-			}
-			if(v.hasClass('flexbox')){
-				v.removeStyle('outline')
 			}
 		})
 		_node.finds('.wraper').each(v=>{

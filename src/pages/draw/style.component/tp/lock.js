@@ -1,7 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
-// import _ from '../../js/public/jzer'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -32,9 +32,11 @@ export default ({ _node }) => {
 	const onPosition = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			if(v){
-				_drag.style('position','absolute')
+				const dragInfo = _drag.getInfo()
+				const { offsetTop } = _('#dragContent').getInfo()
+				_drag.removeClass('darg-rel').style('position','absolute').top(dragInfo.offsetTop-offsetTop)
 			}else{
-				_drag.style('position','relative').removeStyle('left,top')
+				_drag.addClass('darg-rel').style('position','relative').removeStyle('left,top')
 			}
 		})
 	}, [ _node ])

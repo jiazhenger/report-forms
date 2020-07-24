@@ -93,18 +93,37 @@ const classExtend = {
 	// 移除 calssName
 	removeClass(className){
 		return $.listener(this.el, el => {
-			if($.isHtmlNodeList(el)){
-				$(el).each((v,i,n)=>{
-					const c = n.className
-					if($.isString(c)){
-						n.className = c.replace(' ' + className,'')
+			if(className.indexOf(',') === -1){
+				if($.isHtmlNodeList(el)){
+					$(el).each((v,i,n)=>{
+						const c = n.className
+						if(v.hasClass(className)){
+							n.className = c.replace(' ' + className,'')
+						}
+					})
+				}else{
+					if($(el).hasClass(className)){
+						const c = el.className.replace(' ' + className,'')
+						el.className = c
+					}
+				}
+			}else{
+				const arr = className.split(',')
+				arr.forEach( styleName =>{
+					if($.isHtmlNodeList(el)){
+						$(el).each((v,i,n)=>{
+							const c = n.className
+							if(v.hasClass(styleName)){
+								n.className = c.replace(' ' + styleName,'')
+							}
+						})
+					}else{
+						if($(el).hasClass(styleName)){
+							const c = el.className.replace(' ' + styleName,'')
+							el.className = c
+						}
 					}
 				})
-			}else{
-				if($(el).hasClass(className)){
-					const c = el.className.replace(' ' + className,'')
-					el.className = c
-				}
 			}
 			return this
 		})
@@ -120,6 +139,11 @@ const styleExtend = {
 			}else{
 				return el.style
 			}
+		})
+	},
+	hasStyle(name){
+		return $.listener(this.el, el => {
+			return el.style[name] ? true : false
 		})
 	},
 	style(name,value){
@@ -169,8 +193,12 @@ const styleExtend = {
 				}
 			}else{
 				const arr = name.split(',')
-				arr.forEach(v=>{
-					el.style.removeProperty(v)
+				arr.forEach( styleName =>{
+					if( $.isHtmlNodeList(el) ){
+						$(el).each( (v,i,n) => n.style.removeProperty(styleName) )
+					}else{
+						el.style.removeProperty(styleName)
+					}
 				})
 			}
 			return this
@@ -262,11 +290,14 @@ const attrExtend = {
 				}else{
 					el.removeAttribute(attr)
 				}
-				
 			}else{ // 获取多个属性
 				attr = attr.split(',')
-				attr.forEach(v=>{
-					el.removeAttribute(v)
+				attr.forEach( attrName =>{
+					if( $.isHtmlNodeList(el) ){
+						$(el).each( (v,i,n) => n.removeAttribute(attrName) )
+					}else{
+						el.removeAttribute(attrName)
+					}
 				})
 			}
 			return this

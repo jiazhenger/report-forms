@@ -1,6 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -21,34 +22,28 @@ const BorderStyle = [
 	{ label:'点线', 			value:'dotted' },
 ]
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ _node }) => {
 	const [ row, setRow] = React.useState(2)
 	const [ value, setValue] = React.useState('decimal')
 	// 选择列表样式
 	const onSelectType = React.useCallback(v=>{
-		if(node){
-			const ul = node.querySelector('ul')
-			if(ul){
-				ul.style.listStyleType = v
-			}
-		}
-		setValue(v)
-	}, [node])
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			_temp.find('ul').style('listStyleType',v)
+			setValue(v)
+		})
+	}, [_node])
 	// 选择
-	const onBorderStyle = React.useCallback(v => {
-		if(node){
-			const li = node.querySelectorAll('li')
-			for(let n of li){
-				n.style.borderBottomStyle = v
-			}
-		}
-	}, [node])
+	const onChange = React.useCallback(v => {
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			const { key, value } = _.getKeyValue(v)
+			_temp.find('li').style([key],value)
+		})
+	}, [_node])
 	// 动态创建列表
 	const createList = React.useCallback(()=>{
 		if(row <= 0){ return $fn.toast('行数必须大于 0')}
-		Dom.getNode(node).then(({ node })=>{
-			node.style.height = 'auto'
-			const $temp = node.querySelector('.template')
+		Dom.getNodeInfo(_node).then(({ _temp,_drag }) => {
+			_drag.removeStyle('height')
 			const ul = document.createElement('ul')
 			ul.style.cssText = `width:100%;padding-left:2em;list-style:outside ${value}`
 			const fragment = document.createDocumentFragment()
@@ -61,10 +56,9 @@ export default ({ node }) => {
 			}
 			ul.appendChild(fragment)
 			// last
-			$temp.innerHTML = ''
-			$temp.appendChild(ul)
+			_temp.html('').append(ul)
 		})
-	}, [node, row, value])
+	}, [_node, row, value])
 	return (
 		<>
 			<div className='fx'>
@@ -72,7 +66,8 @@ export default ({ node }) => {
 				<List.Select label='样式' value={value} data={ListType} p='选择样式' isHalf onChange={onSelectType} />
 			</div>
 			<div className='fx'>
-				<List.Select label='下边线' value='dashed' data={BorderStyle} p='选择样式' isHalf onChange={onBorderStyle} />
+				<List.Select label='下边线' value='dashed' data={BorderStyle} p='选择样式' isHalf name='borderBottomStyle' onChange={onChange} />
+				<List.Input label='颜色' p='颜色' isHalf name='borderBottomColor' onChange={onChange} />
 			</div>
 			<div className='fx'>
 				<List.Button label='' name='src' text='生成列表' onClick={createList} />

@@ -5,6 +5,12 @@ import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
+const flexDirection = [
+	{ label:'横向排列', value:'row' },
+	{ label:'纵向排列', value:'column' },
+	{ label:'横向反转', value:'row-reverse' },
+	{ label:'纵向反转', value:'column-reverse' },
+]
 const justifyContent = [
 	{ label:'左对齐', value:'flex-start' },
 	{ label:'右对齐', value:'flex-end	' },
@@ -21,38 +27,33 @@ const alignItems = [
 ]
 // ===================================================================== page component
 export default ({ _node }) => {
-	const flexRef = React.useRef()
+	const flexDirectionRef = React.useRef()
 	const justifyContentRef = React.useRef()
 	const alignItemsRef = React.useRef()
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _drag } ) => {
-			const style = _drag.style()
-			flexRef.current.setValue(style.display === 'flex')
+			const style = _drag.getStyle(true)
+			flexDirectionRef.current.setValue( style.flexDirection )
 		})
 	},[ _node ])
-	
-	const onDisplay = React.useCallback( bool => {
-		Dom.getNodeInfo(_node).then(( { _drag } ) => {
-			if(bool){
-				_drag.style('display', 'flex')
-			}else{
-				_drag.removeStyle('display')
-			}
-		})
-	}, [ _node ])
 	
 	const onChange = React.useCallback( name => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			const { key, value } = _.getKeyValue(name)
+			if(key === 'flexDirection'){ _drag.style('display','flex') }
 			_drag.style([key],value)
+			if(!value){
+				
+				_drag.removeStyle('display,flexDirection')
+			}
 		})
 	}, [ _node ])
 	
 	return (
 		<>
 			<div>
-				<List.Switch label='横排' ref={flexRef} onChange={onDisplay}/>
+				<List.Select label='排列' p='选择方式' ref={flexDirectionRef} name='flexDirection' data={flexDirection} onChange={onChange}/>
 			</div>
 			<div className='fx'>
 				<List.Select label='水平' ref={justifyContentRef} isHalf name='justifyContent' data={justifyContent} onChange={onChange}/>

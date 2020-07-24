@@ -55,6 +55,11 @@ const TextAlign = [
 	{ label:'居右对齐', value:'right'},
 	{ label:'两端对齐', value:'justify'},
 ]
+const verticalAlign = [
+	{ label:'上对齐', value: 'top'},
+	{ label:'中对齐', value: 'middle'},
+	{ label:'下对齐', value: 'bottom'}
+]
 const style = {
 	fontWeight:{ value:'bold' },
 	fontStyle:{ value: 'italic'},
@@ -69,6 +74,7 @@ export default ({ _node }) => {
 	const lineHeight = React.useRef()
 	const letterSpacing = React.useRef()
 	const textAlign = React.useRef()
+	const verticalAlignRef = React.useRef()
 	const color = React.useRef()
 	const width = React.useRef()
 	// switch
@@ -79,14 +85,19 @@ export default ({ _node }) => {
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _temp } ) => {
+			const deepStyle = _temp.getStyle(true)
+			const style = _temp.style()
 			// select
-			fontFamily.current.setValue(style.fontFamily)
-			fontSize.current.setValue(style.fontSize)
-			lineHeight.current.setValue(style.lineHeight)
-			letterSpacing.current.setValue(style.letterSpacing)
-			textAlign.current.setValue(style.textAlign)
+			style.fontFamily && fontFamily.current.setValue(style.fontFamily)
+			style.fontSize && fontSize.current.setValue(style.fontSize)
+			style.lineHeight && lineHeight.current.setValue(style.lineHeight)
+			style.letterSpacing && letterSpacing.current.setValue(deepStyle.letterSpacing)
+			
+			textAlign.current.setValue(deepStyle.textAlign === 'start' ? 'left' : deepStyle.textAlign)
+			verticalAlignRef.current.setValue(deepStyle.verticalAlign)
+			
 			color.current.setValue(style.color)
-			width.current.setValue(_temp.getInfo().clientWidth)
+			width.current.setValue(_temp.outerWidth())
 			// switch
 			fontWeight.current.setValue(style.fontWeight === 'bold')
 			fontStyle.current.setValue(style.fontStyle === 'italic')
@@ -104,11 +115,13 @@ export default ({ _node }) => {
 			
 			if(['width','letterSpacing','fontSize'].includes(key)){
 				_temp[key]( value )
-			}else if(['fontFamily','textAlign','lineHeight','color'].includes(key)){
+			}else if(['fontFamily','textAlign','lineHeight','color','verticalAlign'].includes(key)){
 				_temp.style([key], value)
 			}else if(['fontWeight','fontStyle','textDecoration','textIndent'].includes(key)){
 				_temp.style([key], style[key].value)
 			}
+			
+			if(!value) _temp.removeStyle(key)
 			
 		})
 	}, [ _node ])
@@ -124,10 +137,11 @@ export default ({ _node }) => {
 				<List.Select label='间距' ref={letterSpacing} data={LetterSpacing} p='选择间距' isHalf name='letterSpacing' onChange={onChange} />
 			</div>
 			<div className='fx'>
-				<List.Select label='对齐' ref={textAlign} data={TextAlign} p='选择对齐方式' isHalf name='textAlign' onChange={onChange} />
-				<List.Input label='颜色' ref={color} p='颜色' isHalf name='color' onChange={onChange} />
+				<List.Select label='横对齐' ref={textAlign} data={TextAlign} p='水平对齐' isHalf name='textAlign' onChange={onChange} />
+				<List.Select label='纵对齐' ref={verticalAlignRef} data={verticalAlign} p='垂直对齐' isHalf name='verticalAlign'  onChange={onChange}/>
 			</div>
 			<div className='fx'>
+				<List.Input label='颜色' ref={color} p='颜色' isHalf name='color' onChange={onChange} />
 				<List.Input label='宽度' ref={width} p='宽度' isHalf name='width' onChange={onChange} />
 			</div>
 			<div className='fxj'>

@@ -3,14 +3,8 @@
 .drag-list li:nth-child(3n){.mr;}
 
 .move{.bor(@main-color);.cd;}
-.drag{
-	.template:extend(.rel){.index(-1)}
-}
-.hide{
-	.template{.index(20)}
-}
 
-.point-mark:extend(.abs){.bor(@main-color);.l_t(-1);.bm(-1);.r(-1);.dn;.index(10);
+.point-mark:extend(.abs){.bor(@main-color);.l_t(-1);.bm(-1);.r(-1);.dn;.index(100);
 	@w:6;
 	@f:-@w/2;
 	p:extend(.abs,.r100px){.ww(@w);.bc(@main-color);.p(2);
@@ -32,7 +26,7 @@
 .control-title:extend(.ptb5,.b,.c0,.f12,.tc){.bbor(#eee)}
 
 #paper{
-	.drag{
+	.drag{.mw(10);.mh(5);
 		code:extend(.fxm){.ar;.i;.c(green);
 			s{.c(red);.mr(2)}
 		}
@@ -41,6 +35,12 @@
 				p{.bc(#000)}
 			}
 		}
+		.template:extend(.rel){.index(-1)}
+	}
+	
+	.hide{
+		.template{.index(20)}
+		>.mark-show{.index(0)!important;}
 	}
 	.header{
 		&:after{.cn('Header')}
@@ -55,11 +55,12 @@
 		&.drag-move{ outline: 1px solid green;border:0 }
 	}
 	.header,.main,.footer,.flexbox{
-		.point-mark{.bc!important;}
+		&.no-border{outline:0;}
+		>.mark-show{.bc!important;.index(0)!important;}
 	}
 	.header,.main,.footer{ outline: 1px dashed blue;
 		&.drag-move{ outline: 1px solid blue  }
-		&:after{.abs_rt(-45,0);.c(red);.b;.ar;.f16}
+		&:after{.w(80);.abs_rt(-85,0);.c(red);.b;.ar;.f16}
 	}
 	
 	.drag-elem{ border:1px dashed #999;
@@ -67,5 +68,11 @@
 	}
 	
 	.border-parent{ outline: 1px dashed purple !important }
+	
+	.darg-rel{
+		>.mark-show{
+			.lt-wh,.lc-w,.lb-wh,.tc-h,.rt-wh{.dn}
+		}
+	}
 }
 

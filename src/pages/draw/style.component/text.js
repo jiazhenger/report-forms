@@ -7,12 +7,11 @@ import Position from './tp/position'
 import MergeTable from './tp/merge-table'
 // ===================================================================== template
 const Font  =  Async(()=>import('./tp/font'))
-// const Position  =  Async(()=>import('./tp/position'))
 const Layout  =  Async(()=>import('./tp/layout'))
 const Lock  =  Async(()=>import('./tp/lock'))
 const Border  =  Async(()=>import('./tp/border'))
 const Data  =  Async(()=>import('./tp/data'))
-// const MergeTable =  Async(()=>import('./tp/merge-table'))
+const Flex  =  Async(()=>import('./tp/flex'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -26,18 +25,17 @@ export default ({ _node }) => {
 	return (
 		<div className='abs_lt wh scroll'>
 			<h5 className='control-title'>文本框</h5>
-			<Collapse bordered={false} defaultActiveKey={['0','1','2','3','4']}>
+			<Collapse bordered={false} defaultActiveKey={['0','1','2','3','4','5']}>
 				<Panel header='常规选项'>
 					<Data _node={_node}/>
 					<Lock _node={_node}/>
 				</Panel>
 				<Panel header='文本字体'><Font _node={_node}/></Panel>
-				<Panel header='边框'><Border _node={_node}/></Panel>
+				{ td && <Panel header='表格单元格'><MergeTable _node={_node}/></Panel> }
+				{ !td && <Panel header='边框'><Border _node={_node}/></Panel> }
+				{ !td && <Panel header='位置 && 大小'><Position _node={_node}/></Panel> }
 				<Panel header='页面布局'><Layout _node={_node}/></Panel>
-				{
-					td 	? <Panel header='合并单元格'><MergeTable _node={_node}/></Panel>
-						: <Panel header='位置 && 大小'><Position _node={_node}/></Panel>
-				}
+				{ _node.parent().style('display') === 'flex' && <Panel header='排版'><Flex _node={_node} /></Panel> }
 			</Collapse>
 		</div>
 	)

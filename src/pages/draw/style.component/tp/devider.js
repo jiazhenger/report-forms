@@ -1,6 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
+import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -12,28 +13,27 @@ const BorderStyle = [
 	{ label:'点线', 			value:'dotted' },
 ]
 // ===================================================================== page component
-export default ({ node }) => {
+export default ({ node, _node }) => {
 	const borderWidthRef = React.useRef()
 	const borderStyleRef = React.useRef()
 	const borderColorRef = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNode(node).then(({ $temp } ) => {
-			const style = Dom.getStyle($temp.children[0])
+		Dom.getNodeInfo(_node, false).then(({ _temp } ) => {
+			const style = _temp.children(0).style()
 			borderWidthRef.current.setValue($fn.toNum(style.borderTopWidth))
 			borderStyleRef.current.setValue(style.borderTopStyle)
 			borderColorRef.current.setValue(style.borderTopColor)
 		},false)
-	}, [node])
+	}, [_node])
 	// 选择粗细
 	const onChange = React.useCallback(v => {
-		Dom.getNode(node).then(({ $temp } ) => {
-			const $ = $temp.children[0]
-			const key = Object.keys(v)[0]
+		Dom.getNodeInfo(_node).then(({ _temp } ) => {
+			const { key, value } = _.getKeyValue(v)
 			const unit = key === 'borderTopWidth' ? 'px' : ''
-			$.style[key] = v[key] + unit
+			_temp.children(0).style([key], value + unit)
 		})
-	}, [ node ])
+	}, [ _node ])
 	
 	return (
 		<>

@@ -17,27 +17,24 @@ export default ({ _node }) => {
 	const marginRef = React.useRef()
 	const fullRef = React.useRef()
 	const centerRef = React.useRef()
+	const autoHeightRef = React.useRef()
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node,false).then(({ _drag })=>{
 			const style = _drag.getStyle(true)
 			leftRef.current.setValue(style.left)
 			topRef.current.setValue(style.top)
-			widthRef.current.setValue(style.width)
-			heightRef.current.setValue(style.height)
+			widthRef.current.setValue(_drag.outerWidth())
+			heightRef.current.setValue(_drag.outerHeight())
 			indexRef.current.setValue($fn.toNum(style.zIndex))
 			marginRef.current.setValue(style.margin)
-			fullRef.current.setValue( _drag.width() ===  '100%')
+			fullRef.current.setValue( _drag.style('width') ===  '100%')
+			autoHeightRef.current.setValue( !_drag.hasStyle('height') )
 			
 			const parentWidth = _drag.parent('.drag').outerWidth()
 			const childWidth = _drag.outerWidth()
 			const left = (parentWidth - childWidth)/2
 			centerRef.current.setValue( _drag.left() === left )
-			
-			const _parent = _drag.parent()
-			if(_parent.hasClass('wraper')){
-				marginRef.current.setValue(_parent.style('margin'))
-			}
 		})
 	},[ _node ])
 	
@@ -62,7 +59,9 @@ export default ({ _node }) => {
 	const onFull = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			if(v){
-				_drag.left(0).width('100%')
+				_drag.removeStyle('left').width('100%')
+			}else{
+				_drag.removeStyle('width')
 			}
 		})
 	}, [ _node ])
@@ -79,12 +78,10 @@ export default ({ _node }) => {
 			}
 		})
 	}, [ _node ])
-	const onAuto = React.useCallback( v => {
+	const onHeightAuto = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			if(v){
-				_drag.style('flex',1)
-			}else{
-				_drag.removeStyle('flex')
+				_drag.removeStyle('height')
 			}
 		})
 	}, [ _node ])
@@ -106,7 +103,7 @@ export default ({ _node }) => {
 				<div className='fx'>
 					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  isHalf />
 					<List.Switch label='居中' ref={centerRef} onChange={onCenter}  isHalf />
-					<List.Switch label='自适应' ref={centerRef} onChange={onAuto}  isHalf />
+					<List.Switch label='自动高' ref={autoHeightRef} onChange={onHeightAuto}  isHalf />
 				</div>
 			</div>
 		</>

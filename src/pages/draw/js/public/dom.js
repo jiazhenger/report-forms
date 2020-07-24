@@ -30,22 +30,17 @@ export default {
 	// 设置父级边框
 	setParentBorder(__drag, _drag){
 		__drag.parent().finds('.border-parent').removeClass('border-parent')
-		
 		_drag.parent('.drag').addClass('border-parent')
-	},
-	// 移动中添加的边框
-	setMoveBorder(_drag){
-		this.clearMark(_drag)
-		_drag.addClass('drag-move')
 	},
 	// 重置所有边框
 	resetBorder(__drag){
-		const _mark = __drag.removeStyle('outline').find('.mark-show').removeClass('mark-show')
+		const _mark = __drag.find('.mark-show').removeClass('mark-show')
 		if(_mark.el){
 			const _drag = _mark.style('zIndex',0).parent().style('zIndex',1)
-			_drag.removeClass('drag-move')
+			_drag.removeClass('drag-move,no-border')
 		}else{
 			__drag.find('.drag-move').removeClass('drag-move')
+			__drag.find('.no-border').removeClass('no-border')
 		}
 		__drag.parent().find('.border-parent').removeClass('border-parent')
 	},
@@ -58,14 +53,18 @@ export default {
 	},
 	// 显示 mark
 	showMark(__drag, _drag){
-		if(!_drag.attr('id')){ this.createPointMark(_drag) }
-		this.hideMark(__drag, _drag)
-		const _mark = _drag.style('zIndex',10).children('.point-mark').addClass('mark-show')
-		this.setParentBorder(__drag,_drag)
-		
-		// 
-		if(_drag.attr('fixed')){
-			_mark.removeStyle('background').style('zIndex',0)
+		if(_drag && _drag.el){
+			this.hideMark(__drag, _drag)
+			if(!_drag.attr('id')){ 
+				this.createPointMark(_drag)
+				_drag.addClass('no-border').style('zIndex',10).children('.point-mark').addClass('mark-show')
+				if(_drag.style('position') === 'relative'){
+					_drag.addClass('darg-rel')
+				}else{
+					_drag.removeClass('darg-rel')
+				}
+			}
+			this.setParentBorder(__drag,_drag)
 		}
 	},
 	// 获取节点信息
@@ -182,13 +181,10 @@ export default {
 		// last
 		$temp.appendChild(ul)
 	},
-	hasMark(node){
-		return ( [].slice.call(node.children).some( v => _(v).hasClass('point-mark')) )
-	},
 	// 创建拖动标尺
 	createPointMark(_node){
 		if(_node.el){
-			if(!this.hasMark(_node.el)){
+			if( !_node.children('.point-mark').el ){
 				const point = document.createElement('div')
 				const _point = _(point)
 				_point.addClass('point-mark').html(`
@@ -202,8 +198,7 @@ export default {
 					<p class='dir lc-w'><s></s></p>
 				`).style('background','rgba(0,0,0,0.05)').bind('click',e=>{
 					e.stopPropagation()
-				})
-				_node.append(point)
+				}).appendTo(_node.el)
 			}
 		}
 	},

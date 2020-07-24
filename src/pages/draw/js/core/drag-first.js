@@ -142,7 +142,7 @@ export default {
 						_node.style({ left:0, width: '100%'})
 					}else if( type === 'devider' ){
 						_node.style({ left:0, width: '100%', height:'10px'})
-						_node.find('.template').html('<div></div>').children(0).cssText('width:100%;height:1px; border-top:1px solid #ddd')
+						_node.find('.template').html('<div></div>').children(0).cssText('width:100%;height:0; border-top:1px solid #ddd;')
 					}else if( type === 'checkbox' ){
 						_node.removeStyle('width')
 					}else if( type === 'barcode' ){

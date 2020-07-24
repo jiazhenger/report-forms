@@ -3,7 +3,7 @@ import React from 'react'
 export default ({ label, children, onClick, suffix, isHalf, labelWidth }) => {
 	const style = isHalf ? {width:'50%'} : {}
 	return (
-		<div className='ns-list fxm' style={{padding:'5px 0',...style}}>
+		<div className='ns-list fxm' style={{padding:'2px 0',...style}}>
 			{
 				(label || label==='') && <h3 className='mr5 tr f12' style={{width: labelWidth || '45px'}}>{label}</h3>
 			}

@@ -54,39 +54,38 @@ export default {
 		// 开始拖动
 		$drag.addEventListener('mousedown',e => {
 			e.stopPropagation()
-			if(_this.stop) return
 			const { target } = e
 			const { x, y } = _.mouse.getCoord(e)
-			const _t = _( target ).parents('.drag')
-			const t = _t.el
+			const _drag = _( target ).parents('.drag')
+			const _temp = _drag.find('.template')
+			// 如果编辑，不允许移动
+			if(_temp.el && _temp.attr('contentEditable')) return;
 			// 为最外层元素，不允许拖动
-			if(_t.attr('id')) return;
+			if(_drag.attr('id')) return;
 			// 如果被锁定，不允许拖动
-			if(_t.hasClass('lock')){ return }
+			if(_drag.hasClass('lock')){ return }
 			// 如果 mark 存在，不允许拖动
-			if( !_t.find('.point-mark').hasClass('mark-show')){ return }
-			
+			if( !_drag.children('.point-mark').hasClass('mark-show')){ return }
 			// 获取拖动尺寸的元素
 			const name = target.className
 			if( name.indexOf('dir') >= 0 ){
-				_this.dragNode = t
+				_this.dragNode = _drag.el
 				this.sizeNode = target
 				return $drag.addEventListener('mousemove',DragSizeMove)
 			}
 			
-			if(t){
-				_this.node = t
-				_this._node = _t
+			if(_drag.el){
+				_this.node = _drag.el
+				_this._node = _drag
 				// _this.zIndex = _t.getStyle(true).zIndex
 				
-				const targetInfo = _t.getInfo()
-				startX = x -  targetInfo.offsetLeft
-				startY = y - targetInfo.offsetTop
-				startOffsetX = targetInfo.offsetLeft
-				startOffsetY = targetInfo.offsetTop
+				const dragInfo =  _drag.getInfo()
+				startX = x -  dragInfo.offsetLeft
+				startY = y - dragInfo.offsetTop
+				startOffsetX = dragInfo.offsetLeft
+				startOffsetY = dragInfo.offsetTop
 				
 				$drag.addEventListener('mousemove',DragMove)
-				_this.setState({hasNode:true,node:t, _node: _t, target})
 			}
 		})
 		// 拖动中
@@ -123,10 +122,10 @@ export default {
 					Dom.setMark(_this,'.axesY', left + (offsetLeft - dragInfo.offsetLeft) )
 					Dom.setMark(_this,'.axesX', top + (offsetTop - dragInfo.offsetTop))
 				}
-				
-				Dom.setMoveBorder(_node)
-				
-				
+				// 清除 mark
+				Dom.clearMark(_node)
+				// 添加移动样式
+				_node.addClass('drag-move').removeClass('no-border')
 			}
 		}
 		// 结束拖动
@@ -216,7 +215,7 @@ export default {
 				
 				if(!hasDrag){
 					$fn.leak(()=>{
-						_this.setState({ node:null, _node:null, target:null }, ()=>{
+						_this.setState({ node:null, _node:null, target:null, hasNode:null }, ()=>{
 							_this.cancelNode()
 						})
 					})()
@@ -248,83 +247,77 @@ export default {
 		// 单击
 		$drag.addEventListener('click',e=>{
 			const { target } = e
-			const _t = _( target ).parents('.drag')
+			const _target = _(target)
+			const _drag = _target.parents('.drag')
 			e.stopPropagation()
-			
-			if(_t.el){
-				Dom.showMark(__drag, _t)
-			}
-			
-			if(_t.el && !_t.attr('id')){
+			Dom.showMark(__drag, _drag)
+			if(_drag.el && !_drag.attr('id')){
 				// 表格处理
-				if(_t.hasClass('hide')){
-					const _t2 = _( target ).parents('.loopNode')
-					const isMergeTable = _t.attr('mergeTable')
+				const _loopNode = _target.parents('.loopNode')
+				if(_drag.hasClass('hide')){
+					const isMergeTable = _drag.attr('mergeTable')
 					const nodes = document.querySelectorAll('.loopNode')
 					const _nodes = _( nodes )
 					if(nodes.length > 0){
-						if(_t2.el){
+						if(_loopNode.el){
 							_nodes.removeClass('activeLoop')
 							if(isMergeTable){
-								if(_t2.hasClass('tableSpan')){
-									_t2.removeClass('tableSpan')
+								if(_loopNode.hasClass('tableSpan')){
+									_loopNode.removeClass('tableSpan')
 								}else{
-									_t2.addClass('tableSpan')
+									_loopNode.addClass('tableSpan')
 								}
-								
 							}else{
-								_t2.addClass('activeLoop')
+								_loopNode.addClass('activeLoop')
 							}
-							
-							// _this.setState({ node:_t2.el, _node: _t2, target }, ()=>{
-							// 	_this.runNode()
-							// })
 						}else{
 							_nodes.removeClass('activeLoop')
 						}
 					}
-				}else{
-					_this._node = _t
-					_this.setState({ node:_t.el, _node: _t, target:target },()=>{
-						_this.runNode()
-					})
 				}
-			}else{
+				if(_loopNode.el && _loopNode.hasClass('loopNode')){
+					_this._node = _loopNode
+				}else{
+					_this._node = _drag
+				}
 				
+				
+				_this.setState({ node:_this._node.el, _node: _this._node, hasNode:true },()=>{
+					_this.runNode()
+				})
 			}
 		})
 		// 双击
 		$drag.addEventListener('dblclick',e=>{
 			const { target } = e
-			const _t = _( target ).parents('.drag')
-			const t = _t.el
-			
-			if(t){
-				let type = _t.attr('type')
-				const isGroup = _t.attr('group')
-				const hasUrl = _t.attr('rooturl')
+			const _target = _( target )
+			const _drag = _target.parents('.drag')
+			if(_drag && _drag.el){
+				let type = _drag.attr('type')
+				const isGroup = _drag.attr('group')
+				const hasUrl = _drag.attr('rooturl')
 				
 				if(!isGroup && hasUrl){ return}
 				
-				let _editor = _t.find('.template')
+				let _temp = _drag.find('.template')
 				
-				if(type !== 'text'){
-					_editor = _( target ).parents('.loopNode')
-					type =  _editor.attr('type')
-					if(isGroup && _editor.hasClass('x-bind-table')){
+				if(type === 'table' || type === 'ul' || type === 'text'){
+					_drag.addClass('hide')
+				}
+				
+				if( _target.parent('.drag').attr('group') ){
+					_temp = _target.parents('.loopNode')
+					type =  _temp.attr('type')
+					if(isGroup && _temp.hasClass('x-bind-table')){
 						return
 					}
 				}
 				
 				if(type === 'text'){
-					_this.stop = true
-					_t.addClass('hide')
-					if(_t.attr('mergeTable')){ return }
-					_editor.contentEditable(true).focus().once('blur', function(e){
+					if(_drag.attr('mergeTable')){ return }
+					_temp.contentEditable(true).focus().once('blur', function(e){
 						_(this).removeAttr('contentEditable')
 					})
-				}else if(type === 'table'){
-					_t.addClass('hide')
 				}
 			}
 		})
