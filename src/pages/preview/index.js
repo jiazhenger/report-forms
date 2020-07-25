@@ -1,7 +1,6 @@
 import React from 'react'
 // ===================================================================== public component
 import _ from '@pages/draw/js/public/jzer'
-import { paperParam } from '@pages/draw/js/public/config'
 // ===================================================================== antd
 
 // ===================================================================== image
@@ -19,39 +18,47 @@ const IconButton = ({ label, id, hasNode, onClick}) => (
 const { $fn, $http } = window
 // ===================================================================== component
 export default class extends React.Component{
+	state = {
+		
+	}
 	componentDidMount(){
 		this.html = this.getLocalHtml()
-	}
-	getLocalHtml(){
-		return $fn.local('html')
-	}
-	getPdf = () => {
-		// const style = `
-		// 	<style>
-		// 		*{margin:0;padding:0;box-sizing:border-box;color:Red}
-		// 		body{font:12px/20px Microsoft YaHei;color:#333;}
-		// 		img{border:0;display:block}
-		// 		table{border:0,width:100%;border-collapse:collapse;border-spacing:0;}
-		// 		.fxmc{display:flex;align-items: center;justify-content: center}
-		// 	</style>
-		// `
-		// const clone = el.cloneNode(true)
-		// // clone.style.removeProperty('position')
-		// const _clone = _( clone )
-		// _clone.style({
-		// 	width: '100%',
-		// 	position:'relative',
-		// 	left: 0,
-		// 	top: 0
-		// })
+		this.paper = $fn.local('paper')
+		this.setState({ paperWidth: this.paper.width })
 		
-		// if(_clone.attr('type') === 'main'){ clone.removeStyle('height') }
-		// _clone.appendTo(node)
-		// _node.finds('.more').removeStyle('height')
+		this.preview()
 	}
+	// 预览内容
+	preview(){
+		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
+		const node = document.createElement('div')
+		_(node).addClass('fv paper-page bcf').style('height', this.paper.height)
+		// header
+		if(headerHtml !== ''){
+			const _header = _.toNode(headerHtml).children(0)
+			_header.appendTo(node)
+		}
+		// main
+		const _main = _.toNode(mainHtml).children(0).addClass('ex').background('yellow')
+		_main.appendTo(node)
+		const mainHeight = parseInt(this.paper.height) - headerHeight - footerHeight
+		console.log(mainHeight)
+		// footer
+		if(footerHtml !== ''){
+			const _footer = _.toNode(footerHtml).children(0)
+			_footer.appendTo(node)
+		}
+		
+		console.log(node)
+		
+		_('#preview').append(node)
+	}
+	// 获取本地 html
+	getLocalHtml(){ return $fn.local('html') }
 	// 最终输出
-	getLastHtml(paper){
+	getLastHtml(isPdf){
 		const _node = _.toNode(this.getLocalHtml())
+		const paper = this.paper
 		let _header = _node.find('.header')
 		let _footer = _node.find('.footer')
 		let _main = _node.find('.main')
@@ -63,31 +70,36 @@ export default class extends React.Component{
 		let headerHtml = ''
 		let mainHtml = _node.html()
 		let footerHtml = ''
-		const scale = 1
+		const scale = 0.713
 		if(_header.el){
 			_header.style('position','relative').removeStyle('left,top')
 			headerHeight = _header.height()
-			headerHtml = _header.htmls()
-			if(paper){
+			if(isPdf){
 				_header.width(paper.width).style('transform', `scale(${scale})`)
 			}
+			headerHtml = _header.htmls()
 		}
 		if(_footer.el){
 			_footer.style('position','relative').removeStyle('left,top')
 			footerHeight = _footer.height()
-			footerHtml = _footer.htmls()
-			if(paper){
+			if(isPdf){
 				_footer.width(paper.width).style('transform', `scale(${scale})`)
 			}
+			footerHtml = _footer.htmls()
 		}
+		
 		if(_main.el){
 			_main.style('position','relative').removeStyle('left,top')
 			mainHeight = _main.height()
 			mainHtml = _main.htmls()
-			if(paper){
+			if(isPdf){
 				_main.removeStyle('height')
 			}
 		}
+		if(isPdf){
+			_node.finds('.more').removeStyle('height')
+		}
+		
 		return {
 			mainHtml,
 			headerHtml,
@@ -99,8 +111,9 @@ export default class extends React.Component{
 		}
 	}
 	// 获取生成 html 的内容
-	getHtml = paper => {
+	getHtml = () => {
 		const { mainHtml, headerHtml, footerHtml } = this.getLastHtml()
+		const paper = this.paper
 		const width = parseInt(paper.width) + 20 + 'px'
 		
 		return `
@@ -144,9 +157,8 @@ export default class extends React.Component{
 	createPdf = () => {
 		const html = this.getLocalHtml()
 		if(!html) return $fn.toast('无内容')
-		const paper = $fn.local('paper') || paperParam
-		
-		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml(paper)
+		const paper = this.paper
+		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
 		
 		$http.submit(null,'pdf',{ 
 			param:{
@@ -185,7 +197,7 @@ export default class extends React.Component{
 	}
 	// 创建 html
 	createHtml = () => {
-		const paper = $fn.local('paper') || paperParam
+		const paper = this.paper
 		let html = this.getHtml( paper )
 		if(_.isString(html)){ html = html.replace(/[\n\r\t]/g,''); }
 		$http.submit(null, 'html', { param:{ html, name: paper.name, source:this.getSource(paper) } }).then(data=>{
@@ -199,8 +211,9 @@ export default class extends React.Component{
 		window.open(window.$config.api + 'downloadHtml?name' + this.reportName)
 	}
 	render(){
+		const { paperWidth } = this.state
 		return (
-			<div className='wh'>
+			<div className='wh fv'>
 				<header className='fxm plr10 bcf bbor1 nosel' style={{height:'30px'}}>
 					<div className='ex h'>
 						<ul className='fxmc h'>
@@ -211,6 +224,13 @@ export default class extends React.Component{
 						</ul>
 					</div>
 				</header>
+				<div className='ex rel'>
+					<div className='abs_full scroll fxc' style={{padding:'5px'}}>
+						<div id='preview' style={{width:paperWidth}}>
+							
+						</div>
+					</div>
+				</div>
 			</div>
 		)
 	}
