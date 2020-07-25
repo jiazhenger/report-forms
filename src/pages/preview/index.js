@@ -63,12 +63,13 @@ export default class extends React.Component{
 		let headerHtml = ''
 		let mainHtml = _node.html()
 		let footerHtml = ''
+		const scale = 1
 		if(_header.el){
 			_header.style('position','relative').removeStyle('left,top')
 			headerHeight = _header.height()
 			headerHtml = _header.htmls()
 			if(paper){
-				_header.width(paper.width)
+				_header.width(paper.width).style('transform', `scale(${scale})`)
 			}
 		}
 		if(_footer.el){
@@ -76,7 +77,7 @@ export default class extends React.Component{
 			footerHeight = _footer.height()
 			footerHtml = _footer.htmls()
 			if(paper){
-				_footer.width(paper.width)
+				_footer.width(paper.width).style('transform', `scale(${scale})`)
 			}
 		}
 		if(_main.el){
