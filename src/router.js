@@ -7,6 +7,7 @@ import Import from '@com/bundle'
 export default () => (
 	<Switch>
 		<Route path='/' component={ Import('index') } exact />
+		<Route path='/preview' component={ Import('preview') } exact />
 		{/* 重定向 */}
 		<Route path='/' children={<Redirect to='/index' />} exact />
 		{/* 404 */}

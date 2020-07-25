@@ -20,7 +20,10 @@ export default class MyInput extends React.Component {
 		onChange && onChange( name ? {[name]:this.state.value} : this.state.value, this.state.value)
 	}
 	
-	setValue = value => this.setState({ value })
+	setValue = value => {
+		if(value === null){ value = ''}
+		this.setState({ value })
+	}
 	
 	clear = () => this.setValue('')
 	

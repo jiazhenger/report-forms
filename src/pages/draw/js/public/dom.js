@@ -42,6 +42,8 @@ export default {
 			__drag.find('.drag-move').removeClass('drag-move')
 			__drag.find('.no-border').removeClass('no-border')
 		}
+		__drag.finds('.loopNode').removeClass('activeLoop')
+		__drag.finds('.hide').removeClass('hide')
 		__drag.parent().find('.border-parent').removeClass('border-parent')
 	},
 	// 隐藏 mark

@@ -26,5 +26,11 @@ module.exports =  {
 	},
 	tableConfig:{
 		style:{ padding:'2px 5px', height:'20px', boxSizing:'content-box', border:'1px solid #ddd'}
+	},
+	paperParam: {
+		format: 'A4',
+		width:'810px',
+		height:'1160px',
+		name:'报表'
 	}
 }

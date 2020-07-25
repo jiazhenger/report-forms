@@ -32,7 +32,13 @@ $.getNum = function(value, flag){
 // 将横杠线转换驼峰
 // $.toHump = name => ( name.replace(/\-(\w)/g, (all, letter) => letter.toUpperCase() ) )
 // 驼峰转换横杠线
-$.toLine = name => ( name.replace(/([A-Z])/g, '-$1').toLowerCase() );
+$.toLine = name => ( name.replace(/([A-Z])/g, '-$1').toLowerCase() )
+// 将字符串转为 node
+$.toNode = function(str){
+	const node = document.createElement('div')
+	node.innerHTML = str
+	return __(node)
+}
 // 鼠标
 $.mouse = {
 	getCoord(e){
@@ -43,7 +49,7 @@ $.mouse = {
 	}
 };
 // 数据判断
-(['String', 'Number', 'Array', 'Object', 'Boolean', 'Undefined']).forEach(v => {
+(['String', 'Number', 'Array', 'Object', 'Boolean', 'Function', 'Undefined']).forEach(v => {
 	$['is' + v] = obj => ( {}.toString.call(obj) === '[object '+ v +']' )
 })
 
@@ -451,6 +457,14 @@ const valueExtend = {
 			}
 		})
 	},
+	// 获取包括自身的 html
+	htmls(){
+		return $.listener(this.el, el => {
+			const node = document.createElement('div')
+			node.appendChild(el)
+			return node.innerHTML
+		})
+	},
 	text(str){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -585,10 +599,40 @@ const appendExtend = {
 	}
 }
 // 事件
+$.stopEvent = function(e, isStop, isDef){
+	if(isStop) e.stopPropagation()
+	if(isDef) e.preventDefault()
+}
+$.getRunEvent = function(){
+	let callback,stop,prevent
+	const s0 = arguments[0]
+	const s1 = arguments[1]
+	const s2 = arguments[2]
+	if( $.isFunction(s0) ){
+		callback = s0
+	}else if($.isBoolean(s0) ){
+		stop = s0
+		prevent = s2
+		callback = s1
+	}else if($.isObject(s0) ){
+		stop = s0.stop
+		prevent = s0.prevent
+		callback = s2
+	}
+	return { callback, stop, prevent }
+}
 const eventExtend = {
-	bind(event,callback){
+	bind(event){
 		return $.listener(this.el, el => {
-			el.addEventListener(event,callback)
+			const { callback, stop, prevent } = $.getRunEvent(arguments[1],arguments[2], arguments[3] )
+			if(stop || prevent) {
+				el.addEventListener(event, function(e){
+					if(callback){ callback.call(this, e) }
+					$.stopEvent(e, stop, prevent)
+				})
+			}else{
+				el.addEventListener(event, callback)
+			}
 			return this
 		})
 	},
@@ -610,9 +654,13 @@ const eventExtend = {
 			return this
 		})
 	},
-	once(event, callback){
+	once(event){
 		return $.listener(this.el, el => {
-			el['on' + event] = callback
+			const { callback, stop, prevent } = $.getRunEvent(arguments[1],arguments[2], arguments[3] )
+			el['on' + event] = function(e){
+				if(callback){ callback.call(this, e) }
+				$.stopEvent(e, stop, prevent)
+			}
 			return this
 		})
 	},
@@ -622,7 +670,15 @@ const eventExtend = {
 			return this
 		})
 	}
-}
+};
+(['click', 'mouseup', 'mousedown', 'submit', 'mousemove', 'dblclick']).forEach(function(v){
+	eventExtend[v] = function(){
+		return $.listener(this.el, el => {
+			$(el).bind(v, arguments[0], arguments[1], arguments[2] )
+			return this
+		})
+	}
+})
 // 判断
 const judgeExtend = {
 	isElement(){ return this.el instanceof HTMLElement },

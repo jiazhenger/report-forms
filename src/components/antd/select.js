@@ -15,7 +15,10 @@ export default class Index extends React.Component {
 		})
 	}
 	
-	setValue = value =>  this.setState({ value: value})
+	setValue = value => {
+		if(value === null){ value = ''}
+		this.setState({ value })
+	}
 	
 	clear = () => this.setState({ value: '', key:this.state.key+1 })
 	

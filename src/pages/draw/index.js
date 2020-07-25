@@ -1,6 +1,8 @@
 import React from 'react'
 import Async from '@com/async'
+// ===================================================================== public component
 import _ from './js/public/jzer'
+import { paperParam } from './js/public/config'
 // import Dom from './js/public/dom'
 // ===================================================================== image
 import TableImage from '@img/icon/table.png'
@@ -11,7 +13,6 @@ import DeviderImage from '@img/icon/devider.png'
 import CheckboxImage from '@img/icon/checkbox.png'
 // ===================================================================== dom js
 import MouseEvent from './js/index'
-import { stopBorderColor  } from './js/public/config'
 // ===================================================================== antd
 // import { SlackOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
@@ -34,19 +35,14 @@ const Header = Async(()=>import('./style.component/header'))
 const Main = Async(()=>import('./style.component/main'))
 const Footer = Async(()=>import('./style.component/footer'))
 const Flexbox = Async(()=>import('./style.component/flexbox'))
-// const Tabs = ()=>import('@antd/tabs')// ===================================================================== declare
+// const Tabs = ()=>import('@antd/tabs')
+// ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
 const rightWidth = '350px'
 const leftWidth = '200px'
-const { $fn, $http } = window
-// 默认纸张
-const paperParam = {
-	format: 'A4',
-	width:'810px',
-	height:'1160px',
-	name:'报表'
-}
+const { $fn } = window
+let clear
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode, onClick}) => (
 	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`} onClick={onClick}>
@@ -80,23 +76,22 @@ export default class extends React.Component {
 		this.$axes = document.querySelector('#axes')				// x 轴
 		this.$control =  document.querySelector('#control') 		// 控制面版
 		
-		this._drag = _( this.$drag )
-		this._paper = _( this.$paper )
+		this.__drag = _( this.$drag )
+		this.__scroll = _( this.$scroll )
+		this.__paper = _( this.$paper )
+		this.__axes = _( this.$axes )
+		this.__control = _( this.$control )
 		
 		this.setPaper()
 		MouseEvent.init(this)
 		// Size(this)
 		const local = $fn.local('html')
-		this._drag.each(v=>{
-			if(!v.hasClass('x-layout')){
-				v.style.border = '1px dashed ' + stopBorderColor
-			}
-		}).html( local ? $fn.local('html') : '' )
+		this.__drag.html( local ? $fn.local('html') : '' )
 		
-		setInterval(()=>{
+		clear = setInterval(()=>{
 			const html = $fn.local('html')
-			const formatHtml = this.formatHtml(this.$drag)
-			if(this._drag.html() !== '' && html !==  formatHtml){
+			const formatHtml = this.formatHtml()
+			if(this.__drag.html() !== '' && html !==  formatHtml){
 				$fn.local('html', formatHtml)
 			}
 		},3000)
@@ -117,12 +112,19 @@ export default class extends React.Component {
 					info.myWidth && $fn.local('myWidth',info.myWidth)
 					info.myHeight && $fn.local('myHeight',info.myHeight)
 					this.setPaper()
-					this._drag.html( sourceNode.innerHTML )
+					this.__drag.html( sourceNode.innerHTML )
 					$fn.local('html',sourceNode.innerHTML)
 					window.location.reload()
 				}
 			}
 		}
+		// 预览
+		_('#preview').mouseup({stop:true}).bind('click', e=>{
+			this.props.history.push('/preview')
+		})
+	}
+	componentWillUnmount(){
+		clearInterval(clear)
 	}
 	// 纸张设置
 	setPaper = () =>{
@@ -141,7 +143,7 @@ export default class extends React.Component {
 		if(myHeight){ paperHeight = myHeight }
 		if(myWidth) { paperWidth = myWidth}
 		
-		this._paper.width(paperWidth).height(paperHeight)
+		this.__paper.width(paperWidth).height(paperHeight)
 	}
 	// 开始拖动模板
 	onDragStart = (e,type) => MouseEvent.DragStart(e,this,type)
@@ -160,41 +162,11 @@ export default class extends React.Component {
 	cancelNode = () => {
 		this.refs.dataSource && this.refs.dataSource.cancelNode()
 	}
-	formatHtml = (el,isPdf) => {
-		if(!el) return null
+	// 格式化多余的修饰
+	formatHtml = () => {
 		const node = document.createElement('div')
-		const _node = _( node )
-		if(el.id === 'dragContent'){ node.innerHTML = el.innerHTML }
-		else {
-			// el.style.removeProperty('position')
-			if(isPdf){
-				// const style = `
-				// 	<style>
-				// 		*{margin:0;padding:0;box-sizing:border-box;color:Red}
-				// 		body{font:12px/20px Microsoft YaHei;color:#333;}
-				// 		img{border:0;display:block}
-				// 		table{border:0,width:100%;border-collapse:collapse;border-spacing:0;}
-				// 		.fxmc{display:flex;align-items: center;justify-content: center}
-				// 	</style>
-				// `
-				const clone = el.cloneNode(true)
-				// clone.style.removeProperty('position')
-				const _clone = _( clone )
-				_clone.style({
-					width: '100%',
-					position:'relative',
-					left: 0,
-					top: 0
-				})
-				
-				if(_clone.attr('type') === 'main'){ clone.removeStyle('height') }
-				_clone.appendTo(node)
-				_node.finds('.more').removeStyle('height')
-			}else{
-				_node.append(el.cloneNode(true))
-			}
-		}
-		
+		const _node = _( node ).html(this.__drag.html())
+	
 		_node.finds('.loopNode').removeClass('activeLoop')
 		_node.finds('.tableSpan').removeClass('tableSpan')
 		_node.finds('.no-border').removeClass('no-border')
@@ -215,128 +187,10 @@ export default class extends React.Component {
 				v.remove()
 			}
 		})
-		return _node.html()
+		let html = _node.html()
+		return html
 	}
-	// 获取生成 html 的内容
-	getHtml = title => {
-		let $header = this.$drag.querySelector('.header')
-		let $footer = this.$drag.querySelector('.footer')
-		let $main = this.$drag.querySelector('.main')
-		const headerHeight = $header ? $header.clientHeight : 0
-		const footerHeight = $footer ? $footer.clientHeight: 0
-		const mainHeight = $main ? $main.clientHeight: 0
-		const width = this.$drag.clientWidth
-		const height = headerHeight + footerHeight + mainHeight
-		
-		let headerHtml = ''
-		let mainHtml = ''
-		let footerHtml = ''
-		if($header){
-			$header = $header.cloneNode(true)
-			$header.style.removeProperty('position')
-			headerHtml = this.formatHtml( $header ) 
-		}
-		if($footer){
-			$footer = $footer.cloneNode(true)
-			$footer.style.removeProperty('position')
-			footerHtml = this.formatHtml( $footer )
-		}
-		if($main){
-			$main = $main.cloneNode(true)
-			$main.style.removeProperty('position')
-			$main.style.removeProperty('left')
-			$main.style.removeProperty('top')
-			mainHtml = this.formatHtml( $main )
-		}
-		
-		return `
-			<!DOCTYPE html>
-			<html lang='en'>
-			<head>
-				<meta charset='utf-8' />
-				<meta name='renderer' content='webkit' />
-				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
-				<title>${title}</title>
-				<style>
-					html,body{font:13px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
-					*{margin:0;padding:0;box-sizing:border-box}
-					img{border:0;display:block}
-					table{width:100%;border-collapse:collapse;border-spacing:0}
-					.fxmc{display:flex; align-items: center;justify-content: center}
-					footer,header,main{position:relative;}
-					.container{position:relative;margin:0 auto;border:1px solid #666;padding:10px}
-					[type='pages']{visibility:hidden}
-				</style>
-			</head>
-			<body>
-				<div class='container' name='${this.reportName}' style='width:${width+20}px;height:${height+20}px;'>
-					<header>${headerHtml}</header>
-					<main>${mainHtml}</main>
-					<footer>${footerHtml}</footer>
-				</div>
-			</body>
-			</html>
-		`
-	}
-	// 创建 pdf
-	createPdf = () => {
-		if(this.$drag.innerHTML === '') return $fn.toast('无内容')
-		const $header = this.$drag.querySelector('.header')
-		const $footer = this.$drag.querySelector('.footer')
-		const $main = this.$drag.querySelector('.main')
-		const mainHtml = $main ? this.formatHtml($main, true) : this.formatHtml( this.$drag )
-		const paper = $fn.local('paper') || paperParam
-		const setScale = v => (`<div style='width:${this.$drag.clientWidth}px'>${this.formatHtml(v, true)}</div>`)
-		$http.submit(null,'pdf',{ 
-			param:{
-				header: setScale($header),
-				footer: setScale($footer),
-				headerHeight: $header ? parseInt($header.style.height) : 0,
-				footerHeight: $footer ? parseInt($footer.style.height) : 0,
-				main: mainHtml,
-				format: paper.format,
-				name: paper.name,
-				source: this.getSource(paper)
-			}
-		}).then(data=>{
-			$fn.toast('生成 pdf 成功')
-		})
-	}
-	getSource = paper => {
-		const myWidth = $fn.local('myWidth')
-		const myHeight = $fn.local('myHeight')
-		const html = this.formatHtml(this.$drag)
-		const infoNode = document.createElement('section')
-		const node = document.createElement('div')
-		const json = {
-			format : paper.format,
-			width : paper.width,
-			height : paper.height,
-			name : paper.name,
-			myWidth,
-			myHeight
-		}
-		infoNode.setAttribute('data',JSON.stringify(json))
-		infoNode.innerHTML = html
-		node.appendChild(infoNode)
-		return node.innerHTML
-	}
-	// 创建 html
-	createHtml = () => {
-		if(this.$drag.innerHTML === '') return $fn.toast('无内容')
-		const paper = $fn.local('paper') || paperParam
-		const html = this.getHtml( paper.name )
-		
-		$http.submit(null,'html',{ param:{ html, name: paper.name, source:this.getSource(paper) } }).then(data=>{
-			$fn.toast('生成 html 成功')
-		})
-	}
-	downloadPdf = () => {
-		window.open(window.$config.api + 'downloadPdf?=' + this.reportName)
-	}
-	downloadHtml = () => {
-		window.open(window.$config.api + 'downloadHtml?name' + this.reportName)
-	}
+	
 	// 导入 html
 	importHtml = () => {
 		this.refs.importFileRef.click()
@@ -351,10 +205,7 @@ export default class extends React.Component {
 					<h5 className='f12 b ml5 c0'>报表编辑器</h5>
 					<div className='ex h'>
 						<ul className='fxmc h'>
-							<IconButton label='生成 html' onClick={ this.createHtml } hasNode={true}/>
-							<IconButton label='生成 pdf' onClick={ this.createPdf } hasNode={true}/>
-							<IconButton label='下载 pdf' onClick={ this.downloadPdf } hasNode={true}/>
-							<IconButton label='下载 html' onClick={ this.downloadHtml } hasNode={true}/>
+							<IconButton label='预览' id='preview' hasNode={true}/>
 							<IconButton label='导入' onClick={ this.importHtml } hasNode={true}/>
 							<IconButton label='删除' id='del' hasNode={hasNode} />
 							<IconButton label='删除全部' id='delAll' hasNode={true} />

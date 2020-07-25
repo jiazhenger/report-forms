@@ -31,7 +31,7 @@ export default ({ _node }) => {
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(({ _temp })=>{
 			const style = _temp.getStyle(true)
-			if(!_.isString(style.borderWidth)) return;
+			if(!_.isString(style.borderWidth) || !borderWidthRef.current) return;
 			const borderWidth = style.borderWidth.replace(/0px/g,'').trim()
 			const borderStyle = style.borderStyle.replace(/none/g,'').trim()
 			const borderColor = style.borderColor.replace(/rgb\(34, 34, 34\)/g,'').trim()
