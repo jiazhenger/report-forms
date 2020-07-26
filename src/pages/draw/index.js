@@ -142,7 +142,7 @@ export default class extends React.Component {
 		const myWidth = $fn.local('myWidth')
 		if(myHeight){ paperHeight = myHeight }
 		if(myWidth) { paperWidth = myWidth}
-		
+		console.log(paperWidth)
 		this.__paper.width(paperWidth).height(paperHeight)
 	}
 	// 开始拖动模板
@@ -182,11 +182,7 @@ export default class extends React.Component {
 				}
 			}
 		})
-		_node.finds('.wraper').each(v=>{
-			if(!v.hasChild()){ 
-				v.remove()
-			}
-		})
+	
 		let html = _node.html()
 		return html
 	}

@@ -5,6 +5,8 @@ import Dom from '../../js/public/dom'
 import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
+import Margin from './margin'
+import Fieldset from '../../public.component/fieldset'
 // ===================================================================== data
 const { $fn } = window
 // ===================================================================== page component
@@ -14,7 +16,6 @@ export default ({ _node }) => {
 	const widthRef = React.useRef()
 	const heightRef = React.useRef()
 	const indexRef = React.useRef()
-	const marginRef = React.useRef()
 	const fullRef = React.useRef()
 	const centerRef = React.useRef()
 	const autoHeightRef = React.useRef()
@@ -27,7 +28,6 @@ export default ({ _node }) => {
 			widthRef.current.setValue(_drag.outerWidth())
 			heightRef.current.setValue(_drag.outerHeight())
 			indexRef.current.setValue($fn.toNum(style.zIndex))
-			marginRef.current.setValue(style.margin)
 			fullRef.current.setValue( _drag.style('width') ===  '100%')
 			autoHeightRef.current.setValue( !_drag.hasStyle('height') )
 			
@@ -41,18 +41,7 @@ export default ({ _node }) => {
 	const onChange = React.useCallback( (v,unit) => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			const { key, value} = _.getKeyValue(v); // 转换成{key:,value: }
-			
-			const _parent = _drag.parent()
-			if(_parent.hasClass('wraper')){
-				_parent.style({
-					[key] : value
-				})
-			}else{
-				_drag.style({
-					[key] : value
-				})
-			}
-			
+			_drag.style([key], value)
 		})
 	}, [ _node ])
 	// 全屏
@@ -87,25 +76,29 @@ export default ({ _node }) => {
 	}, [ _node ])
 	return (
 		<>
-			<div className='fx'>
-				<List.Input label='宽' ref={widthRef} name='width' onChange={v=>onChange(v,'px')}  isHalf />
-				<List.Input label='高' ref={heightRef} name='height' onChange={v=>onChange(v,'px')}  isHalf />
-			</div>
-			<div>
+			<Fieldset title='尺寸' first>
+				<div className='fx'>
+					<List.Input label='宽' ref={widthRef} name='width' onChange={v=>onChange(v,'px')}  isHalf />
+					<List.Input label='高' ref={heightRef} name='height' onChange={v=>onChange(v,'px')}  isHalf />
+				</div>
+			</Fieldset>
+			<Fieldset title='位置'>
 				<div className='fx'>
 					<List.Input label='左' ref={leftRef} name='left' onChange={v=>onChange(v,'px')}  isHalf />
 					<List.Input label='上' ref={topRef} name='top' onChange={v=>onChange(v,'px')}  isHalf />
 				</div>
 				<div className='fx'>
 					<List.Input label='层级' ref={indexRef} name='zIndex' onChange={v=>onChange(v,'')} isHalf />
-					<List.Input label='边距' ref={marginRef} name='margin' onChange={v=>onChange(v,'px')} isHalf />
 				</div>
-				<div className='fx'>
-					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  isHalf />
-					<List.Switch label='居中' ref={centerRef} onChange={onCenter}  isHalf />
-					<List.Switch label='自动高' ref={autoHeightRef} onChange={onHeightAuto}  isHalf />
+			</Fieldset>
+			<Margin _node={_node} />
+			<Fieldset title='控制'>
+				<div className='fxj'>
+					<List.Switch label='全屏' ref={fullRef} onChange={onFull}  />
+					<List.Switch label='居中' ref={centerRef} onChange={onCenter}  />
+					<List.Switch label='自动高' ref={autoHeightRef} onChange={onHeightAuto} />
 				</div>
-			</div>
+			</Fieldset>
 		</>
 	)
 }

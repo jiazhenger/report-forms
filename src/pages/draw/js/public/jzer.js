@@ -51,11 +51,12 @@ $.mouse = {
 // 数据判断
 (['String', 'Number', 'Array', 'Object', 'Boolean', 'Function', 'Undefined']).forEach(v => {
 	$['is' + v] = obj => ( {}.toString.call(obj) === '[object '+ v +']' )
-})
+});
 
-$.isHtmlNodeList = function(el){
-	return el instanceof HTMLCollection || el instanceof NodeList
-}
+$.isHtmlNodeList = el => el instanceof HTMLCollection || el instanceof NodeList
+$.isNode = el => el instanceof Node
+$.isElement = el => el instanceof HTMLElement
+$.isInit = el => el instanceof Init
 
 function Init(selector,all){
 	if( $.isString(selector) ){
@@ -193,17 +194,17 @@ const styleExtend = {
 		return $.listener(this.el, el => {
 			if(name.indexOf(',') === -1){
 				if( $.isHtmlNodeList(el) ){
-					$(el).each( (v,i,n) => n.style.removeProperty(name) )
+					$(el).each( (v,i,n) => n.style.removeProperty($.toLine(name)) )
 				}else{
-					el.style.removeProperty(name)
+					el.style.removeProperty($.toLine(name))
 				}
 			}else{
 				const arr = name.split(',')
 				arr.forEach( styleName =>{
 					if( $.isHtmlNodeList(el) ){
-						$(el).each( (v,i,n) => n.style.removeProperty(styleName) )
+						$(el).each( (v,i,n) => n.style.removeProperty($.toLine(styleName)) )
 					}else{
-						el.style.removeProperty(styleName)
+						el.style.removeProperty($.toLine(styleName))
 					}
 				})
 			}
@@ -310,7 +311,7 @@ const attrExtend = {
 		})
 	}
 };
-(['src','href','contentEditable','draggable']).forEach(function(v){
+(['src','href','contentEditable','draggable', 'id']).forEach(function(v){
 	attrExtend[v] = function(value){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -447,6 +448,12 @@ const parentExtend = {
 }
 // 设置值
 const valueExtend = {
+	clear(){
+		return $.listener(this.el, el => {
+			el.innerHTML = ''
+			return this
+		})
+	},
 	html(str){
 		return $.listener(this.el, el => {
 			if(arguments.length === 0){
@@ -569,13 +576,21 @@ const infoExtend = {
 const appendExtend = {
 	appendTo(elem){
 		return $.listener(this.el, el => {
-			elem.appendChild(el)
+			if($.isNode(elem)){
+				elem.appendChild(el)
+			}else if($.isInit(elem) && elem.el){
+				elem.el.appendChild(el)
+			}
 			return this
 		})
 	},
 	append(elem){
 		return $.listener(this.el, el => {
-			el.appendChild(elem)
+			if($.isNode(elem)){
+				el.appendChild(elem)
+			}else if($.isInit(elem) && elem.el){
+				el.appendChild(elem.el)
+			}
 			return this
 		})
 	},

@@ -341,6 +341,7 @@ export default {
 			_tbody.html(tbody.innerHTML)
 		}
 		if(isContent){
+			_drag.height(20 * 5)
 			data.forEach((v,i) => {
 				_tbody.children(i).children(index).text(v[name])
 				_tbody.children(i).children(index).attr({url})

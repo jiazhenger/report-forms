@@ -30,7 +30,8 @@ module.exports =  {
 	paperParam: {
 		format: 'A4',
 		width:'810px',
-		height:'1160px',
+		height:'1154px',
+		// height:'1160px',
 		name:'报表'
 	}
 }

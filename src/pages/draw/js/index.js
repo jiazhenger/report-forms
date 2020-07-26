@@ -17,6 +17,6 @@ export default {
 		DragFirst.DragStart(e, _this,type)
 	},
 	axes(){
-		Aexes()
+		Aexes.init()
 	}
 }

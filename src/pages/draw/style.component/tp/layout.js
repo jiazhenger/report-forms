@@ -4,17 +4,17 @@ import Dom from '../../js/public/dom'
 import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
+import Padding from './padding'
+// import Fieldset from '../../public.component/fieldset'
 const { $fn } = window
 // ===================================================================== page component
 export default ({ _node }) => {
-	const padding = React.useRef()
 	const backgroundColor = React.useRef()
 	const opacity = React.useRef()
 	
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _temp } ) => {
 			const style = _temp.getStyle(true)
-			padding.current.setValue($fn.toNum(style.padding))
 			backgroundColor.current.setValue(style.backgroundColor)
 			opacity.current.setValue($fn.toNum(style.opacity))
 		})
@@ -31,12 +31,10 @@ export default ({ _node }) => {
 	return (
 		<>
 			<div className='fx'>
-				<List.Input ref={padding} label='补白' name='padding' onChange={onChange}  isHalf />
+				<List.Input ref={backgroundColor} label='背景色' name='backgroundColor' onChange={v=>onChange(v,'transparent')} isHalf />
 				<List.Input ref={opacity} label='透明度' name='opacity' onChange={onChange} isHalf />
 			</div>
-			<div className='fx'>
-				<List.Input ref={backgroundColor} label='背景' name='backgroundColor' onChange={v=>onChange(v,'transparent')} isHalf />
-			</div>
+			<Padding _node={_node} />
 		</>
 	)
 }

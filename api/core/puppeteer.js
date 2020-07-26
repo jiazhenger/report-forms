@@ -35,7 +35,7 @@ module.exports = {
 		
 		const style = `
 			*{margin:0;padding:0;box-sizing:border-box;zoom:1!important; transfrom:scale(1)!important;}
-			body,.wraper{font:13px/22px Microsoft YaHei;color:#333;}
+			body,.wraper{font:12px/20px Microsoft YaHei;color:#333;}
 			img{border:0;display:block}
 			table{border:0;width:100%;border-collapse:collapse;border-spacing:0;font-size:inherit}
 			.fxmc{display:flex;align-items: center;justify-content: center}

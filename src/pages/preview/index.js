@@ -1,10 +1,10 @@
 import React from 'react'
 // ===================================================================== public component
 import _ from '@pages/draw/js/public/jzer'
+import Format from '@pages/draw/js/public/format'
 // ===================================================================== antd
 
 // ===================================================================== image
-
 // ===================================================================== private component
 const IconButton = ({ label, id, hasNode, onClick}) => (
 	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`} onClick={onClick}>
@@ -24,34 +24,78 @@ export default class extends React.Component{
 	componentDidMount(){
 		this.html = this.getLocalHtml()
 		this.paper = $fn.local('paper')
-		this.setState({ paperWidth: this.paper.width })
+		const myHeight = $fn.local('myHeight')
+		if(myHeight) this.paper.height = myHeight
 		
+		this.setState({ paperWidth: this.paper.width })
+		this.__preview = _('#preview')
 		this.preview()
 	}
 	// 预览内容
 	preview(){
 		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
-		const node = document.createElement('div')
-		_(node).addClass('fv paper-page bcf').style('height', this.paper.height)
-		// header
-		if(headerHtml !== ''){
-			const _header = _.toNode(headerHtml).children(0)
-			_header.appendTo(node)
-		}
-		// main
-		const _main = _.toNode(mainHtml).children(0).addClass('ex').background('yellow')
-		_main.appendTo(node)
 		const mainHeight = parseInt(this.paper.height) - headerHeight - footerHeight
-		console.log(mainHeight)
-		// footer
-		if(footerHtml !== ''){
-			const _footer = _.toNode(footerHtml).children(0)
-			_footer.appendTo(node)
+		let index = 0
+		const deep = html => {
+			const node = document.createElement('div')
+			const _node = _(node).addClass('paper-page bcf').style({
+				width: this.paper.width,
+				height: this.paper.height,
+				padding: '10px',
+				boxSizing: 'content-box',
+				position: 'relative',
+				display: 'flex',
+				flexDirection: 'column'
+			})
+			if(index>0){ _node.style('marginTop','10px') }
+			// header
+			if(headerHtml !== ''){
+				const _header = _.toNode(headerHtml).children(0)
+				_header.appendTo(node)
+			}
+			// main
+			const _main = _.toNode(html).children(0).style({flex:1}).background('yellow')
+			_main.appendTo(node)
+			// footer
+			if(footerHtml !== ''){
+				const _footer = _.toNode(footerHtml).children(0)
+				_footer.appendTo(node)
+			}
+			this.__preview.append(node)
+			// 分页
+			const __main = _node.find('.main')
+			const __page = __main.el ? __main : _node
+			
+			const { offsetTop } = __page.getOffset()
+			index ++
+			__page.finds('.drag').each(v=>{
+				const type = v.attr('type')
+				if(type === 'table'){
+					if(v.outerHeight() > mainHeight){
+						const _main = __page.clone()
+						const _drag = v.clone()
+						const _tbody = _drag.find('tbody').clear()
+						v.finds('tr').each((tr,i)=>{
+							const trInfo = tr.getInfo()
+							const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
+							if(offset > mainHeight){
+								_tbody.append(tr)
+							}
+						})
+						_main.clear().append(_drag)
+						deep(_main.htmls())
+					}
+				}
+			})
 		}
-		
-		console.log(node)
-		
-		_('#preview').append(node)
+		deep(mainHtml)
+	}
+	// 获取数据
+	getData(_node){
+		// $http.pull(this,'',{}).then(data=>{
+		// 	const isContent = $fn.local('bindWay')
+		// })
+		return _node.html()
 	}
 	// 获取本地 html
 	getLocalHtml(){ return $fn.local('html') }
@@ -68,11 +112,20 @@ export default class extends React.Component{
 		let mainHeight = 0
 		
 		let headerHtml = ''
-		let mainHtml = _node.html()
+		let mainHtml = this.getData(_node)
 		let footerHtml = ''
 		const scale = 0.713
+		
+		// 去掉循环的高
+		_node.finds('table').each(v=>{
+			const _drag = v.parents('.drag')
+			if(_drag.attr('rootUrl')){
+				_drag.removeStyle('height')
+			}
+		})
+		
 		if(_header.el){
-			_header.style('position','relative').removeStyle('left,top')
+			_header.style('position','relative').removeStyle('left,top,marginTop,marginBottom')
 			headerHeight = _header.height()
 			if(isPdf){
 				_header.width(paper.width).style('transform', `scale(${scale})`)
@@ -80,7 +133,7 @@ export default class extends React.Component{
 			headerHtml = _header.htmls()
 		}
 		if(_footer.el){
-			_footer.style('position','relative').removeStyle('left,top')
+			_footer.style('position','relative').removeStyle('left,top,marginTop,marginBottom')
 			footerHeight = _footer.height()
 			if(isPdf){
 				_footer.width(paper.width).style('transform', `scale(${scale})`)
@@ -89,15 +142,9 @@ export default class extends React.Component{
 		}
 		
 		if(_main.el){
-			_main.style('position','relative').removeStyle('left,top')
+			_main.style('position','relative').removeStyle('height,left,top,marginTop,marginBottom')
 			mainHeight = _main.height()
 			mainHtml = _main.htmls()
-			if(isPdf){
-				_main.removeStyle('height')
-			}
-		}
-		if(isPdf){
-			_node.finds('.more').removeStyle('height')
 		}
 		
 		return {
@@ -125,7 +172,7 @@ export default class extends React.Component{
 				<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
 				<title>${paper.name}</title>
 				<style>
-					html,body{width:100%;height:100%;font:13px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
+					html,body{width:100%;height:100%;font:12px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
 					*{margin:0;padding:0;box-sizing:border-box}
 					img{border:0;display:block}
 					table{width:100%;border-collapse:collapse;border-spacing:0}
@@ -158,7 +205,7 @@ export default class extends React.Component{
 		const html = this.getLocalHtml()
 		if(!html) return $fn.toast('无内容')
 		const paper = this.paper
-		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
+		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml(true)
 		
 		$http.submit(null,'pdf',{ 
 			param:{
@@ -210,25 +257,58 @@ export default class extends React.Component{
 	downloadHtml = () => {
 		window.open(window.$config.api + 'downloadHtml?name' + this.reportName)
 	}
+	print = () => {
+		const _node =  this.__preview.clone()
+		_node.finds('.paper-page').removeStyle('marginTop')
+		const pageHtml = _node.html()
+		const html = `
+		    <!DOCTYPE html>
+		    <html lang='en'>
+		    <head>
+		    	<meta charset='utf-8' />
+		    	<meta name='renderer' content='webkit' />
+		    	<meta name='viewport' content='width=device-width,user-scalable=no,initial-scale=1.0,shrink-to-fit=no,minimum-scale=1.0,maximum-scale=1.0,minimal-ui,viewport-fit=cover'/>
+		    	<title>${this.paper.name}</title>
+		    	<style>
+		    		html,body{width:100%;height:100%;font:12px/20px 'Tahoma,Verdana,Arial,sans-serif'; color:#333}
+		    		*{margin:0;padding:0;box-sizing:border-box}
+		    		img{border:0;display:block}
+		    		table{width:100%;border-collapse:collapse;border-spacing:0}
+		    		.fxmc{display:flex; align-items: center;justify-content: center}
+		    	</style>
+		    </head>
+		    <body>
+		        ${pageHtml}
+		    </body>
+		    </html>
+		`
+		_('#iframe').remove()
+		const iframe = document.createElement('iframe')
+		const _iframe = _(iframe).id('iframe').cssText('position:absolute;visibility:hidden').appendTo(document.body)
+		const doc = iframe.contentDocument
+		doc.open()
+		doc.write(html)
+		doc.close()
+		iframe.contentWindow.focus()
+		iframe.contentWindow.print()
+	}
 	render(){
-		const { paperWidth } = this.state
 		return (
 			<div className='wh fv'>
 				<header className='fxm plr10 bcf bbor1 nosel' style={{height:'30px'}}>
 					<div className='ex h'>
 						<ul className='fxmc h'>
-							<IconButton label='生成 html' onClick={ this.createHtml } hasNode={true}/>
-							<IconButton label='生成 pdf' onClick={ this.createPdf } hasNode={true}/>
-							<IconButton label='下载 pdf' onClick={ this.downloadPdf } hasNode={true}/>
-							<IconButton label='下载 html' onClick={ this.downloadHtml } hasNode={true}/>
+							<IconButton label='生成 html' onClick={ this.createHtml }/>
+							<IconButton label='生成 pdf' onClick={ this.createPdf } />
+							<IconButton label='下载 pdf' onClick={ this.downloadPdf } />
+							<IconButton label='下载 html' onClick={ this.downloadHtml }/>
+							<IconButton label='打印' onClick={ this.print }/>
 						</ul>
 					</div>
 				</header>
 				<div className='ex rel'>
-					<div className='abs_full scroll fxc' style={{padding:'5px'}}>
-						<div id='preview' style={{width:paperWidth}}>
-							
-						</div>
+					<div className='abs_full scroll fxc f12 lh20'  style={{padding:'5px'}}>
+						<div id='preview'></div>
 					</div>
 				</div>
 			</div>
