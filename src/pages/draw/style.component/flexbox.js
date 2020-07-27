@@ -7,6 +7,7 @@ const Position  =  Async(()=>import('./tp/position'))
 const Lock  =  Async(()=>import('./tp/lock'))
 const Flexbox  =  Async(()=>import('./tp/flexbox'))
 const Flex  =  Async(()=>import('./tp/flex'))
+const Border  =  Async(()=>import('./tp/border'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component
@@ -16,6 +17,7 @@ export default ({ _node }) => (
 		<Collapse bordered={false} defaultActiveKey={['0','1','2','3']}>
 			<Panel header='常规选项'><Lock _node={_node}/></Panel>
 			<Panel header='排版'><Flexbox _node={_node}/></Panel>
+			<Panel header='边框'><Border _node={_node}/></Panel>
 			<Panel header='位置 && 大小'><Position _node={_node}/></Panel>
 			{ _node.parent().style('display') === 'flex' && <Panel header='子排版'><Flex _node={_node} /></Panel> }
 		</Collapse>

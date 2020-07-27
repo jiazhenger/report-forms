@@ -23,8 +23,8 @@ export default ({ _node}) => (
 			</Panel>
 			<Panel header='选择框'><Checkbox _node={_node}/></Panel>
 			<Panel header='文本字体'><Font _node={_node}/></Panel>
-			<Panel header='位置 && 大小'><Position _node={_node}/></Panel>
 			<Panel header='页面布局'><Layout _node={_node}/></Panel>
+			<Panel header='位置 && 大小'><Position _node={_node}/></Panel>
 			{ _node.parent().style('display') === 'flex' && <Panel header='排版'><Flex _node={_node} /></Panel> }
 		</Collapse>
 	</div>

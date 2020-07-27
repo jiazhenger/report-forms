@@ -42,7 +42,6 @@ export default class extends React.Component{
 				height: this.paper.height,
 				padding: '10px',
 				boxSizing: 'content-box',
-				position: 'relative',
 			})
 			if(index>0){ _node.style('marginTop','10px') }
 			// header
@@ -75,36 +74,37 @@ export default class extends React.Component{
 			
 			const { offsetTop } = __page.getOffset()
 			index ++
+			const wraperNode = document.createElement('div')
+			const _wraperNode = _(wraperNode)
 			__page.finds('.drag').each(v=>{
 				const type = v.attr('type')
+				const marginTop = v.marginTop()
 				// 表格
-				if(type === 'table' && v.find('.x-bind-table').el){
-					if(v.outerHeight() > mainHeight){
-						const _main = __page.clone()
-						const _drag = v.clone()
-						const _tbody = _drag.find('tbody').clear()
-						v.finds('tr').each((tr,i)=>{
-							const trInfo = tr.getInfo()
-							const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
-							if(offset > mainHeight){
-								_tbody.append(tr)
-							}
-						})
-						_main.clear().append(_drag)
-						deep(_main.htmls())
-					}
-				}else{
+				if(type === 'table' && v.find('.x-bind-table').el && v.outerHeight() + marginTop > mainHeight){
 					const _main = __page.clone()
 					const _drag = v.clone()
+					const _tbody = _drag.find('tbody').clear()
+					v.finds('tr').each((tr,i)=>{
+						const trInfo = tr.getInfo()
+						const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
+						if(offset > mainHeight){
+							_tbody.append(tr)
+						}
+					})
+					_main.clear().append(_drag)
+					deep(_main.htmls())
+				}else{
 					const dragInfo = v.getInfo()
 					const offset = dragInfo.offsetTop + dragInfo.offsetHeight - offsetTop 
-					if(offset > mainHeight){
-						_main.clear().append(_drag)
-						// console.log(_main.el)
-						// deep(_main.htmls())
+					if(offset > mainHeight + marginTop){ 
+						_wraperNode.append(v)
 					}
 				}
 			})
+			if(_wraperNode.children().length() > 0){
+				_wraperNode.children(0).removeStyle('marginTop')
+				deep(_wraperNode.html())
+			}
 		}
 		deep(mainHtml)
 	}

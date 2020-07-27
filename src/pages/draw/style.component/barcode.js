@@ -23,8 +23,8 @@ export default ({ node, _node }) => (
 			</Panel>
 			<Panel header='条形码'><Barcode _node={_node}/></Panel>
 			<Panel header='边框'><Border _node={_node}/></Panel>
-			<Panel header='位置 && 大小'><Position _node={_node}/></Panel>
 			<Panel header='页面布局'><Layout node={node} _node={_node}/></Panel>
+			<Panel header='位置 && 大小'><Position _node={_node}/></Panel>
 			{ _node.parent().style('display') === 'flex' && <Panel header='排版'><Flex _node={_node} /></Panel> }
 		</Collapse>
 	</div>
