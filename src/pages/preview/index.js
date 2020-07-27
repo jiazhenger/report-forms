@@ -67,7 +67,7 @@ export default class extends React.Component{
 			if(footerHtml !== ''){
 				_.toNode(footerHtml).children(0).appendTo(node)
 			}
-			
+			_node.attr('page',index+1)
 			this.__preview.append(node)
 			
 			const __page = __main.el ? __main : _node
@@ -107,6 +107,9 @@ export default class extends React.Component{
 			}
 		}
 		deep(mainHtml)
+		
+		const pageTotal = this.__preview.children().length()
+		this.__preview.attr('total', pageTotal)
 	}
 	// 获取数据
 	getData(_node){
