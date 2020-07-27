@@ -69,7 +69,7 @@ export default ({ _node }) => {
 			const _table = _drag.find('table')
 			if(v){
 				const thead = Table.createThead({
-					col: _table.find('tr').children().el.length,
+					col: _table.find('tr').children().length(),
 					th:{
 						style:{
 							...tableConfig.style,
