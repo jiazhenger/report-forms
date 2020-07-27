@@ -19,7 +19,7 @@ const Tree  =  Async(()=>import('../public.component/tree'))
 const Data  =  Async(()=>import('../style.component/tp/data'))
 const { $fn } = window
 // ===================================================================== page component
-const model = { name:'dataSoruce1', url:'' }
+const model = { name:'dataSource1', url:'' }
 export default class extends React.Component {
 	state = {
 		model: JSON.parse(JSON.stringify(model)),
@@ -156,7 +156,7 @@ export default class extends React.Component {
 					myData,
 					key: this.state.key + 1
 				})
-				
+				Format.renderData(rootData, field, _('#dragContent'), isContent)
 			}else{
 				this.cancelNode()
 				Dom.reset(model)

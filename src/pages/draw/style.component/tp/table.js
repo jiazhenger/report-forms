@@ -36,28 +36,29 @@ export default ({ _node }) => {
 		if(_node){
 			const _table = _node.find('table')
 			if(_table.el){
-				
 				const $tbody = _table.find('tbody')
-				const $tr = $tbody.find('tr')
-				const trLen = $tbody.finds('tr').el.length
-				const tdLen = $tr.finds('td').el.length
-				const $td = $tr.find('td')
-				let color = $td.style('borderColor')
-				if(!color){
-					color = $td.style('borderBottomColor')
+				if($tbody.children().length() > 0){
+					const $tr = $tbody.find('tr')
+					const trLen = $tbody.finds('tr').length()
+					const tdLen = $tr.finds('td').length()
+					const $td = $tr.find('td')
+					let color = $td.style('borderColor')
+					if(!color){
+						color = $td.style('borderBottomColor')
+					}
+								
+					const hasHead = Boolean(_table.find('thead').el)
+					rowRef.current.setValue(trLen)
+					colRef.current.setValue(tdLen)
+					colorRef.current.setValue(color)
+					frameRef.current.setValue(_table.attr('xframe'))
+					borderRef.current.setValue(_table.attr('xborder'))
+					checkedRef.current.setValue(hasHead)
+					
+					setRow(trLen)
+					setCol(tdLen)
+					setChecked(hasHead)
 				}
-			
-				const hasHead = Boolean(_table.find('thead').el)
-				rowRef.current.setValue(trLen)
-				colRef.current.setValue(tdLen)
-				colorRef.current.setValue(color)
-				frameRef.current.setValue(_table.attr('xframe'))
-				borderRef.current.setValue(_table.attr('xborder'))
-				checkedRef.current.setValue(hasHead)
-				
-				setRow(trLen)
-				setCol(tdLen)
-				setChecked(hasHead)
 			}
 		}
 	},[ _node ])
@@ -98,8 +99,8 @@ export default ({ _node }) => {
 			const _table = _drag.find('table').attr('xframe', v)
 			Table.showHideBorder(_table, borderRef.current.getValue(), colorRef.current.getValue())
 			if(v === 'hsides' || v === 'box'){
-				_table.find('tr').first().style('borderleft', 0)
-				_table.find('tr').last().style('borderRight', 0)
+				_table.finds('tr').each( v=> v.first().style('borderLeft', 'none') )
+				_table.finds('tr').each( v => v.last().style('borderRight', 'none') )
 			}
 			if(v === 'vsides' || v === 'box'){
 				if(checked){
@@ -107,7 +108,7 @@ export default ({ _node }) => {
 				}else{
 					_table.first().finds('td').style('borderTop', 0)
 				}
-				_table.find('tbody').last().finds('td').style('borderBottom', 0)
+				_table.find('tbody').last().finds('td').style('borderBottom', 'none')
 			}
 		})
 	}, [ _node, checked ])

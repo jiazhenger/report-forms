@@ -24,20 +24,18 @@
 .activeLoop{.bc(yellow)!important;}
 .tableSpan{.bc(pink)!important;}
 .control-title:extend(.ptb5,.b,.c0,.f12,.tc){.bbor(#eee)}
-
-#paper{
-	.drag{.mw(10);.mh(5);
-		code:extend(.fxm){.ar;.i;.c(green);
-			s{.c(red);.mr(2)}
-		}
-		&.lock{
-			>.point-mark{.bor_c(#000);
-				p{.bc(#000)}
-			}
-		}
-		.template:extend(.rel){.index(-1)}
+.drag{.mw(10);.mh(5);
+	code:extend(.fxm){.ar;.i;.c(green);
+		s{.c(red);.mr(2)}
 	}
-	
+	&.lock{
+		>.point-mark{.bor_c(#000);
+			p{.bc(#000)}
+		}
+	}
+	.template:extend(.rel){.index(-1)}
+}
+#paper{
 	.hide{
 		.template{.index(20)}
 		>.mark-show{.index(0)!important;}

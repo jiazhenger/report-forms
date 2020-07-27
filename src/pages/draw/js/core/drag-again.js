@@ -247,7 +247,7 @@ export default {
 			}
 		})
 		// 停止拖动处理
-		_(document.body).mouseup(e=>{
+		_(document.body).once('mouseup',e=>{
 			const { target } = e
 			const _t = _( target ).parents('.drag')
 			const _m = _( target ).parents('.move')

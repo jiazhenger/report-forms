@@ -53,6 +53,9 @@ $.mouse = {
 	$['is' + v] = obj => ( {}.toString.call(obj) === '[object '+ v +']' )
 });
 
+$.hasArray = d => $.isArray(d) && d.length > 0
+$.hasObject = d => $.isObject(d) && Object.keys(d).length > 0
+
 $.isHtmlNodeList = el => el instanceof HTMLCollection || el instanceof NodeList
 $.isNode = el => el instanceof Node
 $.isElement = el => el instanceof HTMLElement
@@ -679,7 +682,7 @@ const eventExtend = {
 			return this
 		})
 	},
-	unonce(event,callback){
+	unonce(event){
 		return $.listener(this.el, el => {
 			el['on' + event] = null
 			return this

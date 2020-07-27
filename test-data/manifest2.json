@@ -3,17 +3,22 @@
   "name": "Flutter App",
   "icons": [
     {
-      "src": "font.ico",
+      "src": "fontdddddddddddddddd.ico",
       "sizes": "16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "some.png",
+      "src": "someddddd.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "sun.png",
+      "src": "sunddddddd.png",
+      "type": "image/jpg",
+      "sizes": "512x512"
+    },
+	{
+      "src": "sundaaaaaaaa.png",
       "type": "image/jpg",
       "sizes": "512x512"
     }

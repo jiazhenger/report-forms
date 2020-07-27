@@ -7,7 +7,7 @@ import Format from '@pages/draw/js/public/format'
 // ===================================================================== image
 // ===================================================================== private component
 const IconButton = ({ label, id, hasNode, onClick}) => (
-	<li id={id} className={`tap cp h fxmc plr10 ${hasNode?'':'activeNode'}`} onClick={onClick}>
+	<li id={id} className={`tap cp h fxmc plr10`} onClick={onClick}>
 		<div>
 			{/*<div className='fxc f15'><img style={{width:'18px',height:'18px'}} src={icon} alt=''/></div>*/}
 			<h3 className='f12 tc'>{label}</h3>
@@ -30,11 +30,13 @@ export default class extends React.Component{
 		this.setState({ paperWidth: this.paper.width })
 		this.__preview = _('#preview')
 		this.preview()
+		_(document.body).unonce('mouseup')
 	}
 	// 预览内容
 	preview(){
 		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
 		const mainHeight = parseInt(this.paper.height) - headerHeight - footerHeight
+		
 		let index = 0
 		const deep = html => {
 			const node = document.createElement('div')
@@ -44,26 +46,34 @@ export default class extends React.Component{
 				padding: '10px',
 				boxSizing: 'content-box',
 				position: 'relative',
-				display: 'flex',
-				flexDirection: 'column'
 			})
 			if(index>0){ _node.style('marginTop','10px') }
 			// header
 			if(headerHtml !== ''){
-				const _header = _.toNode(headerHtml).children(0)
-				_header.appendTo(node)
+				_.toNode(headerHtml).children(0).appendTo(node)
 			}
+			
 			// main
-			const _main = _.toNode(html).children(0).style({flex:1}).background('yellow')
-			_main.appendTo(node)
+			const _html = _.toNode(html)
+			// 分页
+			const __main = _html.find('.main')
+			if(__main.el){
+				_html.children(0).appendTo(node).style({flex:1})
+				_node.style({
+					display: 'flex',
+					flexDirection: 'column'
+				})
+			}else{
+				_html.appendTo(node).style({position:'relative'})
+				// _node.html(_main.html())
+			}
 			// footer
 			if(footerHtml !== ''){
-				const _footer = _.toNode(footerHtml).children(0)
-				_footer.appendTo(node)
+				_.toNode(footerHtml).children(0).appendTo(node)
 			}
+			
 			this.__preview.append(node)
-			// 分页
-			const __main = _node.find('.main')
+			
 			const __page = __main.el ? __main : _node
 			
 			const { offsetTop } = __page.getOffset()
@@ -71,19 +81,21 @@ export default class extends React.Component{
 			__page.finds('.drag').each(v=>{
 				const type = v.attr('type')
 				if(type === 'table'){
-					if(v.outerHeight() > mainHeight){
-						const _main = __page.clone()
-						const _drag = v.clone()
-						const _tbody = _drag.find('tbody').clear()
-						v.finds('tr').each((tr,i)=>{
-							const trInfo = tr.getInfo()
-							const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
-							if(offset > mainHeight){
-								_tbody.append(tr)
-							}
-						})
-						_main.clear().append(_drag)
-						deep(_main.htmls())
+					if(v.find('.x-bind-table').el){
+						if(v.outerHeight() > mainHeight){
+							const _main = __page.clone()
+							const _drag = v.clone()
+							const _tbody = _drag.find('tbody').clear()
+							v.finds('tr').each((tr,i)=>{
+								const trInfo = tr.getInfo()
+								const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
+								if(offset > mainHeight){
+									_tbody.append(tr)
+								}
+							})
+							_main.clear().append(_drag)
+							deep(_main.htmls())
+						}
 					}
 				}
 			})
@@ -92,16 +104,20 @@ export default class extends React.Component{
 	}
 	// 获取数据
 	getData(_node){
+		const rootData = $fn.local('dataSource')
+		
 		// $http.pull(this,'',{}).then(data=>{
 		// 	const isContent = $fn.local('bindWay')
 		// })
+		Format.renderData(rootData.dataSource1, 'dataSource1' , _node, true)
 		return _node.html()
 	}
 	// 获取本地 html
 	getLocalHtml(){ return $fn.local('html') }
 	// 最终输出
 	getLastHtml(isPdf){
-		const _node = _.toNode(this.getLocalHtml())
+		let _node = _.toNode(this.getLocalHtml())
+		this.getData(_node)
 		const paper = this.paper
 		let _header = _node.find('.header')
 		let _footer = _node.find('.footer')
@@ -112,10 +128,9 @@ export default class extends React.Component{
 		let mainHeight = 0
 		
 		let headerHtml = ''
-		let mainHtml = this.getData(_node)
+		let mainHtml = _node.html()
 		let footerHtml = ''
 		const scale = 0.713
-		
 		// 去掉循环的高
 		_node.finds('table').each(v=>{
 			const _drag = v.parents('.drag')
@@ -284,7 +299,7 @@ export default class extends React.Component{
 		`
 		_('#iframe').remove()
 		const iframe = document.createElement('iframe')
-		const _iframe = _(iframe).id('iframe').cssText('position:absolute;visibility:hidden').appendTo(document.body)
+		_(iframe).id('iframe').cssText('position:absolute;visibility:hidden').appendTo(document.body)
 		const doc = iframe.contentDocument
 		doc.open()
 		doc.write(html)

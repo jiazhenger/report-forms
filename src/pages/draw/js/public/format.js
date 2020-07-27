@@ -4,6 +4,7 @@
 import Dom from './dom'
 import _ from './jzer'
 import Table from './table'
+import { tableConfig } from '../../js/public/config'
 const { $fn } = window
 export default {
 	// 重新格式化数组源
@@ -170,23 +171,50 @@ export default {
 			return ''
 		}
 	},
+	// 设置 url 并获取数据
+	getUrlData(_node, option){
+		const opt = {
+			rootUrl:null,
+			data:[],
+			callback:null,
+			...option
+		}
+		const rootUrl = opt.rootUrl
+		const data = opt.data
+		
+		let url = _node.attr('url')
+		
+		if(_.isString(url)){
+			const arr = url.split('/')
+			arr[0] = rootUrl
+			url = arr.join('/')
+			_node.attr({url})
+			
+			const parentData = this.parse({ [rootUrl]: data }, this.getParentUrl(url) )
+			const currentData = this.parse({ [rootUrl]: data }, url )
+			if( _.hasArray(parentData) || _.hasObject(parentData)){
+				opt.callback && opt.callback(currentData,parentData, url)
+			}else{
+				
+			}
+		}
+	},
+	// 判断绑定方式
+	isContent(_node){ return _node.finds('code').length() === 0 },
 	// 数据渲染
 	renderData(data, rootUrl, $drag, isContent){
-		if(isContent){
-			$drag.finds('.x-bind-url').each(v=>{
-				let url = v.attr('url')
-				const type = v.attr('type')
-				
-				if(_.isString(url)){
-					const arr = url.split('/')
-					arr[0] = rootUrl
-					url = arr.join('/')
-					v.attr({ url })
-					
-					const rs = this.parse({ [rootUrl]: data },url)
-						
+		$drag.finds('.x-bind-url').each(v=>{
+			this.getUrlData(v,{
+				data, 
+				rootUrl,
+				callback: (rs, parent, url) =>{
+					const type = v.attr('type')
 					if( type === 'text' ){
-						v.text(rs)
+						if(isContent){
+							v.text(rs)
+						}else{
+							v.html(Dom.bindField(this.getUrlField(url)))
+						}
 					}else if( type === 'img'){
 						v.find('img').src(rs)
 					}else if( type === 'barcode'){
@@ -198,43 +226,70 @@ export default {
 					}
 				}
 			})
-			
-			$drag.finds('table').each(_table =>{
-				const _drag = _table.parent('.drag').removeStyle('height')
-				_table.find('tbody').find('tr').children().each(v=>{
-					// 表格
-					if(v.hasClass('x-bind-table')){
-						let url = v.attr('url')
-						
-						if(_.isString(url)){
-							const arr = url.split('/')
-							arr[0] = rootUrl
-							url = arr.join('/')
-							
-							const parentUrl = this.getParentUrl(url)
-							const rs = this.parse({ [rootUrl]: data }, parentUrl)
-							
-							if(_.isArray(rs)){
-								Table.bindData(v, _drag, rs, this.getUrlField(url), url, isContent)
-							}
+		})
+		// 渲染表格数据
+		$drag.finds('table').each(_table =>{
+			if(_table.finds('.x-bind-table').length() === 0 && _table.finds('code').length() === 0) return 
+			_table.parent('.drag').removeStyle('height')
+			const _tbody = _table.find('tbody')
+			const tdUrls = []
+			_tbody.finds('td').each(v=>{
+				if(v.attr('url')) {
+					tdUrls.push( v.attr('url') )
+				}
+			})
+			// 新建表格
+			this.getUrlData( _tbody.find('td') ,{
+				data, 
+				rootUrl,
+				isParent:true,
+				callback: (rs, parent, url) =>{
+					const col = _tbody.find('tr').children().length()
+					const trLen = _tbody.children().length()
+					if(_.hasArray(parent)){
+						const row = isContent ? parent.length : 1
+						if(row !== trLen){
+							const tbody = Table.createTbody({
+								row,
+								col,
+								td:{
+									style:tableConfig.style,
+									className:'loopNode x-bind-table',
+									attr:{ type:'text' }
+								}
+							})
+							_tbody.html(tbody.innerHTML)
 						}
 					}
-				})
-				
+				}
 			})
-		}
-		$drag.finds('.x-bind-url').each(v=>{
-			const url = v.attr('url')
-			if(_.isString(url)){
-				const arr = url.split('/')
-				arr[0] = rootUrl
-				v.attr('url', arr.join('/'))
-			}
+			// 给表格重新加 url 属性及绑定内容
+			_tbody.finds('tr').each( (_tr, j) =>{
+				_tr.children().each( (_td, i)=>{
+					if(_td.hasClass('x-bind-table')){
+						_td.attr('url', tdUrls[i])
+						this.getUrlData(_td,{
+							data, 
+							rootUrl,
+							callback: (rs, parent, url) =>{
+								const name = this.getUrlField(url)
+								if(isContent){
+									const p = parent[j]
+									if(p) _td.text(p[name])
+								}else{
+									_td.html(Dom.bindField(name))
+								}
+							}
+						})
+					}
+				})
+			})
 		})
-		$drag.finds('.drag').each(v=>{
-			if(v.attr('rootUrl')){
-				v.attr({rootUrl})
-			}
+		
+		// 将所有 drag 上的 roourl 设置成统一
+		$drag.finds('.drag').each( v => {
+			if( v.attr('rootUrl') ){ v.attr({rootUrl}) }
 		})
+		return $drag
 	}
 }

@@ -10,66 +10,6 @@ const addAttr = ( el, { className, style, attr } ) => {
 	// 添加属性
 	if(_.isObject(attr)){ for(let i in attr){ el.setAttribute(i, attr[i]) } }
 }
-// 创建 tbody
-const Tbody = (option, isFoot) => {
-	const opt = {
-		row:2,
-		col:2,
-		tr:{ },
-		td:{ },
-		...option
-	}
-	
-	const tbody = document.createElement( isFoot ? 'tfoot' : 'tbody' )
-	const trFragment = document.createDocumentFragment()
-	
-	if({ }.toString.call(opt.row) === '[object Array]' && { }.toString.call(opt.col) === '[object Array]'){
-		opt.row.forEach(v => {
-			const tr = document.createElement('tr')
-			const tdFragment = document.createDocumentFragment()
-			addAttr(tr,{className:opt.tr.className, style: opt.tr.style, attr: opt.tr.attr})
-			opt.col.forEach(p => {
-				const td = document.createElement('td')
-				addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr}) // 默认样式
-				addAttr(td,{style: p.style}) // 数据上的样式
-				
-				if(p.align){ td.style.textAlign = p.align }
-				
-				if(p.render){
-					td.innerHTML = p.render(v[p.field], v)
-				}else{
-					td.textContent = v[p.field]
-				}
-				tdFragment.appendChild(td)
-			})
-			tr.appendChild(tdFragment)
-			trFragment.appendChild(tr)
-		})
-	}else{
-		const row = opt.row || 0
-		const col = opt.col || 0
-		// 创建 tr
-		for(let i=0; i< row; i++){
-			const tr = document.createElement('tr')
-			const tdFragment = document.createDocumentFragment()
-			addAttr(tr,{className:opt.tr.className, style: opt.tr.style, attr: opt.tr.attr})
-			// 创建 td
-			for(let j=0; j<col; j++){
-				const td = document.createElement('td')
-				addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr})
-				// td 添加内容
-				if(opt.td.text){ td.textContent = opt.td.text }
-				
-				tdFragment.appendChild(td)
-			}
-			tr.appendChild(tdFragment)
-			trFragment.appendChild(tr)
-		}
-	}
-	tbody.appendChild(trFragment)
-	return tbody
-}
-
 /*
 const col = [
 	{ field: 'name', title:'姓名', width:100, align:'center', style:{color:'red'}, render:(text,row)=> text, sort:true },
@@ -124,12 +64,12 @@ export default {
 		
 		const table = document.createElement('table')
 		const fragment = document.createDocumentFragment()
-		fragment.appendChild( Tbody({ col:opt.col, row:opt.row, ...opt.tbody}) )
+		fragment.appendChild( this.createTbody({ col:opt.col, row:opt.row, ...opt.tbody}) )
 		table.style.cssText = 'width:100%;border-collapse:collapse;border-spacing:0'
 		
 		if(opt.colgroup){  fragment.appendChild( this.createColgroup(opt.colgroup) ) }
 		if(opt.thead){ fragment.appendChild( this.createThead({ col:opt.col, ...opt.thead}) )  }
-		if(opt.tfoot){ fragment.appendChild( Tbody({ col:2, row:2, ...opt.tfoot},true) ) }
+		if(opt.tfoot){ fragment.appendChild( this.createTbody({ col:2, row:2, ...opt.tfoot},true) ) }
 		
 		table.appendChild(fragment)
 		
@@ -141,6 +81,65 @@ export default {
 		}else{
 			return table
 		}
+	},
+	// 创建 tbody
+	createTbody(option, isFoot){
+		const opt = {
+			row:2,
+			col:2,
+			tr:{ },
+			td:{ },
+			...option
+		}
+		
+		const tbody = document.createElement( isFoot ? 'tfoot' : 'tbody' )
+		const trFragment = document.createDocumentFragment()
+		
+		if({ }.toString.call(opt.row) === '[object Array]' && { }.toString.call(opt.col) === '[object Array]'){
+			opt.row.forEach(v => {
+				const tr = document.createElement('tr')
+				const tdFragment = document.createDocumentFragment()
+				addAttr(tr,{className:opt.tr.className, style: opt.tr.style, attr: opt.tr.attr})
+				opt.col.forEach(p => {
+					const td = document.createElement('td')
+					addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr}) // 默认样式
+					addAttr(td,{style: p.style}) // 数据上的样式
+					
+					if(p.align){ td.style.textAlign = p.align }
+					
+					if(p.render){
+						td.innerHTML = p.render(v[p.field], v)
+					}else{
+						td.textContent = v[p.field]
+					}
+					tdFragment.appendChild(td)
+				})
+				tr.appendChild(tdFragment)
+				trFragment.appendChild(tr)
+			})
+		}else{
+			const row = opt.row || 0
+			const col = opt.col || 0
+			// 创建 tr
+			for(let i=0; i< row; i++){
+				const tr = document.createElement('tr')
+				const tdFragment = document.createDocumentFragment()
+				addAttr(tr,{className:opt.tr.className, style: opt.tr.style, attr: opt.tr.attr})
+				// 创建 td
+				for(let j=0; j<col; j++){
+					const td = document.createElement('td')
+					addAttr(td,{className:opt.td.className, style: opt.td.style, attr: opt.td.attr})
+					// td 添加内容
+					if(opt.td.text){ td.textContent = opt.td.text }
+					
+					tdFragment.appendChild(td)
+				}
+				tr.appendChild(tdFragment)
+				trFragment.appendChild(tr)
+			}
+		}
+		tbody.appendChild(trFragment)
+		return tbody
 	},
 	// 创建 thead
 	createThead(option){
@@ -328,8 +327,9 @@ export default {
 		const _tbody = _td.parent('tbody')
 		const trLen = _tbody.children().length()
 		const col = _tbody.find('tr').children().length()
+		
 		if(row !== trLen){
-			const tbody = Tbody({
+			const tbody = this.createTbody({
 				row,
 				col,
 				td:{
@@ -340,6 +340,27 @@ export default {
 			})
 			_tbody.html(tbody.innerHTML)
 		}
+		if(isContent){
+			if(row.lenth > 5){
+				_drag.height(20 * 5)
+			}else{
+				_drag.removeStyle('height')
+			}
+			data.forEach((v,i) => {
+				_tbody.children(i).children(index).text(v[name])
+				_tbody.children(i).children(index).attr({url})
+			})
+		}else{
+			_drag.removeStyle('height')
+			_tbody.find('tr').children(index).html(Dom.bindField(name))
+			_tbody.find('tr').children(index).attr({url})
+		}
+	},
+	// 切换数据
+	changeData(_td, _drag, data, name, url, isContent){
+		const index = _td.index()
+		const _tbody = _td.parent('tbody')
+		
 		if(isContent){
 			_drag.height(20 * 5)
 			data.forEach((v,i) => {
