@@ -24,9 +24,6 @@ export default class extends React.Component{
 	componentDidMount(){
 		this.html = this.getLocalHtml()
 		this.paper = $fn.local('paper')
-		const myHeight = $fn.local('myHeight')
-		if(myHeight) this.paper.height = myHeight
-		
 		this.setState({ paperWidth: this.paper.width })
 		this.__preview = _('#preview')
 		this.preview()
@@ -80,22 +77,31 @@ export default class extends React.Component{
 			index ++
 			__page.finds('.drag').each(v=>{
 				const type = v.attr('type')
-				if(type === 'table'){
-					if(v.find('.x-bind-table').el){
-						if(v.outerHeight() > mainHeight){
-							const _main = __page.clone()
-							const _drag = v.clone()
-							const _tbody = _drag.find('tbody').clear()
-							v.finds('tr').each((tr,i)=>{
-								const trInfo = tr.getInfo()
-								const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
-								if(offset > mainHeight){
-									_tbody.append(tr)
-								}
-							})
-							_main.clear().append(_drag)
-							deep(_main.htmls())
-						}
+				// 表格
+				if(type === 'table' && v.find('.x-bind-table').el){
+					if(v.outerHeight() > mainHeight){
+						const _main = __page.clone()
+						const _drag = v.clone()
+						const _tbody = _drag.find('tbody').clear()
+						v.finds('tr').each((tr,i)=>{
+							const trInfo = tr.getInfo()
+							const offset = trInfo.offsetTop + trInfo.offsetHeight - offsetTop 
+							if(offset > mainHeight){
+								_tbody.append(tr)
+							}
+						})
+						_main.clear().append(_drag)
+						deep(_main.htmls())
+					}
+				}else{
+					const _main = __page.clone()
+					const _drag = v.clone()
+					const dragInfo = v.getInfo()
+					const offset = dragInfo.offsetTop + dragInfo.offsetHeight - offsetTop 
+					if(offset > mainHeight){
+						_main.clear().append(_drag)
+						// console.log(_main.el)
+						// deep(_main.htmls())
 					}
 				}
 			})
