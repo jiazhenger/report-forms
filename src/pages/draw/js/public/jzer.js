@@ -12,7 +12,7 @@ $.listener = function(el,callback){
 	if(el){
 		return callback(el)
 	}else{
-		console.log('选择器不存在')
+		// console.log('选择器不存在')
 		return Init.prototype
 	}
 }
@@ -447,6 +447,15 @@ const parentExtend = {
 		return $.listener(this.el, el => {
 			return el.hasChildNodes()
 		})
+	},
+	isSame(elem){
+		return $.listener(this.el, el => {
+			if($.isNode(elem)){
+				return el.isEqualNode(elem)
+			}else if($.isInit(elem) && elem.el){
+				return el.isEqualNode(elem.el)
+			}
+		})
 	}
 }
 // 设置值
@@ -593,6 +602,16 @@ const appendExtend = {
 				el.appendChild(elem)
 			}else if($.isInit(elem) && elem.el){
 				el.appendChild(elem.el)
+			}
+			return this
+		})
+	},
+	before(elem){
+		return $.listener(this.el, el => {
+			if($.isNode(elem)){
+				el.parentElement.insertBefore(elem,el)
+			}else if($.isInit(elem) && elem.el){
+				el.parentElement.insertBefore(elem.el,el)
 			}
 			return this
 		})

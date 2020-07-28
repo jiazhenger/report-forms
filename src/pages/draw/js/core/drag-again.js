@@ -86,7 +86,7 @@ export default {
 				// 清除 mark
 				Dom.clearMark(_node)
 				// 添加移动样式
-				_node.addClass('drag-move').removeClass('no-border')
+				_node.addClass('drag-move')
 			}
 		}
 		// 开始拖动
@@ -103,7 +103,7 @@ export default {
 			// 如果被锁定，不允许拖动
 			if(_drag.hasClass('lock')){ return }
 			// 如果 mark 存在，不允许拖动
-			if( !_drag.children('.point-mark').hasClass('mark-show')){ return }
+			if( _drag.children('.point-mark').style('display') === 'none'){ return }
 			// 获取拖动尺寸的元素
 			const name = target.className
 			if( name.indexOf('dir') >= 0 ){
@@ -154,7 +154,7 @@ export default {
 			if(_this._node){
 				const _node = _this._node
 				_node.style('zIndex', 1)
-				const { left, top } = _node.getPos()
+				const { left, top, offsetTop } = _node.getInfo()
 				// const { left, top, width, height } = _drag.getInfo()
 				// 相对定位处理
 				if(_node.style('position') === 'relative'){
@@ -167,6 +167,25 @@ export default {
 						const lastLeft = (parentWidth - childWidth)/2
 						const ax = lastLeft % axesSpace
 						_node.left(lastLeft - ax).width(childWidth - (ax ? 10 : 0))
+					}
+					if(_node.hasClass('drag-move')){
+						const list =  _node.parent().children()
+						const len = list.length()
+						list.each((v,i)=>{
+							if(!_node.isSame(v) && v.style('position') === 'relative'){
+								const  info = v.getInfo()
+								const small = offsetTop > info.offsetTop
+								const big = offsetTop < info.offsetBottom
+								const condition =  i === len - 1 ? small : (small && big)
+								if(condition){
+									if(top < 0){
+										v.before(_node)
+									}else if( top > 0){
+										_node.before(v)
+									}
+								}
+							}
+						})
 					}
 				}else{
 					if(_node.attr('type') === 'devider'){
@@ -299,6 +318,8 @@ export default {
 			}
 			// 清除目标框
 			__drag.find('.drag-add').removeClass('drag-add')
+			__drag.find('.drag-move').removeClass('drag-move')
+			// Dom.resetBorder(__drag)
 			// 清除标线
 			__axes.finds('i').each(v=>{
 				v.background(axesColor)

@@ -43,7 +43,9 @@ export default {
 		}
 		__drag.finds('.loopNode').removeClass('activeLoop')
 		__drag.finds('.hide').removeClass('hide')
+		__drag.finds('.drag-current').removeClass('drag-current')
 		__drag.parent().find('.border-parent').removeClass('border-parent')
+		__drag.find('.drag-add').removeClass('drag-add')
 	},
 	// 隐藏 mark
 	hideMark(__drag, _node){
@@ -58,7 +60,7 @@ export default {
 			this.hideMark(__drag, _drag)
 			if(!_drag.attr('id')){ 
 				this.createPointMark(_drag)
-				_drag.addClass('no-border').style('zIndex',10).children('.point-mark').addClass('mark-show')
+				_drag.addClass('drag-current').children('.point-mark').addClass('mark-show')
 				if(_drag.style('position') === 'relative'){
 					_drag.addClass('darg-rel')
 				}else{
