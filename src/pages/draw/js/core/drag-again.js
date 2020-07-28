@@ -226,7 +226,7 @@ export default {
 				
 				let _temp = _drag.find('.template')
 				
-				if(type === 'table' || type === 'ul' || type === 'text'){
+				if(type === 'table' || type === 'ul' || type === 'text' || type === 'pages'){
 					_drag.addClass('hide')
 				}
 				
@@ -238,7 +238,7 @@ export default {
 					}
 				}
 				
-				if(type === 'text'){
+				if(type === 'text' || type === 'pages'){
 					if(_drag.attr('mergeTable')){ return }
 					_temp.contentEditable(true).focus().once('blur', function(e){
 						_(this).removeAttr('contentEditable')
