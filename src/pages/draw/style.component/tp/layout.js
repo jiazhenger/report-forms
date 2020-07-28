@@ -23,15 +23,17 @@ export default ({ _node }) => {
 	const onChange = React.useCallback( (name, def) => {
 		Dom.getNodeInfo(_node).then(( { _temp } ) => {
 			const { key, value } = _.getKeyValue(name)
-			_temp.style({
-				[key]: value === '' ?  (def ? def : 0) : (isNaN(parseInt(value)) ? value : value + 'px')
-			})
+			if(value){
+				_temp.style([key], value)
+			}else{
+				_temp.removeStyle(key)
+			}
 		})
 	}, [ _node ])
 	return (
 		<>
 			<div className='fx'>
-				<List.Input ref={backgroundColor} label='背景色' name='backgroundColor' onChange={v=>onChange(v,'transparent')} isHalf />
+				<List.Input ref={backgroundColor} label='背景色' name='backgroundColor' onChange={onChange} isHalf />
 				<List.Input ref={opacity} label='透明度' name='opacity' onChange={onChange} isHalf />
 			</div>
 			<Padding _node={_node} />
