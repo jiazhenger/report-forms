@@ -6,7 +6,7 @@ const { $fn } = window
 export default {
 	// 默认执行
 	init(_this){
-		const {  __scroll, __control, __drag } = _this
+		const {  __scroll, __control, __drag, __axes } = _this
 		let startX = 0
 		let startY = 0
 		let startOffsetX = 0
@@ -297,9 +297,10 @@ export default {
 				// 重置布局元素的边框
 				Dom.resetBorder(__drag)
 			}
-			
+			// 清除目标框
+			__drag.find('.drag-add').removeClass('drag-add')
 			// 清除标线
-			_(_this.$axes).finds('i').each(v=>{
+			__axes.finds('i').each(v=>{
 				v.background(axesColor)
 			})
 			__drag.unbind('mousemove',DragMove).unbind('mousemove',DragSizeMove)

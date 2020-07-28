@@ -72,6 +72,17 @@ export default {
 					let top = y - (dragInfo.offsetTop - scrollInfo.scrollTop ) - differ
 					Dom.setMark(_this,'.axesY', left)
 					Dom.setMark(_this,'.axesX', top)
+					// 显示要添加元素的目标框
+					if(_this.prevNode){
+						const prevInfo = _this.prevNode.getInfo()
+						const isX = x - differ >= prevInfo.offsetLeft && x <= prevInfo.offsetRight
+						const isY = y - differ >= prevInfo.offsetTop && y <= prevInfo.offsetBottom
+						if( isX && isY ){
+							_this.prevNode.addClass('drag-add')
+						}else{
+							_this.prevNode.removeClass('drag-add')
+						}
+					}
 				},
 				onFail:()=>{
 					

@@ -29,9 +29,8 @@ export default ({ _node }) => {
 	const borderRadius = React.useRef()
 	
 	React.useEffect(()=>{
-		Dom.getNodeInfo(_node, false).then(({ _temp, _drag })=>{
-			const $temp = _temp.el ? _temp : _drag
-			const style = $temp.getStyle(true)
+		Dom.getNodeInfo(_node, false).then(({ _temp })=>{
+			const style = _temp.getStyle(true)
 			if(!_.isString(style.borderWidth) || !borderWidthRef.current) return;
 			const borderWidth = style.borderWidth.replace(/0px/g,'').trim()
 			const borderStyle = style.borderStyle.replace(/none/g,'').trim()
@@ -63,19 +62,18 @@ export default ({ _node }) => {
 	// 选择粗细
 	const onChange = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(({ _temp, _drag }) => {
-			const $temp = _temp.el ? _temp : _drag
 			const width = borderWidthRef.current.getValue()
 			const style = borderStyleRef.current.getValue()
 			const color = borderColorRef.current.getValue() || '#000'
 			const border = borderSideRef.current.getValue()
 			
 			if(border === 'border'){
-				$temp.style('border', width + 'px ' +   style + ' ' + color)
+				_temp.style('border', width + 'px ' +   style + ' ' + color)
 			}else if(border === 'none'){
-				$temp.removeStyle('border')
+				_temp.removeStyle('border')
 			}else{
-				$temp.removeStyle('border')
-				$temp.style({
+				_temp.removeStyle('border')
+				_temp.style({
 					[border+'Width']: width + 'px',
 					[border+'Style']: style,
 					[border+'Color']: color
@@ -85,9 +83,8 @@ export default ({ _node }) => {
 	}, [ _node ])
 	
 	const onRaiuus = React.useCallback(v => {
-		Dom.getNodeInfo(_node).then(({ _temp, _drag }) => {
-			const $temp = _temp.el ? _temp : _drag
-			$temp.style('borderRadius', isNaN(v) ? v : (v+'px'))
+		Dom.getNodeInfo(_node).then(({ _temp }) => {
+			_temp.style('borderRadius', isNaN(v) ? v : (v+'px'))
 		})
 	}, [ _node ])
 	

@@ -29,6 +29,11 @@ export default class extends React.Component{
 		this.preview()
 		_(document.body).unonce('mouseup')
 	}
+	// 获取本地 html
+	getLocalHtml(){ 
+		const html = $fn.local('html')
+		return html ? html : `<div class='tc g9 pt30'>暂无内容</div>`
+	}
 	// 预览内容
 	preview(){
 		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml()
@@ -67,21 +72,19 @@ export default class extends React.Component{
 			if(footerHtml !== ''){
 				_.toNode(footerHtml).children(0).appendTo(node)
 			}
-			_node.attr('page',index+1)
+			
 			this.__preview.append(node)
 			
 			const __page = __main.el ? __main : _node
 			
 			const { offsetTop } = __page.getOffset()
 			index ++
-			const wraperNode = document.createElement('div')
-			const _wraperNode = _(wraperNode)
+			const _cloneMain = __page.clone().clear()
 			__page.finds('.drag').each(v=>{
 				const type = v.attr('type')
 				const marginTop = v.marginTop()
 				// 表格
 				if(type === 'table' && v.find('.x-bind-table').el && v.outerHeight() + marginTop > mainHeight){
-					const _main = __page.clone()
 					const _drag = v.clone()
 					const _tbody = _drag.find('tbody').clear()
 					v.finds('tr').each((tr,i)=>{
@@ -91,25 +94,26 @@ export default class extends React.Component{
 							_tbody.append(tr)
 						}
 					})
-					_main.clear().append(_drag)
-					deep(_main.htmls())
+					_cloneMain.clear().append(_drag)
+					deep(_cloneMain.htmls())
 				}else{
 					const dragInfo = v.getInfo()
 					const offset = dragInfo.offsetTop + dragInfo.offsetHeight - offsetTop 
 					if(offset > mainHeight + marginTop){ 
-						_wraperNode.append(v)
+						_cloneMain.append(v)
 					}
 				}
 			})
-			if(_wraperNode.children().length() > 0){
-				_wraperNode.children(0).removeStyle('marginTop')
-				deep(_wraperNode.html())
+			
+			if(_cloneMain.children().length() > 0){
+				_cloneMain.children(0).removeStyle('marginTop')
+				deep(_cloneMain.htmls())
 			}
+			
+			_(document).finds('.pageNumber').each( v => v.text(v.parent('.paper-page').index() + 1))
+			_(document).finds('.totalPages').each( v => v.text(this.__preview.children().length()))
 		}
 		deep(mainHtml)
-		
-		const pageTotal = this.__preview.children().length()
-		this.__preview.attr('total', pageTotal)
 	}
 	// 获取数据
 	getData(_node){
@@ -121,8 +125,6 @@ export default class extends React.Component{
 		Format.renderData(rootData.dataSource1, 'dataSource1' , _node, true)
 		return _node.html()
 	}
-	// 获取本地 html
-	getLocalHtml(){ return $fn.local('html') }
 	// 最终输出
 	getLastHtml(isPdf){
 		let _node = _.toNode(this.getLocalHtml())
@@ -330,8 +332,8 @@ export default class extends React.Component{
 						</ul>
 					</div>
 				</header>
-				<div className='ex rel'>
-					<div className='abs_full scroll fxc f12 lh20'  style={{padding:'5px'}}>
+				<div className='ex rel' style={{margin:'5px'}}>
+					<div className='abs_full scroll fxc f12 lh20'>
 						<div id='preview'></div>
 					</div>
 				</div>

@@ -37,10 +37,9 @@ export default {
 		const _mark = __drag.find('.mark-show').removeClass('mark-show')
 		if(_mark.el){
 			const _drag = _mark.style('zIndex',0).parent().style('zIndex',1)
-			_drag.removeClass('drag-move,no-border')
+			_drag.removeClass('drag-move')
 		}else{
 			__drag.find('.drag-move').removeClass('drag-move')
-			__drag.find('.no-border').removeClass('no-border')
 		}
 		__drag.finds('.loopNode').removeClass('activeLoop')
 		__drag.finds('.hide').removeClass('hide')
@@ -105,7 +104,8 @@ export default {
 			if(_node){
 				let model = {}
 				const _drag = _node.parents('.drag')
-				const _temp = _node.hasClass('loopNode') ? _node : _node.children('.template')
+				let _temp = _node.hasClass('loopNode') ? _node : _node.children('.template')
+				_temp = _temp.el ? _temp : _drag
 				const url = _temp.attr('url')
 				const type = _node.attr('type')
 				const dragType = _drag.attr('type')

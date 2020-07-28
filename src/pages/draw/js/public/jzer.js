@@ -718,4 +718,4 @@ Init.prototype = {
 	...judgeExtend
 }
 
-module.exports =  $
+export default $

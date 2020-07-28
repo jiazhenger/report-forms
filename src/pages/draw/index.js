@@ -249,7 +249,7 @@ export default class extends React.Component {
 								{
 									+activeKey === 0 && (
 										<>
-											{ (type === 'text' || type === 'pages') &&  <Text node={node} _node={_node} /> }
+											{ (type === 'text' || type === 'pages') &&  <Text _node={_node} /> }
 											{ type === 'img' &&  <Image node={node} _node={_node}/> }
 											{ type === 'table' &&  <Table node={node} _node={_node}/> }
 											{ type === 'ul' &&  <List node={node} _node={_node}/> }
