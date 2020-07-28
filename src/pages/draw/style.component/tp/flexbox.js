@@ -42,10 +42,10 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			const { key, value } = _.getKeyValue(name)
 			if(key === 'flexDirection'){ _drag.style('display','flex') }
-			_drag.style([key],value)
-			if(!value){
-				
+			if(value){
 				_drag.removeStyle('display,flexDirection')
+			}else{
+				_drag.style([key],value)
 			}
 		})
 	}, [ _node ])
