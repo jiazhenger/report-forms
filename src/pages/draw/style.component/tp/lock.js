@@ -33,8 +33,8 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
 			if(v){
 				const dragInfo = _drag.getInfo()
-				const { offsetTop } = _('#dragContent').getInfo()
-				_drag.removeClass('darg-rel').style('position','absolute').top(dragInfo.offsetTop-offsetTop)
+				const parentInfo = _drag.parent().getInfo()
+				_drag.removeClass('darg-rel').style('position','absolute').top(dragInfo.offsetTop - parentInfo.offsetTop)
 			}else{
 				_drag.addClass('darg-rel').style('position','relative').removeStyle('left,top')
 			}

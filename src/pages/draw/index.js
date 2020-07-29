@@ -1,5 +1,4 @@
 import React from 'react'
-import Async from '@com/async'
 // ===================================================================== public component
 import _ from './js/public/jzer'
 import { paperParam } from './js/public/config'
@@ -20,28 +19,28 @@ import { Tabs } from 'antd'
 // ===================================================================== layout component
 import ContentComponent from './layout.component/content'
 import DataSourceComponent from './layout.component/dataSource'
-const PaperComponent = Async(()=>import('./layout.component/paper'))
-// const DataSourceComponent = Async(()=>import('./layout.component/dataSource'))
+import PaperComponent from './layout.component/paper'
+// ===================================================================== global
+const { $fn, $async } = window
 // ===================================================================== style component
-const Text  =  Async(()=>import('./style.component/text'))
-const Image  =  Async(()=>import('./style.component/image'))
-const Table = Async(()=>import('./style.component/table'))
-const List = Async(()=>import('./style.component/list'))
-const Devider = Async(()=>import('./style.component/devider'))
-const Checkbox = Async(()=>import('./style.component/checkbox'))
-const Barcode = Async(()=>import('./style.component/barcode'))
-const Qrcode = Async(()=>import('./style.component/qrcode'))
-const Header = Async(()=>import('./style.component/header'))
-const Main = Async(()=>import('./style.component/main'))
-const Footer = Async(()=>import('./style.component/footer'))
-const Flexbox = Async(()=>import('./style.component/flexbox'))
+const Text  =  $async(()=>import('./style.component/text'))
+const Image  =  $async(()=>import('./style.component/image'))
+const Table = $async(()=>import('./style.component/table'))
+const List = $async(()=>import('./style.component/list'))
+const Devider = $async(()=>import('./style.component/devider'))
+const Checkbox = $async(()=>import('./style.component/checkbox'))
+const Barcode = $async(()=>import('./style.component/barcode'))
+const Qrcode = $async(()=>import('./style.component/qrcode'))
+const Header = $async(()=>import('./style.component/header'))
+const Main = $async(()=>import('./style.component/main'))
+const Footer = $async(()=>import('./style.component/footer'))
+const Flexbox = $async(()=>import('./style.component/flexbox'))
 // const Tabs = ()=>import('@antd/tabs')
 // ===================================================================== declare
 const { TabPane } = Tabs
 // const { $fn } = window
 const rightWidth = '350px'
 const leftWidth = '200px'
-const { $fn } = window
 let clear
 // ===================================================================== template
 const IconButton = ({ label, id, hasNode, onClick}) => (
@@ -244,7 +243,7 @@ export default class extends React.Component {
 					</section>
 					{/*  控制面版 */}
 					<div className='bcf nosel' style={{width:rightWidth}} id='control' key={refreshKey}>
-						<Tabs defaultActiveKey={activeKey} onChange={this.onTabChange}>
+						<Tabs defaultActiveKey={activeKey.toString()} onChange={this.onTabChange}>
 							<TabPane tab='样式' key={0}>
 								{
 									+activeKey === 0 && (

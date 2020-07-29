@@ -101,7 +101,7 @@ export default {
 			// 为最外层元素，不允许拖动
 			if(_drag.attr('id')) return;
 			// 如果被锁定，不允许拖动
-			if(_drag.hasClass('lock')){ return }
+			if(_drag.parents('.lock').el){ return }
 			// 如果 mark 存在，不允许拖动
 			if( _drag.children('.point-mark').style('display') === 'none'){ return }
 			// 获取拖动尺寸的元素
@@ -319,6 +319,9 @@ export default {
 			// 清除目标框
 			__drag.find('.drag-add').removeClass('drag-add')
 			__drag.find('.drag-move').removeClass('drag-move')
+			__drag.find('.drag-current').removeClass('drag-current')
+			__drag.find('.border-parent').removeClass('drag-parent')
+			
 			// Dom.resetBorder(__drag)
 			// 清除标线
 			__axes.finds('i').each(v=>{

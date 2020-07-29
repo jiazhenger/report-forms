@@ -71,6 +71,8 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(({ _drag })=>{
 			if(v){
 				_drag.removeStyle('height')
+			}else{
+				_drag.style('height','100%')
 			}
 		})
 	}, [ _node ])

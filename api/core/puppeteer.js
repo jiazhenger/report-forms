@@ -40,6 +40,7 @@ module.exports = {
 			table{border:0;width:100%;border-collapse:collapse;border-spacing:0;font-size:inherit}
 			.fxmc{display:flex;align-items: center;justify-content: center}
 			.wraper{width:100%;margin:${sol.margin};}
+			th{text-align:inherit}
 			.header,.footer { 
 				transform: scale(0.75); 
 			    transform-origin: top left;
@@ -58,9 +59,9 @@ module.exports = {
 		const headerStyle = `<style>${style}</style>`
 		const displayHeaderFooter = (header || footer ) ? true : false
 		const top = headerHeight ? (headerHeight + headerHeight*0.2) : 0
-		const bottom = footerHeight ? (footerHeight + footerHeight*0.6) : 15
+		const bottom = footerHeight ? (footerHeight + footerHeight*0.37) : 15
 		const headerTemplate = header ? `${headerStyle}<div class='wraper'>${header}</div>` : ''
-		const footerTemplate = footer ? `${headerStyle}<div class='wraper' style='position:relative;top:${footerHeight*0.28}px'>${footer}</div>` : ''
+		const footerTemplate = footer ? `${headerStyle}<div class='wraper' style='position:relative;top:${footerHeight*0.43}px'>${footer}</div>` : ''
 		
 		await page.pdf({
 			format: sol.format,

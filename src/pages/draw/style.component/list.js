@@ -1,15 +1,16 @@
 import React from 'react'
-import Async from '@com/async'
 // ===================================================================== antd
 import { Collapse } from 'antd'
-// ===================================================================== template
-const UL  =  Async(()=>import('./tp/ul'))
-const Position  =  Async(()=>import('./tp/position'))
-const Layout  =  Async(()=>import('./tp/layout'))
-const Font  =  Async(()=>import('./tp/font'))
-const Lock  =  Async(()=>import('./tp/lock'))
-const Flex  =  Async(()=>import('./tp/flex'))
-const Border  =  Async(()=>import('./tp/border'))
+// ===================================================================== global
+const { $async } = window
+// ===================================================================== style component
+const UL  =  $async(()=>import('./tp/ul'))
+const Position  =  $async(()=>import('./tp/position'))
+const Layout  =  $async(()=>import('./tp/layout'))
+const Font  =  $async(()=>import('./tp/font'))
+const Lock  =  $async(()=>import('./tp/lock'))
+const Flex  =  $async(()=>import('./tp/flex'))
+const Border  =  $async(()=>import('./tp/border'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component

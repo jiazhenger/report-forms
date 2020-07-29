@@ -7,9 +7,6 @@ const formatNumber = function(n) {
 const join = function(arr,split){
 	return arr.map(formatNumber).join(split)
 }
-const getTime = function(time){
-
-}
 export default {
 	full: function(time){
 		var date = new Date(time);
@@ -27,12 +24,14 @@ export default {
 		var str = null
         var date = null
         if($fn.isString(time)){
-            date = new Date(time).getTime()
+            date = this.getTime(time)
+        }else if(time instanceof Date){
+            date = time.getTime()
         }else{
-            date = time
-        }
+			date = time
+		}
 
-		if(!isNaN(parseInt(date))){
+		if(date){
 			var t = this.full(date);
 			switch(opt.t){
 				case 'full':

@@ -1,5 +1,4 @@
 import React from 'react'
-import Async from '@com/async'
 // ===================================================================== public js
 import Table from '../js/public/table'
 import Dom from '../js/public/dom'
@@ -14,10 +13,10 @@ import Confirm from '@antd/confirm'
 import List from '../public.component/list'
 // ===================================================================== declare
 const { Panel } = Collapse
-const Button  =  Async(()=>import('@antd/button'))
-const Tree  =  Async(()=>import('../public.component/tree'))
-const Data  =  Async(()=>import('../style.component/tp/data'))
-const { $fn } = window
+const { $fn, $http, $async } = window
+const Button  =  $async(()=>import('@antd/button'))
+const Tree  =  $async(()=>import('../public.component/tree'))
+const Data  =  $async(()=>import('../style.component/tp/data'))
 // ===================================================================== page component
 const model = { name:'dataSource1', url:'' }
 export default class extends React.Component {
@@ -40,7 +39,14 @@ export default class extends React.Component {
 			var reader = new FileReader()
 			reader.readAsText(file)
 			reader.onload = () => {
-				this.newData = JSON.parse(reader.result)
+				try{
+					this.newData = JSON.parse(reader.result)
+				}catch(e){
+					this.newData = null
+					$fn.toast('不是有效的 json 数据')
+					this.refs.url.clear()
+					this.refs.file.value = ''
+				}
 			}
 		}
 		// 获取文件
@@ -74,9 +80,7 @@ export default class extends React.Component {
 				const data = $fn.local('dataSource')
 				const { name } = this.state.model
 				
-				if(data.hasOwnProperty(name)){
-					return $fn.toast('数据源已存在')
-				}
+				if(data.hasOwnProperty(name)){ return $fn.toast('数据源已存在') }
 				
 				const dataSource = {...data, [name]: this.newData}
 				
@@ -88,6 +92,9 @@ export default class extends React.Component {
 				})
 			}else{
 				$fn.toast('api 接口添加数据')
+				$http.json(url).then(data=>{
+					console.log(data)
+				})
 			}
 		}else{
 			$fn.toast('请先添加数据源')

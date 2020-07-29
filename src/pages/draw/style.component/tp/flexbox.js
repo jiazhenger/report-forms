@@ -34,7 +34,9 @@ export default ({ _node }) => {
 	React.useEffect(()=>{
 		Dom.getNodeInfo(_node, false).then(( { _drag } ) => {
 			const style = _drag.getStyle(true)
-			flexDirectionRef.current.setValue( style.flexDirection )
+			if(style.display === 'flex'){
+				flexDirectionRef.current.setValue( style.flexDirection )
+			}
 		})
 	},[ _node ])
 	
@@ -43,9 +45,9 @@ export default ({ _node }) => {
 			const { key, value } = _.getKeyValue(name)
 			if(key === 'flexDirection'){ _drag.style('display','flex') }
 			if(value){
-				_drag.removeStyle('display,flexDirection')
-			}else{
 				_drag.style([key],value)
+			}else{
+				_drag.removeStyle('display,flexDirection')
 			}
 		})
 	}, [ _node ])

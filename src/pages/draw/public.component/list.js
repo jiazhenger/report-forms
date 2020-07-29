@@ -35,6 +35,7 @@ class StaticSelect extends React.Component{
 
 class StaticInput extends React.Component{
 	setValue = v => this.refs.input.setValue(v)
+	clear = v => this.refs.input.clear()
 	getValue = () => this.refs.input.state.value
 	render(){
 		const { label, value, name, onChange, disabled, readOnly, isHalf, labelWidth, size, suffix, p } = this.props

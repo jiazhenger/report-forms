@@ -240,7 +240,10 @@ export default {
 				}else if(type === 'checkbox'){
 					_node.width(20).height(20).find('img').attr('temp',1)
 				}else if(type === 'pages'){
-					_node.width(50).height(20).lineHeight(20).style('textAlign','center')
+					_node.width(50).height(20).lineHeight(20).style({
+						'textAlign':'center',
+						'whiteSpace' : 'nowrap'
+					})
 				}
 			}else{
 				_node.width(100).height(100)

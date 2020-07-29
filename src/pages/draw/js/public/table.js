@@ -309,14 +309,14 @@ export default {
 	},
 	// 设置表格边框
 	showHideBorder(_table, checked, color){
-		color = color || '#ddd'
+		color = !color || color === 'initial' ? '#ddd' : color
 		if(_table){
 			if(checked){
 				_table.finds('th').border('1px solid ' + color)
 				_table.finds('td').border('1px solid ' + color)
 			}else{
-				_table.finds('th').border(0)
-				_table.finds('td').border(0)
+				_table.finds('th').border('none')
+				_table.finds('td').border('none')
 			}
 		}
 	},
@@ -325,15 +325,18 @@ export default {
 		const row = isContent ? data.length : 1
 		const index = _td.index()
 		const _tbody = _td.parent('tbody')
+		const _table = _tbody.parent()
 		const trLen = _tbody.children().length()
 		const col = _tbody.find('tr').children().length()
 		
 		if(row !== trLen){
+			const style = tableConfig.style
+			if(+_table.attr('border') === 0){ delete style.border }
 			const tbody = this.createTbody({
 				row,
 				col,
 				td:{
-					style:tableConfig.style,
+					style,
 					className:'loopNode x-bind-table',
 					attr:{ type:'text' }
 				}

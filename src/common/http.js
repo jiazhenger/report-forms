@@ -347,4 +347,20 @@ const paging = (_this,api,option)=>{
 		})
 	})
 }*/
-export default { submit, pull }
+const json = (url,option)=>{
+	$fn.loading(true)
+	return new Promise((resolve, reject) => {
+		axios.get(url).then(res => {
+			let data = res.data
+			if(data){
+				resolve(data);
+			} else {
+				reject(data);
+			}
+			$fn.loading(false)
+		},error=>{
+			$fn.loading(false)
+		})
+	})
+}
+export default { submit, pull, json }

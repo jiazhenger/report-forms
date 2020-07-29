@@ -23,7 +23,6 @@ export default ({ _node }) => {
 	const [ col, setCol] = React.useState(3)
 	const [ row, setRow] = React.useState(1)
 	const [ checked, setChecked] = React.useState(true)
-	const [ border ] = React.useState(true)
 	
 	const rowRef = React.useRef()
 	const colRef = React.useRef()
@@ -31,6 +30,7 @@ export default ({ _node }) => {
 	const frameRef = React.useRef()
 	const borderRef = React.useRef()
 	const checkedRef = React.useRef()
+	const hasBorderRef = React.useRef()
 	
 	React.useEffect(()=>{
 		if(_node){
@@ -38,13 +38,13 @@ export default ({ _node }) => {
 			if(_table.el){
 				const $tbody = _table.find('tbody')
 				if($tbody.children().length() > 0){
-					const $tr = $tbody.find('tr')
+					const _tr = $tbody.find('tr')
 					const trLen = $tbody.finds('tr').length()
-					const tdLen = $tr.finds('td').length()
-					const $td = $tr.find('td')
-					let color = $td.style('borderColor')
+					const tdLen = _tr.finds('td').length()
+					const _td = _tr.find('td')
+					let color = _td.style('borderColor')
 					if(!color){
-						color = $td.style('borderBottomColor')
+						color = _td.style('borderBottomColor')
 					}
 								
 					const hasHead = Boolean(_table.find('thead').el)
@@ -54,11 +54,14 @@ export default ({ _node }) => {
 					frameRef.current.setValue(_table.attr('xframe'))
 					borderRef.current.setValue(_table.attr('xborder'))
 					checkedRef.current.setValue(hasHead)
+					hasBorderRef.current.setValue(_td.style('border') !== 'none')
 					
 					setRow(trLen)
 					setCol(tdLen)
 					setChecked(hasHead)
 				}
+			}else{
+				hasBorderRef.current.setValue(true)
 			}
 		}
 	},[ _node ])
@@ -90,6 +93,7 @@ export default ({ _node }) => {
 	const onBorderChange = React.useCallback(v=>{
 		Dom.getNodeInfo(_node).then(({ _drag } ) => {
 			const _table = _drag.find('table')
+			_table.attr('border', v?1:0)
 			Table.showHideBorder(_table, v, colorRef.current.getValue())
 		})
 	}, [ _node ])
@@ -133,6 +137,9 @@ export default ({ _node }) => {
 		Dom.getNodeInfo(_node).then(({ _drag, _temp })=>{
 			_drag.removeStyle('height')
 			const style = tableConfig.style
+			const hasBorder = hasBorderRef.current.getValue()
+			
+			if(!hasBorder){ delete style.border }
 			const table = Table.create({
 				row,
 				col,
@@ -155,10 +162,12 @@ export default ({ _node }) => {
 				}
 			})
 			// last
-			_temp.html('').append(table)
-			Table.showHideBorder(_(table), border, colorRef.current.getValue())
+			const _table = _(table)
+			_table.attr('border',hasBorder?1:0)
+			_temp.html('').append(_table)
+			Table.showHideBorder(_table, hasBorder, colorRef.current.getValue())
 		})
-	}, [_node, col, row, border])
+	}, [_node, col, row])
 	// 添加行
 	const addRow = React.useCallback(v => {
 		Dom.getNodeInfo(_node).then(({ _temp } ) => {
@@ -235,7 +244,7 @@ export default ({ _node }) => {
 			</div>
 			<div className='fx'>
 				<List.Switch ref={checkedRef} label='表头' onChange={onHeadChange}/>
-				<List.Switch value={border} label='边框' onChange={onBorderChange}/>
+				<List.Switch ref={hasBorderRef} label='边框' onChange={onBorderChange}/>
 			</div>
 			<div className='fx'>
 				<List.Button label='' text='生成表格' width={65} onClick={ceateTable} />

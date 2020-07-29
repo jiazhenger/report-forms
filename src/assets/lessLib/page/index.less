@@ -29,7 +29,7 @@
 		s{.c(red);.mr(2)}
 	}
 	&.lock{
-		>.point-mark{.bor_c(#000);
+		.point-mark{.bor_c(#000);
 			p{.bc(#000)}
 		}
 	}
@@ -54,7 +54,7 @@
 	}
 	.header,.main,.footer,.flexbox{
 		// &.drag-current{outline:0;}
-		>.mark-show{.bc!important;.index(0)!important;}
+		>.point-mark{.bc!important;.index(0)!important;}
 	}
 	.header,.main,.footer{ outline: 1px dashed blue;
 		&.drag-move{ outline: 1px solid blue  }
@@ -73,7 +73,7 @@
 		}
 	}
 	.drag-add{
-		>.mark-show{.bor(@main-color)!important;
+		>.point-mark{.bor(@main-color)!important;
 			p{.dn!important;}
 		}
 	}

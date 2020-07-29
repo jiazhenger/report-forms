@@ -248,12 +248,14 @@ export default {
 					const trLen = _tbody.children().length()
 					if(_.hasArray(parent)){
 						const row = isContent ? parent.length : 1
+						const style = tableConfig.style
+						if(+_table.attr('border') === 0){ delete style.border }
 						if(row !== trLen){
 							const tbody = Table.createTbody({
 								row,
 								col,
 								td:{
-									style:tableConfig.style,
+									style,
 									className:'loopNode x-bind-table',
 									attr:{ type:'text' }
 								}

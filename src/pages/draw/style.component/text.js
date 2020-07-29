@@ -1,17 +1,18 @@
 import React from 'react'
-import Async from '@com/async'
 import Dom from '../js/public/dom'
 // ===================================================================== antd
 import { Collapse } from 'antd'
 import Position from './tp/position'
 import MergeTable from './tp/merge-table'
-// ===================================================================== template
-const Font  =  Async(()=>import('./tp/font'))
-const Layout  =  Async(()=>import('./tp/layout'))
-const Lock  =  Async(()=>import('./tp/lock'))
-const Border  =  Async(()=>import('./tp/border'))
-const Data  =  Async(()=>import('./tp/data'))
-const Flex  =  Async(()=>import('./tp/flex'))
+// ===================================================================== global
+const { $async } = window
+// ===================================================================== style component
+const Font  =  $async(()=>import('./tp/font'))
+const Layout  =  $async(()=>import('./tp/layout'))
+const Lock  =  $async(()=>import('./tp/lock'))
+const Border  =  $async(()=>import('./tp/border'))
+const Data  =  $async(()=>import('./tp/data'))
+const Flex  =  $async(()=>import('./tp/flex'))
 // ===================================================================== declare
 const { Panel } = Collapse
 // ===================================================================== page component

@@ -43,8 +43,8 @@ export default class extends React.Component{
 		const deep = html => {
 			const node = document.createElement('div')
 			const _node = _(node).addClass('paper-page bcf').style({
-				width: this.paper.width,
-				height: this.paper.height,
+				width: this.paper.width || '810px',
+				height: this.paper.height || '100%',
 				padding: '10px',
 				boxSizing: 'content-box',
 			})
@@ -94,7 +94,7 @@ export default class extends React.Component{
 							_tbody.append(tr)
 						}
 					})
-					_cloneMain.clear().append(_drag)
+					_cloneMain.append(_drag)
 					deep(_cloneMain.htmls())
 				}else{
 					const dragInfo = v.getInfo()
@@ -102,13 +102,12 @@ export default class extends React.Component{
 					if(offset > mainHeight + marginTop){ 
 						_cloneMain.append(v)
 					}
+					if(_cloneMain.children().length() > 0){
+						_cloneMain.children(0).removeStyle('marginTop')
+						deep(_cloneMain.htmls())
+					}
 				}
 			})
-			
-			if(_cloneMain.children().length() > 0){
-				_cloneMain.children(0).removeStyle('marginTop')
-				deep(_cloneMain.htmls())
-			}
 			
 			_(document).finds('.pageNumber').each( v => v.text(v.parent('.paper-page').index() + 1))
 			_(document).finds('.totalPages').each( v => v.text(this.__preview.children().length()))
@@ -162,6 +161,7 @@ export default class extends React.Component{
 			_footer.style('position','relative').removeStyle('left,top,marginTop,marginBottom')
 			footerHeight = _footer.height()
 			if(isPdf){
+				footerHeight = _footer.height() * scale
 				_footer.width(paper.width).style('transform', `scale(${scale})`)
 			}
 			footerHtml = _footer.htmls()
@@ -171,8 +171,11 @@ export default class extends React.Component{
 			_main.style('position','relative').removeStyle('height,left,top,marginTop,marginBottom')
 			mainHeight = _main.height()
 			mainHtml = _main.htmls()
+		}else{
+			if(_footer.el || _header.el){
+				mainHtml = ''
+			}
 		}
-		
 		return {
 			mainHtml,
 			headerHtml,
@@ -210,7 +213,7 @@ export default class extends React.Component{
 			</head>
 			<body>
 				<div class='container' name='${paper.name}' style='width:${width};min-height:100%;'>
-					${headerHtml}
+					${headerHtml}</header>
 					${mainHtml}
 					${footerHtml}
 				</div>
@@ -219,7 +222,7 @@ export default class extends React.Component{
 						const box = document.querySelector('.container');
 						box.style.height = document.body.scrollHeight + 'px'
 					}
-					
+					resize();
 					window.onresize = resize
 				</script>
 			</body>

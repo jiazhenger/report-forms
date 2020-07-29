@@ -4,7 +4,7 @@
 	  "method": "荧光PCR法",
 	  "result": "阴性",
 	  "tip": "提示",
-	  "range": "阴性"
+	  "range": "阴性 first first"
 	},
 	{
 	  "label": "新型冠状病毒检测（SARS-CoV-2）",
@@ -522,6 +522,6 @@
 	  "method": "荧光PCR法",
 	  "result": "阴性",
 	  "tip": "提示",
-	  "range": "阴性"
+	  "range": "阴性 last last last"
 	}
 ]
