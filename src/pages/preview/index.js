@@ -169,6 +169,12 @@ export default class extends React.Component{
 		
 		if(_main.el){
 			_main.style('position','relative').removeStyle('height,left,top,marginTop,marginBottom')
+			if(isPdf){
+				const _table = _main.children(0)
+				if(_main.children().length() === 1 && _table.find('.x-bind-table')){
+					_table.style('position','absolute')
+				}
+			}
 			mainHeight = _main.height()
 			mainHtml = _main.htmls()
 		}else{
