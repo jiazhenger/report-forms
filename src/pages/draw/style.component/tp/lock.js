@@ -1,7 +1,7 @@
 import React from 'react'
 // ===================================================================== js
 import Dom from '../../js/public/dom'
-import _ from '../../js/public/jzer'
+// import _ from '../../js/public/jzer'
 // ===================================================================== template
 import List from '../../public.component/list'
 // ===================================================================== data
@@ -20,7 +20,6 @@ export default ({ _node }) => {
 	
 	const onChange = React.useCallback( v => {
 		Dom.getNodeInfo(_node).then(( { _drag } ) => {
-			
 			if(v){
 				_drag.addClass('lock')
 			}else{

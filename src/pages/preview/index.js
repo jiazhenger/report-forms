@@ -59,11 +59,12 @@ export default class extends React.Component{
 			// 分页
 			const __main = _html.find('.main')
 			if(__main.el){
-				_html.children(0).appendTo(node).style({flex:1})
+				_html.children(0).appendTo(node).height( parseInt(this.paper.height) - headerHeight - footerHeight )
 				_node.style({
 					display: 'flex',
 					flexDirection: 'column'
 				})
+				
 			}else{
 				_html.appendTo(node).style({position:'relative'})
 				// _node.html(_main.html())
@@ -80,6 +81,7 @@ export default class extends React.Component{
 			const { offsetTop } = __page.getOffset()
 			index ++
 			const _cloneMain = __page.clone().clear()
+			
 			__page.finds('.drag').each(v=>{
 				const type = v.attr('type')
 				const marginTop = v.marginTop()
@@ -240,15 +242,16 @@ export default class extends React.Component{
 		const html = this.getLocalHtml()
 		if(!html) return $fn.toast('无内容')
 		const paper = this.paper
-		const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml(true)
-		
+		// const { mainHtml, headerHtml, footerHtml, headerHeight, footerHeight } = this.getLastHtml(true)
+		const _clone = this.__preview.clone()
+		_clone.children().removeStyle('marginTop')
 		$http.submit(null,'pdf',{ 
 			param:{
-				header: headerHtml,
-				footer: footerHtml,
-				headerHeight,
-				footerHeight,
-				main: mainHtml,
+				// header: headerHtml,
+				// footer: footerHtml,
+				// headerHeight,
+				// footerHeight,
+				main: _clone.html(),
 				format: paper.format,
 				name: paper.name,
 				source: this.getSource(paper)

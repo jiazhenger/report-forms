@@ -480,7 +480,7 @@ const valueExtend = {
 	htmls(){
 		return $.listener(this.el, el => {
 			const node = document.createElement('div')
-			node.appendChild(el)
+			node.appendChild($(el).clone().el)
 			return node.innerHTML
 		})
 	},
