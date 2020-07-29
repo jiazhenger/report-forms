@@ -33,6 +33,7 @@ module.exports = {
 			img{border:0;display:block}
 			table{border:0;width:100%;border-collapse:collapse;border-spacing:0;font-size:inherit}
 			.fxmc{display:flex;align-items: center;justify-content: center}
+			th,td{line-height:20px}
 			th{text-align:inherit}
 		`
 		await page.addStyleTag({
