@@ -101,7 +101,8 @@ export default {
 			// 为最外层元素，不允许拖动
 			if(_drag.attr('id')) return;
 			// 如果被锁定，不允许拖动
-			if(_drag.parents('.lock').el){ return }
+			// if(_drag.parents('.lock').el){ return }
+			if(_drag.hasClass('lock')){ return }
 			// 如果 mark 存在，不允许拖动
 			if( _drag.children('.point-mark').style('display') === 'none'){ return }
 			// 获取拖动尺寸的元素
@@ -132,7 +133,8 @@ export default {
 				const _drag = _( _this.dragNode )
 				const { left, top, width, height } = _drag.getInfo()
 				// const ax = _drag.attr('fixed') ? 0 : axesSpace
-				const ax = axesSpace
+				let ax = axesSpace
+				if(_drag.attr('type') === 'img'){ ax = 0 }
 				// 右侧拖宽
 				if( findSize('rc-w') || findSize('rt-wh') || findSize('rb-wh')){
 					_drag.width( width - (width%axesSpace) + (width%axesSpace>0 ? axesSpace : 0) )
@@ -168,6 +170,7 @@ export default {
 						const ax = lastLeft % axesSpace
 						_node.left(lastLeft - ax).width(childWidth - (ax ? 10 : 0))
 					}
+					/*
 					if(_node.hasClass('drag-move')){
 						const list =  _node.parent().children()
 						const len = list.length()
@@ -186,9 +189,9 @@ export default {
 								}
 							}
 						})
-					}
+					}*/
 				}else{
-					if(_node.attr('type') === 'devider'){
+					if(_node.attr('type') === 'devider' || _node.attr('type') === 'img'){
 						_node.left(left).top(top)
 					}else{
 						_node.left( left - (left % axesSpace) ).top( top - (top % axesSpace) )

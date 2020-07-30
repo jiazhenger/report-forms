@@ -76,7 +76,7 @@ export default {
 					if(_this.prevNode){
 						const prevInfo = _this.prevNode.getInfo()
 						const isX = x - differ >= prevInfo.offsetLeft && x <= prevInfo.offsetRight
-						const isY = y - differ >= prevInfo.offsetTop && y <= prevInfo.offsetBottom
+						const isY = y - differ >= prevInfo.offsetTop + scrollInfo.scrollTop && y <= prevInfo.offsetBottom  + scrollInfo.scrollTop
 						if( isX && isY ){
 							_this.prevNode.addClass('drag-add')
 						}else{
