@@ -156,8 +156,8 @@ export default {
 			if(_this._node){
 				const _node = _this._node
 				_node.style('zIndex', 1)
-				const { left, top, offsetTop } = _node.getInfo()
-				// const { left, top, width, height } = _drag.getInfo()
+				const { left, top } = _node.getInfo()
+				// const { left, top, offsetTop } = _drag.getInfo()
 				// 相对定位处理
 				if(_node.style('position') === 'relative'){
 					// _this.isRel = false
