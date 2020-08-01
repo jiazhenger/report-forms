@@ -5,6 +5,7 @@ const bodyParser = require('koa-bodyparser')
 // api
 const pdf = require('./api/pdf')
 const html = require('./api/html')
+const idcard = require('./api/idcard')
 const test = require('./api/test')
 // declare
 const app = new Koa()
@@ -24,6 +25,7 @@ app.use( views( path.join(__dirname, './views'), { extension: 'ejs' } ) )
 // 路由
 app.use(pdf.routes()).use(pdf.allowedMethods())
 app.use(html.routes()).use(html.allowedMethods())
+app.use(idcard.routes()).use(idcard.allowedMethods())
 app.use(test.routes()).use(test.allowedMethods())
 // 服务
 app.listen(port, ()=>{
