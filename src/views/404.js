@@ -2,7 +2,7 @@ import React from 'react'
 // ===================================================================== antd
 import { Result, Button } from 'antd'
 // ===================================================================== public component
-import Content from '@base/content'
+import Content from '@tp/content'
 // ===================================================================== page component
 export default ({ history }) => {
 	return (

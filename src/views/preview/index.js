@@ -1,7 +1,7 @@
 import React from 'react'
 // ===================================================================== public component
-import _ from '@pages/draw/js/public/jzer'
-import Format from '@pages/draw/js/public/format'
+import _ from '@views/draw/js/public/jzer'
+import Format from '@views/draw/js/public/format'
 // ===================================================================== antd
 
 // ===================================================================== image
