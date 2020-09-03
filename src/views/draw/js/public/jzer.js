@@ -245,7 +245,7 @@ const styleExtend = {
 // 属性
 const attrExtend = {
 	// 判断是否有某个属性
-	hasAttr(attr): function{
+	hasAttr: function(attr){
 		return $.listener(this.el, el => {
 			return el.hasAttribute(attr)
 		})
