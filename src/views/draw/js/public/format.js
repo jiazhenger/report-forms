@@ -193,7 +193,7 @@ export default {
 			const parentData = this.parse({ [rootUrl]: data }, this.getParentUrl(url) )
 			const currentData = this.parse({ [rootUrl]: data }, url )
 			if( _.hasArray(parentData) || _.hasObject(parentData)){
-				opt.callback && opt.callback(currentData,parentData, url)
+				opt.callback && opt.callback(currentData, parentData, url)
 			}else{
 				
 			}
